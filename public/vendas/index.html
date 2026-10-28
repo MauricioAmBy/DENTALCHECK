@@ -249,6 +249,11 @@ section{padding:96px 0}
 .plano li::before{content:"✓";color:var(--teal);font-weight:800}
 .plano .btn{width:100%}
 .extra{margin-top:26px;font-size:14px;color:var(--muted)}
+.garantia{display:flex;gap:22px;align-items:center;text-align:left;max-width:760px;margin:30px auto 0;padding:22px 26px;border-radius:24px;background:var(--mint);border:1px solid rgba(11,158,150,.3)}
+.garantia h3{font-size:19px}.garantia p{color:var(--muted);font-size:15px;margin-top:4px}
+.selo-g{flex:none;width:86px;height:86px;border-radius:50%;background:var(--teal);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 0 0 6px rgba(11,158,150,.18);line-height:1}
+.selo-g b{font-size:34px;font-weight:800}.selo-g span{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+@media (max-width:560px){.garantia{flex-direction:column;text-align:center;padding:20px}}
 .extra b{color:var(--navy)}
 .plano li b{color:var(--navy)}
 .reservado{display:inline-block;margin-top:14px;font-size:12px;color:var(--muted);background:var(--sky);border:1px dashed var(--line2);padding:6px 12px;border-radius:10px}
@@ -303,7 +308,7 @@ footer p{max-width:560px}
       <h1>O paciente vê o <span class="destaque">novo sorriso</span> antes de dizer sim.</h1>
       <p class="sub">Tire a foto, marque os dentes e escolha o procedimento. Em segundos a IA mostra o resultado na foto do próprio paciente, e a apresentação com a sua marca fica pronta para enviar.</p>
       <div class="acoes"><a class="btn pri" href="#planos">Quero o DENTALCHECK</a><a class="btn sec" href="#como-funciona">Ver como funciona</a></div>
-      <div class="selos"><span><i>✓</i>Lentes, clareamento e implantes</span><span><i>✓</i>Só os dentes escolhidos mudam</span><span><i>✓</i>Funciona no celular</span></div>
+      <div class="selos"><span><i>✓</i>Lentes, clareamento e implantes</span><span><i>✓</i>Só os dentes escolhidos mudam</span><span><i>✓</i>Garantia de 7 dias</span></div>
     </div>
     <div class="comparador revela">
       <div class="comp" id="compHero">
@@ -490,6 +495,10 @@ footer p{max-width:560px}
       <div class="alterna" id="periodo"><button class="on" data-p="mensal">Mensal</button><button data-p="anual">Anual <small id="descontoAnual"></small></button></div>
     </div>
     <div class="planos" id="planosLista"></div>
+    <div class="garantia revela">
+      <div class="selo-g"><b>7</b><span>dias</span></div>
+      <div><h3>Garantia incondicional de 7 dias</h3><p>Assine, use com os seus pacientes e, se não for para você, peça o reembolso em até 7 dias. Devolvemos 100% do valor, sem perguntas.</p></div>
+    </div>
   </div>
 </section>
 
@@ -499,6 +508,7 @@ footer p{max-width:560px}
     <div class="centro revela"><div class="kick">Dúvidas</div><h2>Perguntas frequentes</h2></div>
     <div class="faq">
       <details class="revela"><summary>A simulação é igual ao resultado final do tratamento?</summary><p>Não. A simulação é ilustrativa e serve para o paciente visualizar o planejamento. O resultado real depende da avaliação clínica e da execução do tratamento.</p></details>
+      <details class="revela"><summary>E se eu não gostar? Tem garantia?</summary><p>Sim. As assinaturas têm garantia incondicional de 7 dias: se não for para você, peça o reembolso nesse prazo e devolvemos 100% do valor. O acesso é encerrado após o reembolso. O pacote extra de simulações não tem garantia, porque as simulações são consumidas na hora.</p></details>
       <details class="revela"><summary>Preciso instalar algum programa?</summary><p>Não. O DENTALCHECK abre no navegador do celular, tablet ou computador. Se quiser, adicione à tela inicial para usar como aplicativo.</p></details>
       <details class="revela"><summary>Quanto tempo leva para gerar uma simulação?</summary><p>Em média cerca de 10 segundos, dependendo da conexão.</p></details>
       <details class="revela"><summary>A IA pode mudar dentes que eu não escolhi?</summary><p>O app numera os dentes na foto e aplica o resultado só nos dentes marcados. Os demais dentes, lábios e rosto continuam iguais à foto original.</p></details>
