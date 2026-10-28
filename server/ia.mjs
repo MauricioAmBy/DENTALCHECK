@@ -1,6 +1,7 @@
 /* DENTALCHECK — chamadas à IA (Google Gemini), usadas pelo servidor local e pelas funções da Vercel.
    Cada rota recebe o corpo JSON já lido e devolve { status, corpo }. A chave da API fica só no servidor. */
 import { montarPrompt } from "./prompt-sorriso.mjs";
+import { contasConfiguradas, configPublica, exigirConta, consumirSimulacao, devolverSimulacao, resumoConta, acaoConta, ErroConta } from "./conta.mjs";
 
 const lista = (v, padrao) => (v || padrao).split(",").map(s => s.trim()).filter(Boolean);
 const MODELOS = () => lista(process.env.GEMINI_MODELO, "gemini-3.1-flash-image,gemini-2.5-flash-image");
@@ -187,15 +188,55 @@ async function acesso(corpo) {
   return corpo && corpo.senha === process.env.ACESSO_SENHA ? ok({ ok: true }) : ok({ ok: false, erro: "Senha de acesso incorreta." }, 401);
 }
 
-/* tabela de rotas: /api/<nome> */
-export const ROTAS = { simular, localizar, "analisar-foto": analisarFoto, dentes: detectarDentes, acesso };
+/* publico → endereço e chave pública do login (o navegador precisa para entrar) */
+async function publico() {
+  return ok({ ok: true, contas: contasConfiguradas(), ...(contasConfiguradas() ? { supabase: configPublica() } : {}) });
+}
 
-/* ponto único de entrada: confere senha e configuração, chama a rota e trata erros */
-export async function atender(nome, corpo, senha) {
+/* tabela de rotas: /api/<nome> */
+export const ROTAS = { simular, localizar, "analisar-foto": analisarFoto, dentes: detectarDentes, acesso, publico };
+const SEM_LOGIN = new Set(["acesso", "publico"]);
+const USA_IA = new Set(["simular", "localizar", "analisar-foto", "dentes"]);
+
+/* ponto único de entrada.
+   - Com contas configuradas (Supabase): exige login + assinatura ativa + aparelho dentro do limite;
+     a simulação desconta 1 do mês e é devolvida se a IA falhar.
+   - Sem contas (computador local / testes): vale a senha de acesso antiga (ACESSO_SENHA), se existir.
+   cab = { senha, token, aparelho, descricao } vindos dos cabeçalhos da requisição */
+export async function atender(nome, corpo, cab = {}) {
+  if (nome === "conta" || nome === "conta-acao") return atenderConta(nome, corpo, cab);
   const rota = ROTAS[nome];
   if (!rota) return ok({ ok: false, erro: "Rota não existe." }, 404);
-  if (nome !== "acesso" && !acessoLiberado(senha)) return ok({ ok: false, erro: "Acesso não autorizado. Entre de novo com a senha.", semAcesso: true }, 401);
-  if (nome !== "acesso" && !process.env.GEMINI_API_KEY) return ok({ ok: false, erro: "A IA não está configurada no servidor." }, 500);
-  try { return await rota(corpo || {}); }
-  catch (e) { console.error(e); return ok({ ok: false, erro: "Erro interno." }, 500); }
+  try {
+    let conta = null;
+    if (!SEM_LOGIN.has(nome)) {
+      if (contasConfiguradas()) conta = await exigirConta(cab.token, cab.aparelho, cab.descricao);
+      else if (!acessoLiberado(cab.senha)) return ok({ ok: false, erro: "Acesso não autorizado. Entre de novo com a senha.", semAcesso: true }, 401);
+    }
+    if (USA_IA.has(nome) && !process.env.GEMINI_API_KEY) return ok({ ok: false, erro: "A IA não está configurada no servidor." }, 500);
+    let usado = null;
+    if (nome === "simular" && conta) usado = await consumirSimulacao(conta);
+    const r = await rota(corpo || {});
+    if (usado !== null) {
+      if (r.status !== 200) await devolverSimulacao(conta);   // a IA falhou: a simulação não conta
+      else r.corpo.uso = { simulacoes: usado, limite: conta.plano.simulacoes };
+    }
+    return r;
+  } catch (e) {
+    if (e instanceof ErroConta) return ok({ ok: false, erro: e.message, codigo: e.codigo, ...(e.status === 401 ? { semAcesso: true } : {}) }, e.status);
+    console.error(e); return ok({ ok: false, erro: "Erro interno." }, 500);
+  }
+}
+
+/* minha conta: plano, uso do mês, aparelhos e equipe */
+async function atenderConta(nome, corpo, cab) {
+  if (!contasConfiguradas()) return ok({ ok: true, local: true });
+  try {
+    const conta = await exigirConta(cab.token, cab.aparelho, cab.descricao);
+    if (nome === "conta-acao") await acaoConta(conta, corpo || {});
+    return ok({ ok: true, conta: await resumoConta(conta) });
+  } catch (e) {
+    if (e instanceof ErroConta) return ok({ ok: false, erro: e.message, codigo: e.codigo, ...(e.status === 401 ? { semAcesso: true } : {}) }, e.status);
+    console.error(e); return ok({ ok: false, erro: "Erro interno." }, 500);
+  }
 }

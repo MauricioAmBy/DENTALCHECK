@@ -1,5 +1,5 @@
 /* DENTALCHECK — service worker: deixa o app funcionando offline depois da ativação */
-const VERSAO = "dc-v5";
+const VERSAO = "dc-v6";
 const BASE = [
   "./", "./index.html", "./apresentacao.html", "./simulador.html",
   "./assets/app.css", "./assets/db.js", "./assets/licenca.js", "./assets/dentes.js", "./assets/ia.js",

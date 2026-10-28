@@ -46,6 +46,19 @@ Sem a chave, o simulador mostra um resultado ilustrativo (só clareia a região)
 
 A edição de imagem do Gemini **não tem cota gratuita**, então o faturamento precisa estar ativo na conta do Google AI Studio.
 
+## Contas, planos e pagamento
+
+- **Supabase:** login por e-mail e senha, assinaturas, aparelhos, equipe e contador de simulações. A estrutura do banco está em `supabase/migrations/`.
+- **Kiwify:** cada compra, renovação, atraso, cancelamento ou reembolso chega em `POST /api/kiwify` e atualiza a assinatura pelo e-mail do comprador.
+- **Limites por plano:** ficam em `server/conta.mjs` (`PLANOS`) e são conferidos no servidor.
+
+Variáveis de ambiente (Vercel → Settings → Environment Variables):
+- `SUPABASE_URL`, `SUPABASE_ANON_KEY` e `SUPABASE_SERVICE_KEY`. Com as três configuradas, o app passa a exigir login e assinatura.
+- `KIWIFY_TOKEN`: o token do webhook, usado para conferir a assinatura dos avisos.
+- `KIWIFY_PRODUTOS` (opcional): JSON que liga o id de cada produto ao plano, por exemplo `{"123":"profissional:anual","456":"extra"}`.
+
+Sem as variáveis do Supabase, o app continua no modo de teste com a senha única (`ACESSO_SENHA`).
+
 ## Estrutura
 
 ```

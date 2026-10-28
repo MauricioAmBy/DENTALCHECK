@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "DENTALCHECK — modelo 3D, simulador de sorriso com IA e apresentação do paciente para dentistas",
+  "description": "DENTALCHECK — simulação de sorriso com IA e apresentação do paciente para dentistas",
   "scripts": {
     "start": "node server/servidor.mjs",
     "icones": "node scripts/gerar-icones.mjs"

@@ -878,7 +878,7 @@
     if ((!r || r.status === 404) && lic && lic.token === "local") return { demo: true };
     if (!r) throw new Error("Sem conexão com a internet. A simulação com IA precisa de internet.");
     const d = await r.json().catch(() => ({}));
-    if (!r.ok || !d.ok) throw new Error(d.erro || "Não foi possível gerar a simulação.");
+    if (!r.ok || !d.ok) { const err = new Error(d.erro || "Não foi possível gerar a simulação."); err.codigo = d.codigo; throw err; }
     return { src: `data:${d.mime || "image/png"};base64,${d.imagem}` };
   }
 
@@ -1226,13 +1226,27 @@
       if (res.demo) toast("Modo de teste: resultado ilustrativo, sem IA.");
       mostrarResultado(); irEtapa(3);
     } catch (e) {
-      toast(e.message);
+      if (/^limite|assinatura/.test(e.codigo || "")) avisoPlano(e); else toast(e.message);
     } finally {
       clearInterval(timer); $("gerando").classList.add("hidden");
     }
   }
   $("gerar").onclick = gerar;
   $("outraVersao").onclick = gerar;
+
+  /* ---------- limites do plano ---------- */
+  const planoAtual = () => { try { return JSON.parse(localStorage.getItem("dc_plano") || "null"); } catch (e) { return null; } };
+  /* Essencial: uma versão por simulação (o botão "Gerar outra versão" fica oculto) */
+  if (planoAtual() && planoAtual().limites && planoAtual().limites.versoes === false) $("outraVersao").classList.add("hidden");
+  /* limite do mês ou assinatura inativa: explica e oferece pacote extra / mudança de plano */
+  function avisoPlano(e) {
+    const m = document.createElement("div"); m.className = "modal";
+    const limite = e.codigo === "limite-simulacoes";
+    m.innerHTML = `<div class="card"><h2>${limite ? "Simulações do mês esgotadas" : "Atenção à sua assinatura"}</h2><p class="muted" style="margin:8px 0 18px">${esc(e.message)}</p>
+      <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"><button class="btn" data-x>Fechar</button>${limite ? `<a class="btn" href="/vendas/#planos">Mudar de plano</a><a class="btn pri" href="/vendas/#planos">Comprar +30 simulações</a>` : `<a class="btn pri" href="index.html">Ver minha conta</a>`}</div></div>`;
+    document.body.appendChild(m);
+    m.onclick = ev => { if (ev.target === m || ev.target.closest("[data-x]")) m.remove(); };
+  }
   $("voltarPlano").onclick = () => irEtapa(2);
 
   /* ---------- etapa 3: resultado ---------- */

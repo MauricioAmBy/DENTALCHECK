@@ -681,6 +681,9 @@
     if (tema) { Object.assign(I, (({ nome, ...cores }) => cores)(TEMAS[tema.dataset.tema])); return desenharPainel(); }
     if (t.closest("[data-pdel]")) { I.profissionais.splice(t.closest("[data-pdel]").dataset.pdel, 1); return desenharPainel(); }
     const a = t.closest("[data-a]")?.dataset.a;
+    /* plano Essencial: 1 identidade visual */
+    const limIdent = (() => { try { return JSON.parse(localStorage.getItem("dc_plano") || "null")?.limites?.identidades; } catch (e) { return null; } })();
+    if ((a === "nova" || a === "duplicar") && limIdent && rascunho.lista.length >= limIdent) { toast(`Seu plano permite ${limIdent} identidade visual. Mude de plano para ter várias.`); return; }
     if (a === "nova") { const n = { ...IDENT_PADRAO, id: DB.uid(), nome: "Nova identidade", profissionais: [] }; rascunho.lista.push(n); rascunho.sel = n.id; }
     if (a === "duplicar") { const n = { ...JSON.parse(JSON.stringify(I)), id: DB.uid(), nome: (I.nome || "Identidade") + " (cópia)" }; rascunho.lista.push(n); rascunho.sel = n.id; }
     if (a === "excluir" && confirm(`Excluir a identidade “${I.nome}”? Apresentações que usam ela passam a usar outra.`)) { rascunho.lista = rascunho.lista.filter(x => x.id !== I.id); rascunho.sel = rascunho.lista[0].id; }

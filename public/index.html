@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0c2440">
-<meta name="description" content="DENTALCHECK — modelo 3D, simulador de sorriso e apresentação do paciente.">
+<meta name="description" content="DENTALCHECK — simulação de sorriso com IA e apresentação do paciente.">
 <title>DENTALCHECK</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
@@ -30,6 +30,25 @@
 .at-form h2{font-size:26px;margin-bottom:6px}
 .erro{background:#fdecec;color:#9b1c1c;padding:10px 14px;border-radius:var(--r-sm);font-size:14px;margin-bottom:14px}
 .ajuda{font-size:13px;color:var(--muted);margin-top:16px}
+.okmsg{background:#e8f7ef;color:#1f7a45;padding:10px 14px;border-radius:var(--r-sm);font-size:14px;margin-bottom:14px}
+.abas{display:flex;background:var(--sky);border:1px solid var(--line);border-radius:999px;padding:3px;margin-bottom:16px}
+.abas button{flex:1;padding:9px;border-radius:999px;font-weight:700;font-size:14px;color:var(--muted)}
+.abas button.on{background:var(--navy);color:#fff}
+/* minha conta */
+.minha-conta,.bloqueio{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px;margin-bottom:20px;box-shadow:var(--shadow)}
+.bloqueio{border-color:#f3c5c5}
+.mc-topo{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.mc-uso{display:flex;align-items:center;gap:12px;margin:16px 0 6px;font-size:14px;font-weight:600;color:var(--navy)}
+.mc-barra{flex:1;height:10px;border-radius:99px;background:var(--sky);overflow:hidden}
+.mc-barra i{display:block;height:100%;background:var(--brand);border-radius:99px;transition:width .5s}
+.mc-barra i.cheia{background:var(--warn)}
+.mc-alerta{background:#fff7e6;color:#8a5a00;border-radius:12px;padding:10px 14px;font-size:14px;margin:8px 0}
+.mc-det{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+.mc-det summary{cursor:pointer;font-weight:700;color:var(--navy);font-size:14px}
+.mc-det ul{list-style:none;display:grid;gap:8px;margin-top:10px}
+.mc-det li{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px;background:var(--sky);border-radius:10px;padding:8px 12px}
+.mc-det li small{color:var(--muted)}
+.mc-add{display:flex;gap:8px;margin-top:10px}
 
 /* hub */
 .hub-ola{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin:10px 0 24px}
@@ -59,25 +78,31 @@
     <div class="logo" style="color:#fff"><img src="icons/icon.svg" alt=""><span>DENTAL<b>CHECK</b></span></div>
     <div style="position:relative;z-index:1">
       <h1>Mostre ao paciente o sorriso que ele vai ter.</h1>
-      <p>Anatomia em 3D, simulação do sorriso na foto do paciente e uma apresentação pronta em PDF — tudo no seu celular, tablet ou computador.</p>
+      <p>Simulação do sorriso com IA na foto do paciente, dente a dente, e uma apresentação com a sua marca pronta em PDF — no celular, tablet ou computador.</p>
       <ul>
-        <li><span>✓</span> Funciona offline depois da ativação</li>
+        <li><span>✓</span> Lentes, clareamento e implantes</li>
         <li><span>✓</span> Fotos e dados ficam só no seu aparelho</li>
-        <li><span>✓</span> Até 3 aparelhos por acesso</li>
+        <li><span>✓</span> Apresentação e PDF com a sua marca</li>
       </ul>
     </div>
     <small style="color:rgba(255,255,255,.5);position:relative;z-index:1">© DENTALCHECK</small>
   </div>
   <div class="at-form">
     <form id="formAtivar" autocomplete="on">
-      <div class="kick">Acesso de teste</div>
-      <h2>Entrar no DENTALCHECK</h2>
-      <p class="muted" style="margin-bottom:22px">Digite a senha de acesso. Ela fica salva neste aparelho e você não precisa digitar de novo.</p>
+      <div class="kick" id="fKick">Área do assinante</div>
+      <h2 id="fTitulo">Entrar no DENTALCHECK</h2>
+      <p class="muted" id="fTexto" style="margin-bottom:18px">Use o e-mail da sua assinatura.</p>
+      <div class="abas hidden" id="abas"><button type="button" data-m="entrar" class="on">Entrar</button><button type="button" data-m="criar">Criar conta</button></div>
       <div id="erroAtivar" class="erro hidden"></div>
-      <div class="f"><label for="senha">Senha de acesso</label><input class="in" id="senha" type="password" required placeholder="••••••••" autocomplete="current-password"></div>
+      <div id="okAtivar" class="okmsg hidden"></div>
+      <div class="f" id="campoEmail"><label for="email">E-mail</label><input class="in" id="email" type="email" placeholder="voce@clinica.com" autocomplete="email"></div>
+      <div class="f" id="campoSenha"><label for="senha" id="rotSenha">Senha</label><input class="in" id="senha" type="password" placeholder="••••••••" autocomplete="current-password" minlength="6"></div>
+      <div class="f hidden" id="campoSenha2"><label for="senha2">Repita a senha</label><input class="in" id="senha2" type="password" placeholder="••••••••" autocomplete="new-password"></div>
       <button class="btn pri" id="btnAtivar" style="width:100%;height:48px;margin-top:6px">Entrar</button>
+      <button type="button" class="btn ghost hidden" id="btnEsqueci" style="width:100%;margin-top:6px">Esqueci minha senha</button>
+      <button type="button" class="btn ghost hidden" id="btnVoltarLogin" style="width:100%;margin-top:6px">← Voltar para entrar</button>
       <button type="button" class="btn ghost hidden" id="btnTeste" style="width:100%;margin-top:8px">Entrar em modo de teste (só no computador local)</button>
-      <p class="ajuda">Precisa de internet só nesta etapa.</p>
+      <p class="ajuda" id="fAjuda">Ainda não assina? <a href="/vendas/#planos">Conheça os planos</a>.</p>
     </form>
   </div>
 </section>
@@ -97,7 +122,22 @@
         <h1>O que vamos fazer hoje?</h1>
       </div>
     </div>
-    <div class="sistemas">
+    <div class="minha-conta hidden" id="minhaConta">
+      <div class="mc-topo">
+        <div><div class="kick">Minha conta</div><h2 id="mcPlano">Plano</h2><p class="muted" id="mcInfo"></p></div>
+        <a class="btn sm" href="/vendas/#planos" id="mcUpgrade">Mudar de plano</a>
+      </div>
+      <div class="mc-uso"><div class="mc-barra"><i id="mcBarra"></i></div><span id="mcUso"></span></div>
+      <div class="mc-alerta hidden" id="mcAlerta"></div>
+      <details class="mc-det"><summary>Aparelhos conectados <span id="mcQtdAp"></span></summary><ul id="mcAparelhos"></ul></details>
+      <details class="mc-det hidden" id="mcEquipeBox"><summary>Equipe <span id="mcQtdEq"></span></summary>
+        <ul id="mcEquipe"></ul>
+        <form id="mcAddMembro" class="mc-add"><input class="in" id="mcEmailMembro" type="email" placeholder="email@doprofissional.com" required><button class="btn sm pri">Adicionar</button></form>
+        <p class="muted" style="font-size:13px;margin-top:8px">Cada profissional cria a própria conta com o e-mail adicionado aqui e usa as simulações do plano da clínica.</p>
+      </details>
+    </div>
+    <div class="bloqueio hidden" id="bloqueio"><h2>Assinatura não ativa</h2><p id="bloqueioMsg"></p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><a class="btn pri" href="/vendas/#planos">Ver planos</a><button class="btn" id="btnSair2">Entrar com outro e-mail</button></div></div>
+    <div class="sistemas" id="sistemas">
       <a class="sis principal" href="simulador.html">
         <div class="arte a2">
           <svg viewBox="0 0 120 100" fill="none"><path d="M18 44c14 26 70 26 84 0" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path d="M28 48c10 14 54 14 64 0" fill="#fff"/><path d="M60 10l4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#fff"/><path d="M94 14l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#fff" opacity=".8"/></svg>
@@ -121,31 +161,119 @@
 <script>
 (function () {
   const $ = id => document.getElementById(id);
+  const mostra = (id, sim) => $(id).classList.toggle("hidden", !sim);
+  let pub = { contas: false }, modo = "entrar", tokenRecuperacao = null;
 
-  function mostrar() {
-    const lic = Licenca.atual();
-    $("ativacao").classList.toggle("hidden", !!lic);
-    $("hub").classList.toggle("hidden", !lic);
-    if (lic) $("ola").textContent = lic.nome ? "Olá, " + lic.nome.split(" ")[0] + "!" : "Olá!";
+  /* link de "esqueci minha senha": o Supabase volta com #access_token=…&type=recovery */
+  const hash = new URLSearchParams(location.hash.slice(1));
+  if (hash.get("type") === "recovery" && hash.get("access_token")) { tokenRecuperacao = hash.get("access_token"); history.replaceState(null, "", location.pathname); }
+
+  /* ---------- formulário de entrada ---------- */
+  const TEXTOS = {
+    entrar: ["Área do assinante", "Entrar no DENTALCHECK", "Use o e-mail da sua assinatura.", "Entrar"],
+    criar: ["Primeiro acesso", "Criar sua conta", "Use o mesmo e-mail da compra para liberar o seu plano.", "Criar conta"],
+    esqueci: ["Recuperar acesso", "Esqueci minha senha", "Enviaremos um link para você criar uma nova senha.", "Enviar link"],
+    nova: ["Recuperar acesso", "Crie uma nova senha", "Digite a nova senha duas vezes.", "Salvar nova senha"],
+    senha: ["Acesso de teste", "Entrar no DENTALCHECK", "Digite a senha de acesso. Ela fica salva neste aparelho.", "Entrar"]
+  };
+  function definirModo(m) {
+    modo = m;
+    const [k, t, p, b] = TEXTOS[m];
+    $("fKick").textContent = k; $("fTitulo").textContent = t; $("fTexto").textContent = p; $("btnAtivar").textContent = b;
+    mostra("abas", m === "entrar" || m === "criar");
+    document.querySelectorAll("#abas button").forEach(x => x.classList.toggle("on", x.dataset.m === m));
+    mostra("campoEmail", m !== "senha" && m !== "nova");
+    mostra("campoSenha", m !== "esqueci");
+    mostra("campoSenha2", m === "criar" || m === "nova");
+    mostra("btnEsqueci", m === "entrar");
+    mostra("btnVoltarLogin", m === "esqueci" || m === "nova");
+    mostra("fAjuda", m === "entrar" || m === "criar");
+    $("rotSenha").textContent = m === "senha" ? "Senha de acesso" : m === "nova" ? "Nova senha" : "Senha";
+    $("senha").autocomplete = m === "entrar" || m === "senha" ? "current-password" : "new-password";
+    aviso("", "");
   }
+  function aviso(erro, ok) {
+    $("erroAtivar").textContent = erro; mostra("erroAtivar", !!erro);
+    $("okAtivar").textContent = ok; mostra("okAtivar", !!ok);
+  }
+  $("abas").onclick = e => { const b = e.target.closest("[data-m]"); if (b) definirModo(b.dataset.m); };
+  $("btnEsqueci").onclick = () => definirModo("esqueci");
+  $("btnVoltarLogin").onclick = () => definirModo("entrar");
+
+  $("formAtivar").onsubmit = async e => {
+    e.preventDefault();
+    const email = $("email").value.trim(), senha = $("senha").value, senha2 = $("senha2").value;
+    if (!navigator.onLine) return aviso("Conecte-se à internet para entrar.", "");
+    if ((modo === "entrar" || modo === "criar" || modo === "esqueci") && !/^\S+@\S+\.\S+$/.test(email)) return aviso("Informe um e-mail válido.", "");
+    if ((modo === "criar" || modo === "nova") && senha.length < 8) return aviso("A senha precisa ter pelo menos 8 caracteres.", "");
+    if ((modo === "criar" || modo === "nova") && senha !== senha2) return aviso("As duas senhas não são iguais.", "");
+    const b = $("btnAtivar"), txt = b.textContent;
+    b.disabled = true; b.textContent = "Aguarde…"; aviso("", "");
+    try {
+      if (modo === "senha") { await Licenca.ativar(senha); return mostrar(); }
+      if (modo === "entrar") { await Licenca.entrar(email, senha); return mostrar(); }
+      if (modo === "criar") {
+        const r = await Licenca.criarConta(email, senha);
+        if (r.lic) return mostrar();
+        definirModo("entrar"); $("email").value = email;
+        return aviso("", "Conta criada! Enviamos um link de confirmação para o seu e-mail. Confirme e depois entre aqui.");
+      }
+      if (modo === "esqueci") { await Licenca.recuperarSenha(email); return aviso("", "Se existir uma conta com este e-mail, você vai receber o link em instantes. Confira também o spam."); }
+      if (modo === "nova") { await Licenca.definirNovaSenha(tokenRecuperacao, senha); tokenRecuperacao = null; definirModo("entrar"); return aviso("", "Senha alterada! Entre com a nova senha."); }
+    } catch (err) { aviso(err.message, ""); }
+    finally { b.disabled = false; b.textContent = txt; }
+  };
 
   if (Licenca.LOCAL) $("btnTeste").classList.remove("hidden");
   $("btnTeste").onclick = () => { Licenca.ativarTeste(); mostrar(); };
 
-  $("formAtivar").onsubmit = async e => {
-    e.preventDefault();
-    const b = $("btnAtivar"), erro = $("erroAtivar");
-    erro.classList.add("hidden");
-    if (!navigator.onLine) { erro.textContent = "Conecte-se à internet para a primeira ativação."; erro.classList.remove("hidden"); return; }
-    b.disabled = true; b.textContent = "Entrando…";
-    try { await Licenca.ativar($("senha").value); mostrar(); }
-    catch (err) { erro.textContent = err.message; erro.classList.remove("hidden"); }
-    finally { b.disabled = false; b.textContent = "Entrar"; }
-  };
+  /* ---------- tela inicial ---------- */
+  async function mostrar() {
+    const lic = Licenca.atual();
+    mostra("ativacao", !lic); mostra("hub", !!lic);
+    if (!lic) return definirModo(tokenRecuperacao ? "nova" : pub.contas ? (modo === "senha" ? "entrar" : modo) : "senha");
+    $("ola").textContent = lic.email ? "Olá, " + lic.email.split("@")[0] + "!" : "Olá!";
+    if (lic.tipo === "conta") carregarConta();
+  }
 
-  $("btnSair").onclick = () => {
-    if (confirm("Desconectar este aparelho? Seus pacientes salvos continuam guardados aqui.")) { Licenca.sair(); mostrar(); }
-  };
+  /* ---------- minha conta ---------- */
+  const dataBR = d => d ? new Date(d).toLocaleDateString("pt-BR") : "";
+  async function carregarConta() {
+    let d;
+    try { d = await (await fetch("/api/conta", { method: "POST", headers: { "content-type": "application/json" }, body: "{}" })).json(); }
+    catch (e) { return; }                                   // offline: mantém o app utilizável
+    const bloqueado = !d.ok;
+    mostra("bloqueio", bloqueado); mostra("minhaConta", !bloqueado); mostra("sistemas", !bloqueado);
+    if (bloqueado) return ($("bloqueioMsg").textContent = d.erro || "Não foi possível confirmar sua assinatura.");
+    const c = d.conta;
+    if (!c) return mostra("minhaConta", false);
+    const total = c.limites.simulacoes + c.uso.extras, pct = Math.min(100, c.uso.simulacoes / total * 100);
+    const STATUS = { ativa: "ativa", atrasada: "com pagamento pendente", cancelada: "cancelada (vale até " + dataBR(c.validoAte) + ")" };
+    $("mcPlano").textContent = `Plano ${c.planoNome}`;
+    $("mcInfo").textContent = `${c.periodo === "anual" ? "Anual" : "Mensal"} · assinatura ${STATUS[c.status] || c.status}${c.status === "ativa" && c.validoAte ? " · renova em " + dataBR(c.validoAte) : ""}${c.titular ? "" : " · equipe de " + c.titularEmail}`;
+    $("mcBarra").style.width = pct + "%"; $("mcBarra").classList.toggle("cheia", pct >= 85);
+    $("mcUso").textContent = `${c.uso.simulacoes} de ${total} simulações este mês${c.uso.extras ? ` (inclui +${c.uso.extras} extras)` : ""}`;
+    mostra("mcAlerta", pct >= 85);
+    $("mcAlerta").textContent = pct >= 100 ? "Você usou todas as simulações do mês. Compre um pacote extra ou mude de plano." : "Você já usou a maior parte das simulações do mês.";
+    $("mcQtdAp").textContent = `(${c.aparelhos.length} de ${c.limites.aparelhos})`;
+    const meu = Licenca.aparelho();
+    $("mcAparelhos").innerHTML = c.aparelhos.map(a => `<li><span>${a.descricao || "Aparelho"} ${a.aparelho === meu ? "<b>· este</b>" : ""}<br><small>usado em ${dataBR(a.ultimo_uso)}</small></span>${a.aparelho === meu ? "" : `<button class="btn sm danger" data-ap="${a.aparelho}">Desconectar</button>`}</li>`).join("");
+    mostra("mcEquipeBox", c.titular && c.limites.profissionais > 1);
+    $("mcQtdEq").textContent = `(${c.membros.length + 1} de ${c.limites.profissionais})`;
+    $("mcEquipe").innerHTML = `<li><span>${c.email} <small>· titular</small></span></li>` + c.membros.map(m => `<li><span>${m}</span><button class="btn sm danger" data-membro="${m}">Remover</button></li>`).join("");
+    try { localStorage.setItem("dc_plano", JSON.stringify({ plano: c.plano, limites: c.limites })); } catch (e) {}
+  }
+  async function acao(corpo) {
+    const d = await (await fetch("/api/conta-acao", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(corpo) })).json();
+    if (!d.ok) alert(d.erro || "Não foi possível concluir.");
+    carregarConta();
+  }
+  $("mcAparelhos").onclick = e => { const b = e.target.closest("[data-ap]"); if (b && confirm("Desconectar este aparelho? Ele precisará entrar de novo.")) acao({ acao: "remover-aparelho", aparelho: b.dataset.ap }); };
+  $("mcEquipe").onclick = e => { const b = e.target.closest("[data-membro]"); if (b && confirm(`Remover ${b.dataset.membro} da equipe?`)) acao({ acao: "remover-membro", email: b.dataset.membro }); };
+  $("mcAddMembro").onsubmit = e => { e.preventDefault(); acao({ acao: "adicionar-membro", email: $("mcEmailMembro").value }); $("mcEmailMembro").value = ""; };
+
+  $("btnSair").onclick = () => { if (confirm("Sair desta conta neste aparelho? Seus pacientes salvos continuam guardados aqui.")) { Licenca.sair(); mostrar(); } };
+  $("btnSair2").onclick = () => { Licenca.sair(); mostrar(); };
 
   /* instalação como app (Android / Chrome) */
   let pedidoInstalar;
@@ -153,6 +281,9 @@
   $("btnInstalar").onclick = async () => { if (!pedidoInstalar) return; pedidoInstalar.prompt(); await pedidoInstalar.userChoice; pedidoInstalar = null; $("btnInstalar").classList.add("hidden"); };
 
   if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("sw.js");
+  /* descobre se o servidor tem contas (Supabase) ou usa a senha de testes, e mostra a tela certa */
+  if (tokenRecuperacao) Licenca.sair();
+  Licenca.publico().then(p => { pub = p; mostrar(); });
   mostrar();
 })();
 </script>

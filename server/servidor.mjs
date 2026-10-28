@@ -29,6 +29,10 @@ for (const tipo of ["log", "error"]) {
 
 /* importado depois do .env para os modelos e limites já enxergarem as variáveis */
 const { atender } = await import("./ia.mjs");
+const { webhookKiwify } = await import("./kiwify.mjs");
+
+/* cabeçalhos que identificam quem chama: senha antiga, token de login e aparelho */
+export const cabecalhos = h => ({ senha: h["x-acesso"], token: String(h.authorization || "").replace(/^Bearers+/i, ""), aparelho: h["x-aparelho"], descricao: h["x-aparelho-nome"] });
 
 const PORTA = Number(process.env.PORTA || 5173);
 const TIPOS = {
@@ -58,10 +62,15 @@ function arquivo(req, res) {
 
 async function api(req, res, nome) {
   let bruto = "";
+  if (nome === "kiwify") {                              // webhook: precisa do corpo original para conferir a assinatura
+    for await (const parte of req) bruto += parte;
+    const r = await webhookKiwify(bruto, Object.fromEntries(new URL(req.url, "http://x").searchParams));
+    return responder(res, r.status, r.corpo);
+  }
   for await (const parte of req) { bruto += parte; if (bruto.length > 6_000_000) return responder(res, 413, { ok: false, erro: "Foto grande demais." }); }
   let corpo;
   try { corpo = bruto ? JSON.parse(bruto) : {}; } catch { return responder(res, 400, { ok: false, erro: "Requisição inválida." }); }
-  const r = await atender(nome, corpo, req.headers["x-acesso"]);
+  const r = await atender(nome, corpo, cabecalhos(req.headers));
   responder(res, r.status, r.corpo);
 }
 
