@@ -539,13 +539,13 @@ footer p{max-width:560px}
   const CONFIG = {
     contato: "",                       // ex.: "https://wa.me/5511999999999"
     descontoAnual: 20,                 // % de desconto no anual (mostrado no botão "Anual")
-    pacoteExtra: { qtd: 30, preco: 29, link: "" },   // simulações avulsas para quem passar do limite
+    pacoteExtra: { qtd: 30, preco: 29, link: "https://pay.kiwify.com.br/QLr9A4h" },   // simulações avulsas para quem passar do limite
     planos: [
-      { nome: "Essencial", para: "Para quem está começando a simular na consulta.", mensal: 97, anual: 77.60, link: "",
+      { nome: "Essencial", para: "Para quem está começando a simular na consulta.", mensal: 97, anual: 77.60, links: { mensal: "https://pay.kiwify.com.br/lC2Eunb", anual: "https://pay.kiwify.com.br/bXu02Gk" },
         itens: ["<b>40 simulações</b> com IA por mês", "Lentes, clareamento e implantes", "Fotos guiadas e organizadas pela IA", "Planejamento dente a dente", "Apresentação e PDF", "1 identidade visual", "1 profissional · 2 aparelhos", "Suporte por e-mail"] },
-      { nome: "Profissional", para: "O mais completo para o dia a dia do consultório.", mensal: 167, anual: 133.60, link: "", destaque: true,
+      { nome: "Profissional", para: "O mais completo para o dia a dia do consultório.", mensal: 167, anual: 133.60, links: { mensal: "https://pay.kiwify.com.br/M8FHLNa", anual: "https://pay.kiwify.com.br/vag1AhD" }, destaque: true,
         itens: ["<b>150 simulações</b> com IA por mês", "Tudo do Essencial", "Identidades visuais ilimitadas", "Várias versões por simulação", "1 profissional · 3 aparelhos", "Suporte por WhatsApp"] },
-      { nome: "Clínica", para: "Para equipes com várias cadeiras e profissionais.", mensal: 267, anual: 213.60, link: "",
+      { nome: "Clínica", para: "Para equipes com várias cadeiras e profissionais.", mensal: 267, anual: 213.60, links: { mensal: "https://pay.kiwify.com.br/tU9oVTh", anual: "https://pay.kiwify.com.br/CDkKRJg" },
         itens: ["<b>350 simulações</b> com IA por mês", "Tudo do Profissional", "Até 5 profissionais · 10 aparelhos", "Suporte prioritário no WhatsApp", "Treinamento da equipe"] }
     ]
   };
@@ -703,7 +703,7 @@ footer p{max-width:560px}
       const valor = p[periodo];
       const preco = valor == null ? `<div class="preco"><b>Em breve</b></div><div class="preco-nota"></div>`
         : `<div class="preco"><span>R$</span><b>${reais(valor)}</b><span>/mês</span></div><div class="preco-nota">${periodo === "anual" ? `R$ ${reais(valor * 12)} cobrados por ano` : "Cobrança mensal, sem fidelidade"}</div>`;
-      const link = p.link || "#duvidas";
+      const link = (p.links && p.links[periodo]) || p.link || "#duvidas";
       return `<div class="plano revela visivel ${p.destaque ? "dest" : ""}">${p.destaque ? `<span class="selo">Mais escolhido</span>` : ""}
         <h3>${p.nome}</h3><p class="para">${p.para}</p>${preco}
         <ul>${p.itens.map(i => `<li><span>${i}</span></li>`).join("")}</ul>
@@ -714,7 +714,7 @@ footer p{max-width:560px}
   desenharPlanos();
   if (CONFIG.planos.every(p => p.mensal == null)) $("planosLista").insertAdjacentHTML("afterend", `<span class="reservado">Espaço reservado para os planos de assinatura: valores e links serão definidos.</span>`);
   const px = CONFIG.pacoteExtra;
-  if (px) $("planosLista").insertAdjacentHTML("afterend", `<p class="extra">Passou do limite do mês? Pacote avulso de <b>+${px.qtd} simulações por R$ ${reais(px.preco)}</b>, sem trocar de plano. · Uma simulação = uma imagem gerada pela IA.</p>`);
+  if (px) $("planosLista").insertAdjacentHTML("afterend", `<p class="extra">Passou do limite do mês? Pacote avulso de <b>+${px.qtd} simulações por R$ ${reais(px.preco)}</b>, sem trocar de plano${px.link ? ` · <a href="${px.link}">Comprar pacote</a>` : ""}. · Uma simulação = uma imagem gerada pela IA.</p>`);
 
   /* contato */
   if (CONFIG.contato) $("ctaContato").href = CONFIG.contato; else $("ctaContato").href = "#duvidas";

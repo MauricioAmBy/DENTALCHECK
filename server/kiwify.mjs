@@ -3,7 +3,8 @@
    conferir os campos reais depois da primeira compra de teste e não processar o mesmo aviso duas vezes.
 
    Configuração (variáveis de ambiente):
-   - KIWIFY_TOKEN: token do webhook (Kiwify → Apps → Webhooks). Confere a assinatura ?signature=HMAC-SHA1(corpo).
+   - KIWIFY_TOKEN: token(s) do webhook (Kiwify → Apps → Webhooks), separados por vírgula — a Kiwify cria um
+     webhook (e um token) por produto. Confere a assinatura ?signature=HMAC-SHA1(corpo) com qualquer um deles.
    - KIWIFY_PRODUTOS (opcional): JSON { "<id do produto>": "profissional:anual", "<id>": "extra" }.
      Sem ele, o plano é reconhecido pelo nome do produto/oferta (Essencial, Profissional, Clínica, Extra). */
 import crypto from "node:crypto";
@@ -21,24 +22,35 @@ const pegar = (obj, ...caminhos) => {
 };
 const normal = s => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
+/* mensal e anual são planos do MESMO produto na Kiwify: o período vem da frequência do aviso,
+   do nome do plano ou, em último caso, do valor cobrado (todo anual custa mais de R$ 500). */
+function identificarPeriodo(p, nome) {
+  const freq = normal(pegar(p, "subscription.plan.frequency", "plan.frequency", "subscription.frequency", "subscription.plan.recurrence") || "");
+  if (/anual|year|annual/.test(freq + " " + nome)) return "anual";
+  if (/mensal|month/.test(freq)) return "mensal";
+  const centavos = Number(pegar(p, "commissions.charge_amount", "commissions.product_base_price", "order.amount", "charge_amount") || 0);
+  return centavos > 50000 ? "anual" : "mensal";
+}
 function identificarProduto(p) {
   const id = String(pegar(p, "product.product_id", "product_id", "product.id") || "");
+  const nome = normal([pegar(p, "product.product_name", "product_name"), pegar(p, "subscription.plan.name", "plan.name", "offer_name")].join(" "));
+  let plano = null;
   try {
     const mapa = JSON.parse(process.env.KIWIFY_PRODUTOS || "{}");
-    if (mapa[id]) { const [plano, periodo] = mapa[id].split(":"); return { plano, periodo: periodo || null }; }
+    if (mapa[id]) { const [pl, per] = mapa[id].split(":"); if (per) return { plano: pl, periodo: per }; plano = pl; }
   } catch { /* mapa inválido: cai no reconhecimento pelo nome */ }
-  const nome = normal([pegar(p, "product.product_name", "product_name"), pegar(p, "subscription.plan.name", "plan.name", "offer_name")].join(" "));
-  const plano = /extra|avuls|pacote/.test(nome) ? "extra" : /clinica/.test(nome) ? "clinica" : /profission/.test(nome) ? "profissional" : /essencial/.test(nome) ? "essencial" : null;
-  const freq = normal(pegar(p, "subscription.plan.frequency", "plan.frequency", "subscription.frequency"));
-  const periodo = /anual|year|annual/.test(nome + " " + freq) ? "anual" : "mensal";
-  return { plano, periodo };
+  plano = plano || (/extra|avuls|pacote/.test(nome) ? "extra" : /clinica/.test(nome) ? "clinica" : /profission/.test(nome) ? "profissional" : /essencial/.test(nome) ? "essencial" : null);
+  return { plano, periodo: identificarPeriodo(p, nome) };
 }
 
-function assinaturaValida(token, corpoBruto, assinatura) {
-  if (!token) return true;                                   // sem token configurado: aceita (só em testes)
-  const esperado = crypto.createHmac("sha1", token).update(corpoBruto).digest("hex");
-  const a = Buffer.from(String(assinatura || "")), b = Buffer.from(esperado);
-  return a.length === b.length && crypto.timingSafeEqual(a, b);
+function assinaturaValida(tokens, corpoBruto, assinatura) {
+  const lista = String(tokens || "").split(",").map(t => t.trim()).filter(Boolean);
+  if (!lista.length) return true;                            // sem token configurado: aceita (só em testes)
+  const a = Buffer.from(String(assinatura || ""));
+  return lista.some(token => {
+    const b = Buffer.from(crypto.createHmac("sha1", token).update(corpoBruto).digest("hex"));
+    return a.length === b.length && crypto.timingSafeEqual(a, b);
+  });
 }
 
 /* recebe o corpo bruto (string) e a query; devolve { status, corpo } */

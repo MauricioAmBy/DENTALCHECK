@@ -1243,7 +1243,7 @@
     const m = document.createElement("div"); m.className = "modal";
     const limite = e.codigo === "limite-simulacoes";
     m.innerHTML = `<div class="card"><h2>${limite ? "Simulações do mês esgotadas" : "Atenção à sua assinatura"}</h2><p class="muted" style="margin:8px 0 18px">${esc(e.message)}</p>
-      <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"><button class="btn" data-x>Fechar</button>${limite ? `<a class="btn" href="/vendas/#planos">Mudar de plano</a><a class="btn pri" href="/vendas/#planos">Comprar +30 simulações</a>` : `<a class="btn pri" href="index.html">Ver minha conta</a>`}</div></div>`;
+      <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"><button class="btn" data-x>Fechar</button>${limite ? `<a class="btn" href="/vendas/#planos">Mudar de plano</a><a class="btn pri" href="https://pay.kiwify.com.br/QLr9A4h" target="_blank" rel="noopener">Comprar +30 simulações</a>` : `<a class="btn pri" href="index.html">Ver minha conta</a>`}</div></div>`;
     document.body.appendChild(m);
     m.onclick = ev => { if (ev.target === m || ev.target.closest("[data-x]")) m.remove(); };
   }
