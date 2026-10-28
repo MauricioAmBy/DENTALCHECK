@@ -21,7 +21,7 @@
     const ua = navigator.userAgent;
     const so = /iPhone/.test(ua) ? "iPhone" : /iPad/.test(ua) ? "iPad" : /Android/.test(ua) ? "Android" : /Windows/.test(ua) ? "Windows" : /Mac/.test(ua) ? "Mac" : "Aparelho";
     const nav = /Edg\//.test(ua) ? "Edge" : /Chrome\//.test(ua) ? "Chrome" : /Safari\//.test(ua) ? "Safari" : /Firefox\//.test(ua) ? "Firefox" : "navegador";
-    return `${so} · ${nav}`;
+    return `${so} - ${nav}`;                          // só ASCII: cabeçalhos HTTP não aceitam acentos nem "·"
   }
 
   const ler = c => { try { return JSON.parse(localStorage.getItem(c) || "null"); } catch (e) { return null; } };
