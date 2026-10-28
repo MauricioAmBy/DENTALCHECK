@@ -49,6 +49,7 @@ A edição de imagem do Gemini **não tem cota gratuita**, então o faturamento 
 ## Contas, planos e pagamento
 
 - **Supabase:** login por e-mail e senha, assinaturas, aparelhos, equipe e contador de simulações. A estrutura do banco está em `supabase/migrations/`.
+- **E-mail de boas-vindas:** enviado pelo app na primeira ativação (`server/email.mjs`, Resend). Variáveis: `RESEND_API_KEY`, `EMAIL_REMETENTE` e, opcional, `EMAIL_RESPOSTA`.
 - **Kiwify:** cada compra, renovação, atraso, cancelamento ou reembolso chega em `POST /api/kiwify` e atualiza a assinatura pelo e-mail do comprador.
 - **Limites por plano:** ficam em `server/conta.mjs` (`PLANOS`) e são conferidos no servidor.
 

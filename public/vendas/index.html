@@ -717,14 +717,14 @@ footer p{max-width:560px}
       return `<div class="plano revela visivel ${p.destaque ? "dest" : ""}">${p.destaque ? `<span class="selo">Mais escolhido</span>` : ""}
         <h3>${p.nome}</h3><p class="para">${p.para}</p>${preco}
         <ul>${p.itens.map(i => `<li><span>${i}</span></li>`).join("")}</ul>
-        <a class="btn ${p.destaque ? "pri" : "sec"}" href="${link}">${valor == null ? "Avise-me quando abrir" : "Assinar " + p.nome}</a></div>`;
+        <a class="btn ${p.destaque ? "pri" : "sec"}" href="${link}"${/^https?:/.test(link) ? " target=\"_blank\" rel=\"noopener\"" : ""}>${valor == null ? "Avise-me quando abrir" : "Assinar " + p.nome}</a></div>`;
     }).join("");
   }
   $("periodo").onclick = e => { const b = e.target.closest("[data-p]"); if (!b) return; periodo = b.dataset.p; document.querySelectorAll("#periodo button").forEach(x => x.classList.toggle("on", x === b)); desenharPlanos(); };
   desenharPlanos();
   if (CONFIG.planos.every(p => p.mensal == null)) $("planosLista").insertAdjacentHTML("afterend", `<span class="reservado">Espaço reservado para os planos de assinatura: valores e links serão definidos.</span>`);
   const px = CONFIG.pacoteExtra;
-  if (px) $("planosLista").insertAdjacentHTML("afterend", `<p class="extra">Passou do limite do mês? Pacote avulso de <b>+${px.qtd} simulações por R$ ${reais(px.preco)}</b>, sem trocar de plano${px.link ? ` · <a href="${px.link}">Comprar pacote</a>` : ""}. · Uma simulação = uma imagem gerada pela IA.</p>`);
+  if (px) $("planosLista").insertAdjacentHTML("afterend", `<p class="extra">Passou do limite do mês? Pacote avulso de <b>+${px.qtd} simulações por R$ ${reais(px.preco)}</b>, sem trocar de plano${px.link ? ` · <a href="${px.link}" target="_blank" rel="noopener">Comprar pacote</a>` : ""}. · Uma simulação = uma imagem gerada pela IA.</p>`);
 
   /* contato */
   if (CONFIG.contato) $("ctaContato").href = CONFIG.contato; else $("ctaContato").href = "#duvidas";

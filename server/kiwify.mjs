@@ -8,7 +8,8 @@
    - KIWIFY_PRODUTOS (opcional): JSON { "<id do produto>": "profissional:anual", "<id>": "extra" }.
      Sem ele, o plano é reconhecido pelo nome do produto/oferta (Essencial, Profissional, Clínica, Extra). */
 import crypto from "node:crypto";
-import { contasConfiguradas, salvarAssinatura, atualizarAssinatura, adicionarExtras, eventoJaProcessado } from "./conta.mjs";
+import { contasConfiguradas, salvarAssinatura, atualizarAssinatura, adicionarExtras, eventoJaProcessado, assinaturaDoEmail, acessoLiberado } from "./conta.mjs";
+import { emailBoasVindas } from "./email.mjs";
 
 const QTD_PACOTE_EXTRA = 30;
 
@@ -82,7 +83,11 @@ export async function webhookKiwify(corpoBruto, query) {
     if (plano === "extra") await adicionarExtras(email, QTD_PACOTE_EXTRA);
     else if (plano) {
       const ate = validoAte || new Date(Date.now() + (periodo === "anual" ? 366 : 31) * 864e5).toISOString();
+      /* boas-vindas só na primeira ativação (ou na volta depois de cancelar/reembolsar), nunca em renovação */
+      const antes = await assinaturaDoEmail(email).catch(() => null);
+      const novaAtivacao = !antes || !antes.titular || !acessoLiberado(antes);
       await salvarAssinatura({ email, plano, periodo, status: "ativa", valido_ate: ate, kiwify_pedido: pedido || null, kiwify_assinatura: assinaturaId });
+      if (novaAtivacao) await emailBoasVindas({ email, nome: pegar(p, "customer.full_name", "customer.first_name"), plano }).catch(e => console.error("[email]", e.message));
     } else console.error("[kiwify] produto não reconhecido — configure KIWIFY_PRODUTOS:", pegar(p, "product.product_id", "product_id"), pegar(p, "product.product_name"));
   }
   console.log(`[kiwify] ${tipo || status} · ${email} · ${plano || "?"}`);

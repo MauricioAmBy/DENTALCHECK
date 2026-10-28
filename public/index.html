@@ -30,6 +30,15 @@
 .at-form h2{font-size:26px;margin-bottom:6px}
 .erro{background:#fdecec;color:#9b1c1c;padding:10px 14px;border-radius:var(--r-sm);font-size:14px;margin-bottom:14px}
 .ajuda{font-size:13px;color:var(--muted);margin-top:16px}
+.compra-ok{background:#e8f7ef;border:1px solid #9fd8b8;color:#145c34;padding:12px 14px;border-radius:var(--r-sm);font-size:14px;line-height:1.5;margin-bottom:14px}
+.meus{margin-top:26px}
+.meus-topo{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.meus-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.mp{display:block;text-decoration:none;color:inherit;background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:transform .2s,box-shadow .2s}
+.mp:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.mp .img{aspect-ratio:4/3;background:var(--mint) center/cover;display:grid;place-items:center;font-size:30px;font-weight:800;color:var(--brand2);position:relative}
+.mp .tag{position:absolute;left:8px;bottom:8px;background:rgba(12,36,64,.82);color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px}
+.mp .txt{padding:10px 12px}.mp b{display:block;color:var(--navy);font-size:14px}.mp small{color:var(--muted);font-size:12px}
 .okmsg{background:#e8f7ef;color:#1f7a45;padding:10px 14px;border-radius:var(--r-sm);font-size:14px;margin-bottom:14px}
 .abas{display:flex;background:var(--sky);border:1px solid var(--line);border-radius:999px;padding:3px;margin-bottom:16px}
 .abas button{flex:1;padding:9px;border-radius:999px;font-weight:700;font-size:14px;color:var(--muted)}
@@ -93,6 +102,7 @@
       <h2 id="fTitulo">Entrar no DENTALCHECK</h2>
       <p class="muted" id="fTexto" style="margin-bottom:18px">Use o e-mail da sua assinatura.</p>
       <div class="abas hidden" id="abas"><button type="button" data-m="entrar" class="on">Entrar</button><button type="button" data-m="criar">Criar conta</button></div>
+      <div class="compra-ok hidden" id="avisoCompra"><b>✅ Compra confirmada!</b> Agora crie a sua conta usando <b>o mesmo e-mail que você usou na compra</b> — é assim que liberamos o seu plano. Já tem conta? Use “Entrar”.</div>
       <div id="erroAtivar" class="erro hidden"></div>
       <div id="okAtivar" class="okmsg hidden"></div>
       <div class="f" id="campoEmail"><label for="email">E-mail</label><input class="in" id="email" type="email" placeholder="voce@clinica.com" autocomplete="email"></div>
@@ -110,7 +120,7 @@
 <!-- HUB -->
 <section id="hub" class="hidden">
   <header class="top">
-    <a class="logo" href="./index.html"><img src="icons/icon.svg" alt=""><span>DENTAL<b>CHECK</b></span></a>
+    <a class="logo" href="/"><img src="icons/icon.svg" alt=""><span>DENTAL<b>CHECK</b></span></a>
     <div class="sp"></div>
     <button class="btn sm hidden" id="btnInstalar">Instalar app</button>
     <button class="btn sm ghost" id="btnSair" title="Desconectar este aparelho">Sair</button>
@@ -138,7 +148,7 @@
     </div>
     <div class="bloqueio hidden" id="bloqueio"><h2>Assinatura não ativa</h2><p id="bloqueioMsg"></p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><a class="btn pri" href="/vendas/#planos">Ver planos</a><button class="btn" id="btnSair2">Entrar com outro e-mail</button></div></div>
     <div class="sistemas" id="sistemas">
-      <a class="sis principal" href="simulador.html">
+      <a class="sis principal" href="/simulador">
         <div class="arte a2">
           <svg viewBox="0 0 120 100" fill="none"><path d="M18 44c14 26 70 26 84 0" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path d="M28 48c10 14 54 14 64 0" fill="#fff"/><path d="M60 10l4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#fff"/><path d="M94 14l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#fff" opacity=".8"/></svg>
         </div>
@@ -146,23 +156,39 @@
           <ol class="passos"><li><b>Fotos</b> — capture com o guia passo a passo ou envie as que já tem</li><li><b>Planejamento</b> — lentes, clareamento ou implantes, dente a dente</li><li><b>Simulação com IA</b> — antes e depois do novo sorriso</li><li><b>Apresentação</b> — slides e PDF com a sua marca</li></ol>
           <div class="btn pri" style="margin-top:16px">+ Novo procedimento</div></div>
       </a>
-      <a class="sis" href="apresentacao.html">
+      <a class="sis" href="/apresentacao">
         <div class="arte a3">
           <svg viewBox="0 0 120 100" fill="none"><rect x="22" y="14" width="76" height="72" rx="8" fill="#fff" stroke="#0c2440" stroke-width="3"/><rect x="32" y="26" width="56" height="26" rx="4" fill="#0b9e96" opacity=".25"/><path d="M32 62h40M32 72h28" stroke="#0c2440" stroke-width="4" stroke-linecap="round"/><circle cx="86" cy="76" r="12" fill="#0b9e96"/><path d="M80 76l4 4 8-8" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <div class="txt"><div class="kick">Casos salvos</div><h2>Pacientes e apresentações</h2><p>Abra um paciente para revisar fotos, simulações, odontograma e propostas, apresentar na consulta e gerar o PDF.</p><div class="ir">Ver pacientes →</div></div>
       </a>
     </div>
+    <section class="meus hidden" id="meusPacientes">
+      <div class="meus-topo"><h2>Seus pacientes</h2><a class="btn sm" href="/apresentacao">Ver todos →</a></div>
+      <div class="meus-grade" id="meusGrade"></div>
+    </section>
     <div class="dica"><b>Dica:</b> instale o DENTALCHECK na tela inicial para abrir como aplicativo, mesmo sem internet.</div>
   </main>
 </section>
 
 <script src="assets/licenca.js"></script>
+<script src="assets/db.js"></script>
 <script>
 (function () {
   const $ = id => document.getElementById(id);
   const mostra = (id, sim) => $(id).classList.toggle("hidden", !sim);
-  let pub = { contas: false }, modo = "entrar", tokenRecuperacao = null;
+  /* começa com o que o app já sabe do servidor (evita piscar a tela errada antes da resposta) */
+  let pub = (() => { try { return JSON.parse(localStorage.getItem("dc_publico")) || { contas: false }; } catch (e) { return { contas: false }; } })();
+  let modo = "entrar", tokenRecuperacao = null;
+  /* volta da Kiwify depois da compra: /?compra=1 (e, se vier, &email=…) → criar conta com o mesmo e-mail */
+  const busca = new URLSearchParams(location.search);
+  const veioDaCompra = busca.has("compra");
+  if (veioDaCompra) {
+    modo = "criar";
+    const emailCompra = busca.get("email") || busca.get("customer_email") || "";
+    if (/^\S+@\S+\.\S+$/.test(emailCompra)) $("email").value = emailCompra;
+    history.replaceState(null, "", location.pathname);       // tira o e-mail do endereço (privacidade)
+  }
 
   /* link de "esqueci minha senha": o Supabase volta com #access_token=…&type=recovery */
   const hash = new URLSearchParams(location.hash.slice(1));
@@ -171,7 +197,7 @@
   /* ---------- formulário de entrada ---------- */
   const TEXTOS = {
     entrar: ["Área do assinante", "Entrar no DENTALCHECK", "Use o e-mail da sua assinatura.", "Entrar"],
-    criar: ["Primeiro acesso", "Criar sua conta", "Use o mesmo e-mail da compra para liberar o seu plano.", "Criar conta"],
+    criar: ["Primeiro acesso", "Criar sua conta", "Use o MESMO e-mail da compra na Kiwify: é ele que libera o seu plano.", "Criar conta"],
     esqueci: ["Recuperar acesso", "Esqueci minha senha", "Enviaremos um link para você criar uma nova senha.", "Enviar link"],
     nova: ["Recuperar acesso", "Crie uma nova senha", "Digite a nova senha duas vezes.", "Salvar nova senha"],
     senha: ["Acesso de teste", "Entrar no DENTALCHECK", "Digite a senha de acesso. Ela fica salva neste aparelho.", "Entrar"]
@@ -231,9 +257,24 @@
   async function mostrar() {
     const lic = Licenca.atual();
     mostra("ativacao", !lic); mostra("hub", !!lic);
-    if (!lic) return definirModo(tokenRecuperacao ? "nova" : pub.contas ? (modo === "senha" ? "entrar" : modo) : "senha");
+    mostra("avisoCompra", !lic && veioDaCompra && pub.contas);
+    if (!lic) return definirModo(tokenRecuperacao ? "nova" : !pub.contas ? "senha" : modo !== "senha" ? modo : veioDaCompra ? "criar" : "entrar");
     $("ola").textContent = lic.email ? "Olá, " + lic.email.split("@")[0] + "!" : "Olá!";
     if (lic.tipo === "conta") carregarConta();
+    mostrarPacientes();
+  }
+
+  /* ---------- seus pacientes (salvos neste aparelho) ---------- */
+  async function mostrarPacientes() {
+    const lista = (await DB.listar().catch(() => [])).slice(0, 8);
+    mostra("meusPacientes", lista.length > 0);
+    const dataBR = d => d ? d.split("-").reverse().join("/") : "";
+    $("meusGrade").innerHTML = lista.map(p => {
+      const ult = [...(p.antesDepois || [])].reverse().find(b => b.depois);
+      const capa = ult ? ((ult.close && ult.close.depois) || ult.depois) : (p.fotos.sorriso || p.fotos.boca || Object.values(p.fotos)[0]);
+      const n = (p.antesDepois || []).length;
+      return `<a class="mp" href="/apresentacao?paciente=${p.id}"><div class="img" style="${capa ? `background-image:url(${capa})` : ""}">${capa ? "" : esc((p.nome || "?")[0].toUpperCase())}${n ? `<span class="tag">${n} ${n === 1 ? "simulação" : "simulações"}</span>` : ""}</div><div class="txt"><b>${esc(p.nome || "Sem nome")}</b><small>${dataBR(p.data)}</small></div></a>`;
+    }).join("");
   }
 
   /* ---------- minha conta ---------- */
@@ -244,6 +285,7 @@
     catch (e) { return; }                                   // offline: mantém o app utilizável
     const bloqueado = !d.ok;
     mostra("bloqueio", bloqueado); mostra("minhaConta", !bloqueado); mostra("sistemas", !bloqueado);
+    if (bloqueado) mostra("meusPacientes", false);
     if (bloqueado) return ($("bloqueioMsg").textContent = d.erro || "Não foi possível confirmar sua assinatura.");
     const c = d.conta;
     if (!c) return mostra("minhaConta", false);

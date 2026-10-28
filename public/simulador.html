@@ -193,7 +193,7 @@
 </head>
 <body>
 <header class="top">
-  <a class="logo" href="./index.html"><img src="icons/icon.svg" alt=""><span>DENTAL<b>CHECK</b></span></a>
+  <a class="logo" href="/"><img src="icons/icon.svg" alt=""><span>DENTAL<b>CHECK</b></span></a>
   <span class="muted">· Novo procedimento</span>
   <div class="sp"></div>
   <nav class="etapas" id="etapas">
@@ -412,7 +412,7 @@
   $("etapas").onclick = e => {
     const s = e.target.closest("span"); if (!s) return;
     const n = Number(s.dataset.e);
-    if (n === 4 && pacienteId) return (location.href = "apresentacao.html?paciente=" + pacienteId);
+    if (n === 4 && pacienteId) return (location.href = "/apresentacao?paciente=" + pacienteId);
     if (n === 1 || (n === 2 && original) || (n === 3 && versoes.length)) irEtapa(n);
   };
 
@@ -1243,7 +1243,7 @@
     const m = document.createElement("div"); m.className = "modal";
     const limite = e.codigo === "limite-simulacoes";
     m.innerHTML = `<div class="card"><h2>${limite ? "Simulações do mês esgotadas" : "Atenção à sua assinatura"}</h2><p class="muted" style="margin:8px 0 18px">${esc(e.message)}</p>
-      <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"><button class="btn" data-x>Fechar</button>${limite ? `<a class="btn" href="/vendas/#planos">Mudar de plano</a><a class="btn pri" href="https://pay.kiwify.com.br/QLr9A4h" target="_blank" rel="noopener">Comprar +30 simulações</a>` : `<a class="btn pri" href="index.html">Ver minha conta</a>`}</div></div>`;
+      <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"><button class="btn" data-x>Fechar</button>${limite ? `<a class="btn" href="/vendas/#planos">Mudar de plano</a><a class="btn pri" href="https://pay.kiwify.com.br/QLr9A4h" target="_blank" rel="noopener">Comprar +30 simulações</a>` : `<a class="btn pri" href="/">Ver minha conta</a>`}</div></div>`;
     document.body.appendChild(m);
     m.onclick = ev => { if (ev.target === m || ev.target.closest("[data-x]")) m.remove(); };
   }
@@ -1323,7 +1323,7 @@
     }
     pacienteId = id;
     /* etapa 4: a apresentação do paciente, já com fotos e simulação */
-    location.href = "apresentacao.html?paciente=" + id;
+    location.href = "/apresentacao?paciente=" + id;
   }
 
   irEtapa(1);

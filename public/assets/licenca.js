@@ -80,7 +80,7 @@
     return { confirmar: true };                          // Supabase pediu confirmação por e-mail
   }
   async function recuperarSenha(email) {
-    await auth("recover?redirect_to=" + encodeURIComponent(location.origin + "/index.html"), { email: email.trim().toLowerCase() });
+    await auth("recover?redirect_to=" + encodeURIComponent(location.origin + "/"), { email: email.trim().toLowerCase() });
   }
   async function definirNovaSenha(tokenRecuperacao, senha) {
     await auth("user", { password: senha }, tokenRecuperacao, "PUT");
@@ -114,7 +114,7 @@
 
   /* Páginas internas chamam isso no topo: sem acesso, volta para a tela de entrada */
   function exigir() {
-    if (!atual()) location.replace("./index.html");
+    if (!atual()) location.replace("/");
   }
 
   /* toda chamada /api/ leva o login e o aparelho; sessão inválida → volta para a entrada */
@@ -131,7 +131,7 @@
     const r = await fetchOriginal(url, { ...opcoes, headers });
     if (r.status === 401) {
       const d = await r.clone().json().catch(() => ({}));
-      if (d.semAcesso && !(LOCAL && lic && lic.tipo === "local")) { sair(); location.replace("./index.html"); }
+      if (d.semAcesso && !(LOCAL && lic && lic.tipo === "local")) { sair(); location.replace("/"); }
     }
     return r;
   };

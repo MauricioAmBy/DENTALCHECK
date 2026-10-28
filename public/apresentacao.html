@@ -16,7 +16,40 @@
 /* ---------- lista ---------- */
 .lista-top{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:6px 0 18px}
 .lista-top .in{flex:1 1 220px;max-width:380px}
-.pacientes{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.pacientes{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+/* cartão do paciente: foto do resultado mais recente */
+.pcard{display:flex;flex-direction:column;text-align:left;background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.pcard:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.pcard .img{aspect-ratio:4/3;background:var(--mint) center/cover;display:grid;place-items:center;font-size:34px;font-weight:800;color:var(--brand2);position:relative}
+.pcard .tag{position:absolute;left:10px;bottom:10px;background:rgba(12,36,64,.82);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px}
+.pcard .txt{padding:12px 14px}.pcard b{display:block;color:var(--navy)}.pcard small{color:var(--muted)}
+/* página do caso */
+.caso-topo{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin:10px 0 24px}
+.caso-id{display:flex;gap:16px;align-items:center}
+.caso-av{width:72px;height:72px;border-radius:20px;background:var(--mint) center/cover;flex:none;display:grid;place-items:center;font-size:28px;font-weight:800;color:var(--brand2)}
+.caso-id h1{font-size:28px}
+.caso-acoes{display:flex;gap:8px;flex-wrap:wrap}
+.caso-sec{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px;margin-bottom:18px}
+.caso-sec-topo{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.caso-sec h2 small{font-size:14px;color:var(--muted);font-weight:600}
+.sims{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.sim{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--sky);display:flex;flex-direction:column}
+.sim .cmp{position:relative;aspect-ratio:4/3;background:#000;touch-action:none;cursor:ew-resize;user-select:none}
+.sim .cmp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
+.sim .cmp .dep{clip-path:inset(0 0 0 50%)}
+.sim .cmp .ln{position:absolute;top:0;bottom:0;left:50%;width:3px;background:#fff;transform:translateX(-50%);box-shadow:0 0 8px rgba(0,0,0,.4)}
+.sim .cmp .ln::after{content:"⇆";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:15px;color:var(--navy)}
+.sim .cmp .t{position:absolute;top:10px;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:800;color:#fff;background:rgba(12,36,64,.8)}
+.sim .cmp .t.a{left:10px}.sim .cmp .t.d{right:10px;background:var(--brand)}
+.sim .info{padding:12px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.sim .info b{color:var(--navy);font-size:14px}.sim .info p{font-size:12px;color:var(--muted);line-height:1.45}
+.sim .bts{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}
+.caso-fotos{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px}
+.caso-fotos figure{flex:none;width:130px}
+.caso-fotos img{width:130px;height:130px;object-fit:cover;border-radius:14px;display:block}
+.caso-fotos figcaption{font-size:12px;color:var(--muted);margin-top:4px}
+.caso-vazio{text-align:center;padding:30px 10px;color:var(--muted)}
+@media (max-width:600px){.caso-acoes{width:100%}.caso-acoes .btn{flex:1 1 45%}.sims{grid-template-columns:1fr}}
 .pac{display:flex;gap:14px;align-items:center;padding:14px;background:#fff;border:1px solid var(--line);border-radius:var(--r);cursor:pointer;text-align:left;width:100%;transition:border .2s,transform .2s}
 .pac:hover{border-color:var(--brand);transform:translateY(-2px)}
 .pac .av{width:52px;height:52px;border-radius:14px;background:var(--mint) center/cover;flex:none;display:grid;place-items:center;font-weight:800;color:var(--brand2)}
@@ -194,7 +227,7 @@
 <body>
 
 <header class="top">
-  <a class="logo" href="./index.html"><img src="icons/icon.svg" alt=""><span>DENTAL<b>CHECK</b></span></a>
+  <a class="logo" href="/"><img src="icons/icon.svg" alt=""><span>DENTAL<b>CHECK</b></span></a>
   <span class="muted" id="migalha">· Apresentações</span>
   <div class="sp"></div>
   <button class="btn sm" id="btnConfig" title="Aparência da apresentação">🎨<span class="so-pc"> Aparência da apresentação</span></button>
@@ -203,18 +236,40 @@
 <!-- LISTA DE PACIENTES -->
 <main class="wrap" id="vLista">
   <div class="kick">Pacientes</div>
-  <h1>Apresentações do paciente</h1>
+  <h1>Seus pacientes</h1>
   <div class="lista-top">
     <input class="in" id="busca" placeholder="Buscar paciente…" type="search">
-    <button class="btn pri" id="btnNovo">+ Novo paciente</button>
+    <button class="btn pri" id="btnNovo">+ Novo procedimento</button>
   </div>
   <div class="pacientes" id="pacientes"></div>
+</main>
+
+<!-- CASO DO PACIENTE: simulações feitas e ações da apresentação -->
+<main class="wrap hidden" id="vCaso" style="max-width:1200px">
+  <button class="btn sm ghost" id="casoVoltar">← Pacientes</button>
+  <div class="caso-topo">
+    <div class="caso-id"><div class="caso-av" id="casoAv"></div><div><div class="kick">Paciente</div><h1 id="casoNome">Paciente</h1><p class="muted" id="casoInfo"></p></div></div>
+    <div class="caso-acoes">
+      <button class="btn pri" id="casoApresentar">▶ Apresentar</button>
+      <button class="btn" id="casoPdf">⤓ Baixar PDF</button>
+      <button class="btn" id="casoCompartilhar">Compartilhar</button>
+      <button class="btn" id="casoEditar">✏️ Editar apresentação</button>
+    </div>
+  </div>
+  <div class="caso-sec">
+    <div class="caso-sec-topo"><h2>Simulações <small id="casoQtd"></small></h2><a class="btn sm pri" id="casoNova" href="/simulador">+ Nova simulação</a></div>
+    <div class="sims" id="casoSims"></div>
+  </div>
+  <div class="caso-sec" id="casoFotosBox">
+    <div class="caso-sec-topo"><h2>Fotos do paciente</h2><button class="btn sm" id="casoFotosEditar">Organizar fotos</button></div>
+    <div class="caso-fotos" id="casoFotos"></div>
+  </div>
 </main>
 
 <!-- EDITOR -->
 <main class="wrap hidden" id="vEditor" style="max-width:1200px">
   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px">
-    <button class="btn sm ghost" id="btnVoltar">← Pacientes</button>
+    <button class="btn sm ghost" id="btnVoltar">← Voltar ao paciente</button>
     <h1 id="tituloPac" style="font-size:26px;flex:1">Paciente</h1>
     <span class="muted" id="salvo" style="font-size:13px"></span>
     <button class="btn sm" id="btnIdent" title="Escolher a identidade e as cores desta apresentação">🎨 <span id="identNome"></span></button>
@@ -348,40 +403,85 @@
   }
 
   /* ---------- lista ---------- */
+  /* capa do paciente: o "depois" mais recente; sem simulação, a foto do sorriso */
+  const capaPaciente = p => { const ult = [...(p.antesDepois || [])].reverse().find(b => b.depois); return ult ? ((ult.close && ult.close.depois) || ult.depois) : (p.fotos.sorriso || p.fotos.boca || Object.values(p.fotos)[0]); };
   async function renderLista() {
     const termo = $("busca").value.trim().toLowerCase();
     const todos = await DB.listar();
     const lista = todos.filter(p => !termo || (p.nome || "").toLowerCase().includes(termo));
     $("pacientes").innerHTML = lista.length ? lista.map(p => {
-      const capa = p.fotos.sorriso || p.fotos["intra-frontal"] || Object.values(p.fotos)[0];
-      return `<button class="pac" data-id="${p.id}"><div class="av" style="${capa ? `background-image:url(${capa})` : ""}">${capa ? "" : esc((p.nome || "?")[0].toUpperCase())}</div>
-        <div><b>${esc(p.nome || "Sem nome")}</b><small>Avaliação em ${dataBR(p.data)}</small></div></button>`;
-    }).join("") : `<div class="vazio" style="grid-column:1/-1"><h2>${todos.length ? "Nenhum paciente encontrado" : "Nenhum paciente ainda"}</h2><p>Crie o primeiro caso para montar a apresentação.</p></div>`;
+      const capa = capaPaciente(p), n = (p.antesDepois || []).length;
+      return `<button class="pcard" data-id="${p.id}"><div class="img" style="${capa ? `background-image:url(${capa})` : ""}">${capa ? "" : esc((p.nome || "?")[0].toUpperCase())}${n ? `<span class="tag">${n} ${n === 1 ? "simulação" : "simulações"}</span>` : ""}</div>
+        <div class="txt"><b>${esc(p.nome || "Sem nome")}</b><small>Avaliação em ${dataBR(p.data)}</small></div></button>`;
+    }).join("") : `<div class="vazio" style="grid-column:1/-1"><h2>${todos.length ? "Nenhum paciente encontrado" : "Nenhum paciente ainda"}</h2><p>Comece um novo procedimento para criar o primeiro caso.</p></div>`;
   }
   $("busca").oninput = renderLista;
-  $("pacientes").onclick = e => { const b = e.target.closest(".pac"); if (b) abrir(b.dataset.id); };
-  $("btnNovo").onclick = async () => {
-    const nome = prompt("Nome do paciente:");
-    if (nome === null) return;
-    const p = await DB.salvar(DB.novoPaciente(nome.trim()));
-    abrir(p.id);
-  };
+  $("pacientes").onclick = e => { const b = e.target.closest(".pcard"); if (b) abrir(b.dataset.id); };
+  $("btnNovo").onclick = () => { location.href = "/simulador"; };
 
-  /* ---------- editor ---------- */
+  /* ---------- caso do paciente (primeira tela ao abrir) ---------- */
+  function mostrarTela(id) { ["vLista", "vCaso", "vEditor"].forEach(v => $(v).classList.toggle("hidden", v !== id)); scrollTo(0, 0); }
   async function abrir(id) {
     pac = await DB.obter(id);
     if (!pac) return;
     history.replaceState(null, "", "?paciente=" + id);
-    $("vLista").classList.add("hidden"); $("vEditor").classList.remove("hidden");
     aplicarMarca();                                  // cores da identidade deste paciente
-    renderEditor(); scrollTo(0, 0);
+    renderCaso(); mostrarTela("vCaso");
   }
-  $("btnVoltar").onclick = () => { pac = null; aplicarMarca(); history.replaceState(null, "", location.pathname); $("vEditor").classList.add("hidden"); $("vLista").classList.remove("hidden"); renderLista(); };
+  function renderCaso() {
+    const sims = (pac.antesDepois || []).filter(b => b.antes && b.depois), capa = capaPaciente(pac);
+    $("casoAv").style.backgroundImage = capa ? `url(${capa})` : ""; $("casoAv").textContent = capa ? "" : (pac.nome || "?")[0].toUpperCase();
+    $("casoNome").textContent = pac.nome || "Paciente sem nome";
+    $("casoInfo").textContent = `Avaliação em ${dataBR(pac.data)} · ${sims.length} ${sims.length === 1 ? "simulação" : "simulações"} · ${Object.keys(pac.fotos).length} fotos`;
+    $("casoQtd").textContent = sims.length ? `(${sims.length})` : "";
+    $("casoNova").href = "/simulador?paciente=" + pac.id;
+    $("casoSims").innerHTML = sims.length ? [...sims].reverse().map(b => {
+      const temClose = b.close && b.close.antes;
+      const par = temClose ? b.close : b;
+      return `<div class="sim" data-id="${b.id}">
+        <div class="cmp"><img src="${par.antes}" alt="Antes"><img class="dep" src="${par.depois}" alt="Depois"><span class="t a">Antes</span><span class="t d">Depois</span><div class="ln"></div></div>
+        <div class="info"><b>${esc(b.titulo || "Simulação")}</b>${b.plano ? `<p>${esc(b.plano)}</p>` : ""}
+          <div class="bts">${temClose ? `<button class="btn sm" data-vista>Ver rosto inteiro</button>` : ""}<button class="btn sm danger" data-apagar>Apagar</button></div></div></div>`;
+    }).join("") : `<div class="caso-vazio" style="grid-column:1/-1"><p>Nenhuma simulação ainda.</p><a class="btn pri" style="margin-top:12px" href="/simulador?paciente=${pac.id}">Fazer a primeira simulação</a></div>`;
+    $("casoSims").querySelectorAll(".cmp").forEach(ligarComparador);
+    const fotos = ANGULOS.filter(([id]) => pac.fotos[id]);
+    $("casoFotosBox").classList.toggle("hidden", !fotos.length);
+    $("casoFotos").innerHTML = fotos.map(([id, nome]) => `<figure><img src="${pac.fotos[id]}" alt=""><figcaption>${nome}</figcaption></figure>`).join("");
+  }
+  /* comparador arrastável dos cartões de simulação */
+  function ligarComparador(cmp) {
+    const dep = cmp.querySelector(".dep"), ln = cmp.querySelector(".ln");
+    const mover = e => { const r = cmp.getBoundingClientRect(), p = Math.max(0, Math.min(100, (e.clientX - r.left) / r.width * 100)); dep.style.clipPath = `inset(0 0 0 ${p}%)`; ln.style.left = p + "%"; };
+    cmp.onpointerdown = e => { cmp.setPointerCapture(e.pointerId); mover(e); cmp.onpointermove = mover; };
+    cmp.onpointerup = cmp.onpointercancel = () => cmp.onpointermove = null;
+  }
+  $("casoSims").onclick = async e => {
+    const card = e.target.closest(".sim"); if (!card) return;
+    const b = pac.antesDepois.find(x => x.id === card.dataset.id); if (!b) return;
+    if (e.target.closest("[data-apagar]")) {
+      if (!confirm("Apagar esta simulação? Ela sai da apresentação.")) return;
+      pac.antesDepois = pac.antesDepois.filter(x => x !== b); await DB.salvar(pac); return renderCaso();
+    }
+    const bt = e.target.closest("[data-vista]");
+    if (bt) {                                          // alterna entre o close do sorriso e o rosto inteiro
+      const rosto = bt.textContent.includes("rosto"), par = rosto ? b : b.close, imgs = card.querySelectorAll(".cmp img");
+      imgs[0].src = par.antes; imgs[1].src = par.depois; bt.textContent = rosto ? "Ver de perto" : "Ver rosto inteiro";
+    }
+  };
+  $("casoVoltar").onclick = () => { pac = null; aplicarMarca(); history.replaceState(null, "", location.pathname); mostrarTela("vLista"); renderLista(); };
+  $("casoEditar").onclick = () => { renderEditor(); mostrarTela("vEditor"); };
+  $("casoFotosEditar").onclick = () => { renderEditor(); mostrarTela("vEditor"); setTimeout(() => $("s-fotos")?.scrollIntoView({ behavior: "smooth" }), 50); };
+  /* as ações do caso usam as mesmas funções do editor (apresentação e PDF montados com os dados salvos) */
+  $("casoApresentar").onclick = () => $("btnApresentar").click();
+  $("casoPdf").onclick = () => $("btnPdf").click();
+  $("casoCompartilhar").onclick = () => $("btnCompartilhar").click();
+  $("btnVoltar").onclick = async () => { pac = await DB.obter(pac.id); renderCaso(); mostrarTela("vCaso"); };
 
   function salvar() {
     $("salvo").textContent = "Salvando…";
     clearTimeout(salvarTimer);
-    salvarTimer = setTimeout(async () => { await DB.salvar(pac); $("salvo").textContent = "✓ Salvo"; renderMenu(); }, 400);
+    const alvo = pac;                                 // guarda o paciente: ele pode ser fechado antes de salvar
+    salvarTimer = setTimeout(async () => { if (!alvo) return; await DB.salvar(alvo); $("salvo").textContent = "✓ Salvo"; if (pac === alvo) renderMenu(); }, 400);
   }
 
   function contagens() {
@@ -535,7 +635,7 @@
         <div class="item-top"><input class="in" data-campo="titulo" placeholder="Título (ex.: Clareamento + lentes)" value="${esc(b.titulo)}"><button class="btn sm danger" data-del>Remover</button></div>
         <div class="par">${["antes", "depois"].map(k => `<div class="slot ${b[k] ? "tem" : ""}" data-k="${k}" style="${b[k] ? `background-image:url(${b[k]})` : ""}">${b[k] ? `<span class="rot">${k === "antes" ? "Antes" : "Depois"}</span>` : "+ Foto " + k}</div>`).join("")}</div>
       </div>`).join("")}
-      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn sm" id="addBA">+ Adicionar comparação</button><a class="btn sm" href="simulador.html?paciente=${pac.id}">Criar no simulador de sorriso</a></div>`;
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn sm" id="addBA">+ Adicionar comparação</button><a class="btn sm" href="/simulador?paciente=${pac.id}">Criar no simulador de sorriso</a></div>`;
     s.querySelectorAll(".item").forEach(el => ligar(el, pac.antesDepois[el.dataset.i]));
     $("addBA").onclick = () => { pac.antesDepois.push({ id: DB.uid(), titulo: "", antes: "", depois: "" }); salvar(); renderAntesDepois(); };
     s.onclick = async e => {

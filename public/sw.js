@@ -1,7 +1,7 @@
 /* DENTALCHECK — service worker: deixa o app funcionando offline depois da ativação */
-const VERSAO = "dc-v7";
-const BASE = [
-  "./", "./index.html", "./apresentacao.html", "./simulador.html",
+const VERSAO = "dc-v8";
+const BASE = [ /* endereços limpos (sem .html), iguais aos da Vercel */
+  "/", "/apresentacao", "/simulador",
   "./assets/app.css", "./assets/db.js", "./assets/licenca.js", "./assets/dentes.js", "./assets/ia.js",
   "./manifest.webmanifest", "./icons/icon.svg", "./icons/icon-192.png", "./icons/icon-512.png"
 ];
@@ -38,6 +38,6 @@ self.addEventListener("fetch", e => {
     fetch(req).then(r => {
       if (r.ok) { const copia = r.clone(); caches.open(VERSAO).then(c => c.put(req, copia)); }
       return r;
-    }).catch(() => caches.match(req, { ignoreSearch: true }).then(r => r || caches.match("./index.html")))
+    }).catch(() => caches.match(req, { ignoreSearch: true }).then(r => r || caches.match("/")))
   );
 });
