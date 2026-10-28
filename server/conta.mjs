@@ -19,7 +19,7 @@ export class ErroConta extends Error {
   constructor(status, mensagem, codigo) { super(mensagem); this.status = status; this.codigo = codigo; }
 }
 
-async function rest(caminho, opcoes = {}) {
+export async function rest(caminho, opcoes = {}) {
   const e = env();
   const r = await fetch(`${e.url}/rest/v1/${caminho}`, {
     ...opcoes,
@@ -56,7 +56,7 @@ export async function assinaturaDoEmail(email) {
 export function acessoLiberado(a) {
   if (!a) return false;
   const ate = a.valido_ate ? new Date(a.valido_ate).getTime() : Infinity;
-  if (a.status === "ativa") return true;
+  if (a.status === "ativa") return a.kiwify_pedido !== "cortesia" || ate > Date.now();   // cortesia com prazo expira sozinha
   if (a.status === "atrasada") return ate + CARENCIA_DIAS * 864e5 > Date.now();
   if (a.status === "cancelada") return ate > Date.now();      // cancelou: usa até o fim do período pago
   return false;
@@ -101,7 +101,7 @@ export async function resumoConta(conta) {
   const membros = a.titular ? await rest(`membros?assinatura_id=eq.${a.id}&select=email`) : [];
   return {
     email: conta.usuario.email, titular: a.titular, titularEmail: a.email,
-    plano: a.plano, planoNome: conta.plano.nome, periodo: a.periodo, status: a.status, validoAte: a.valido_ate,
+    plano: a.plano, planoNome: conta.plano.nome, periodo: a.periodo, status: a.status, validoAte: a.valido_ate, cortesia: a.kiwify_pedido === "cortesia",
     limites: conta.plano,
     uso: { mes: mesAtual(), simulacoes: uso?.simulacoes || 0, extras: uso?.extras || 0 },
     aparelhos, membros: membros.map(m => m.email)

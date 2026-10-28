@@ -122,6 +122,7 @@
   <header class="top">
     <a class="logo" href="/"><img src="icons/icon.svg" alt=""><span>DENTAL<b>CHECK</b></span></a>
     <div class="sp"></div>
+    <a class="btn sm hidden" id="btnAdmin" href="/admin">Administração</a>
     <button class="btn sm hidden" id="btnInstalar">Instalar app</button>
     <button class="btn sm ghost" id="btnSair" title="Desconectar este aparelho">Sair</button>
   </header>
@@ -260,7 +261,7 @@
     mostra("avisoCompra", !lic && veioDaCompra && pub.contas);
     if (!lic) return definirModo(tokenRecuperacao ? "nova" : !pub.contas ? "senha" : modo !== "senha" ? modo : veioDaCompra ? "criar" : "entrar");
     $("ola").textContent = lic.email ? "Olá, " + lic.email.split("@")[0] + "!" : "Olá!";
-    if (lic.tipo === "conta") carregarConta();
+    if (lic.tipo === "conta") { carregarConta(); verificarAdmin(); }
     mostrarPacientes();
   }
 
@@ -292,7 +293,9 @@
     const total = c.limites.simulacoes + c.uso.extras, pct = Math.min(100, c.uso.simulacoes / total * 100);
     const STATUS = { ativa: "ativa", atrasada: "com pagamento pendente", cancelada: "cancelada (vale até " + dataBR(c.validoAte) + ")" };
     $("mcPlano").textContent = `Plano ${c.planoNome}`;
-    $("mcInfo").textContent = `${c.periodo === "anual" ? "Anual" : "Mensal"} · assinatura ${STATUS[c.status] || c.status}${c.status === "ativa" && c.validoAte ? " · renova em " + dataBR(c.validoAte) : ""}${c.titular ? "" : " · equipe de " + c.titularEmail}`;
+    $("mcInfo").textContent = c.cortesia && c.status === "ativa"
+      ? `Acesso de cortesia${c.validoAte ? " · válido até " + dataBR(c.validoAte) : " · sem prazo"}${c.titular ? "" : " · equipe de " + c.titularEmail}`
+      : `${c.periodo === "anual" ? "Anual" : "Mensal"} · assinatura ${STATUS[c.status] || c.status}${c.status === "ativa" && c.validoAte ? " · renova em " + dataBR(c.validoAte) : ""}${c.titular ? "" : " · equipe de " + c.titularEmail}`;
     $("mcBarra").style.width = pct + "%"; $("mcBarra").classList.toggle("cheia", pct >= 85);
     $("mcUso").textContent = `${c.uso.simulacoes} de ${total} simulações este mês${c.uso.extras ? ` (inclui +${c.uso.extras} extras)` : ""}`;
     mostra("mcAlerta", pct >= 85);
@@ -304,6 +307,13 @@
     $("mcQtdEq").textContent = `(${c.membros.length + 1} de ${c.limites.profissionais})`;
     $("mcEquipe").innerHTML = `<li><span>${c.email} <small>· titular</small></span></li>` + c.membros.map(m => `<li><span>${m}</span><button class="btn sm danger" data-membro="${m}">Remover</button></li>`).join("");
     try { localStorage.setItem("dc_plano", JSON.stringify({ plano: c.plano, limites: c.limites })); } catch (e) {}
+  }
+  /* botão "Administração" só para os e-mails de administrador (o servidor decide) */
+  async function verificarAdmin() {
+    try {
+      const d = await (await fetch("/api/admin", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ acao: "verificar" }) })).json();
+      mostra("btnAdmin", !!d.admin);
+    } catch (e) {}
   }
   async function acao(corpo) {
     const d = await (await fetch("/api/conta-acao", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(corpo) })).json();

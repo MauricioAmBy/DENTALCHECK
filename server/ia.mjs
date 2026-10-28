@@ -2,6 +2,7 @@
    Cada rota recebe o corpo JSON já lido e devolve { status, corpo }. A chave da API fica só no servidor. */
 import { montarPrompt } from "./prompt-sorriso.mjs";
 import { contasConfiguradas, configPublica, exigirConta, consumirSimulacao, devolverSimulacao, resumoConta, acaoConta, ErroConta } from "./conta.mjs";
+import { atenderAdmin } from "./admin.mjs";
 
 const lista = (v, padrao) => (v || padrao).split(",").map(s => s.trim()).filter(Boolean);
 const MODELOS = () => lista(process.env.GEMINI_MODELO, "gemini-3.1-flash-image,gemini-2.5-flash-image");
@@ -205,6 +206,7 @@ const USA_IA = new Set(["simular", "localizar", "analisar-foto", "dentes"]);
    cab = { senha, token, aparelho, descricao } vindos dos cabeçalhos da requisição */
 export async function atender(nome, corpo, cab = {}) {
   if (nome === "conta" || nome === "conta-acao") return atenderConta(nome, corpo, cab);
+  if (nome === "admin") return atenderPainelAdmin(corpo, cab);
   const rota = ROTAS[nome];
   if (!rota) return ok({ ok: false, erro: "Rota não existe." }, 404);
   try {
@@ -224,6 +226,16 @@ export async function atender(nome, corpo, cab = {}) {
     return r;
   } catch (e) {
     if (e instanceof ErroConta) return ok({ ok: false, erro: e.message, codigo: e.codigo, ...(e.status === 401 ? { semAcesso: true } : {}) }, e.status);
+    console.error(e); return ok({ ok: false, erro: "Erro interno." }, 500);
+  }
+}
+
+/* painel do administrador: não exige assinatura, só login com e-mail de ADMIN_EMAILS */
+async function atenderPainelAdmin(corpo, cab) {
+  if (!contasConfiguradas()) return ok({ ok: false, erro: "Contas não configuradas." }, 503);
+  try { return ok(await atenderAdmin(corpo || {}, cab)); }
+  catch (e) {
+    if (e instanceof ErroConta) return ok({ ok: false, erro: e.message, codigo: e.codigo }, e.status);
     console.error(e); return ok({ ok: false, erro: "Erro interno." }, 500);
   }
 }

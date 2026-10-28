@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0c2440">
+<meta name="robots" content="noindex, nofollow">
+<title>DENTALCHECK · Administração</title>
+<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/app.css">
+<style>
+.ad-topo{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.ad-resumo{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.ad-resumo div{background:#fff;border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 14px;font-size:13px;color:var(--muted)}
+.ad-resumo b{display:block;font-size:20px;color:var(--navy)}
+.ad-novo{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;align-items:end;margin-top:12px}
+.ad-novo label{font-size:12px;font-weight:700;color:var(--muted);display:grid;gap:4px}
+.ad-busca{margin:18px 0 12px}
+.ad-lista{display:grid;gap:10px}
+.ad-item{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+.ad-item .em{font-weight:700;color:var(--navy);word-break:break-all}
+.ad-item small{color:var(--muted);font-size:12px;display:block;margin-top:3px}
+.selo{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle}
+.selo.ok{background:#e8f7ef;color:#1f7a45}.selo.off{background:#fdecec;color:#9b1c1c}.selo.cort{background:#eef0ff;color:#3b3fb3}.selo.sem{background:var(--sky);color:var(--muted)}
+.ad-acoes{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.ad-lib{grid-column:1/-1;display:none;gap:8px;grid-template-columns:1fr 1fr auto auto;align-items:end;border-top:1px solid var(--line);padding-top:10px}
+.ad-lib.on{display:grid}
+.ad-lib label{font-size:12px;font-weight:700;color:var(--muted);display:grid;gap:4px}
+.msg{padding:10px 14px;border-radius:var(--r-sm);font-size:14px;margin-bottom:14px}
+.msg.erro{background:#fdecec;color:#9b1c1c}.msg.ok{background:#e8f7ef;color:#1f7a45}
+@media (max-width:700px){.ad-novo,.ad-lib{grid-template-columns:1fr 1fr}.ad-novo label:first-child{grid-column:1/-1}.ad-item{grid-template-columns:1fr}.ad-acoes{justify-content:flex-start}}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="/"><img src="/icons/icon.svg" alt=""><span>DENTAL<b>CHECK</b></span></a>
+  <div class="sp"></div>
+  <a class="btn sm ghost" href="/">Voltar ao app</a>
+</header>
+<main class="wrap">
+  <div class="ad-topo"><div><div class="kick">Administração</div><h1>Contas e acessos</h1></div><button class="btn sm" id="btnAtualizar">Atualizar</button></div>
+  <div class="msg hidden" id="msg"></div>
+  <div id="conteudo" class="hidden">
+    <div class="ad-resumo" id="resumo"></div>
+    <div class="card">
+      <b style="color:var(--navy)">Liberar acesso gratuito</b>
+      <p class="muted" style="font-size:13px;margin-top:4px">Funciona para quem já tem conta ou para um e-mail novo: a pessoa cria a conta com este e-mail e já entra com o plano liberado.</p>
+      <form class="ad-novo" id="formNovo">
+        <label>E-mail<input class="in" id="novoEmail" type="email" placeholder="email@dentista.com" required></label>
+        <label>Plano<select class="in" id="novoPlano"></select></label>
+        <label>Válido até<input class="in" id="novoAte" type="date" title="Deixe vazio para não ter prazo"></label>
+        <button class="btn pri">Liberar</button>
+      </form>
+    </div>
+    <input class="in ad-busca" id="busca" type="search" placeholder="Buscar por e-mail">
+    <div class="ad-lista" id="lista"></div>
+  </div>
+</main>
+<script src="/assets/licenca.js"></script>
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const data = d => d ? new Date(d).toLocaleDateString("pt-BR") : "—";
+  const PLANOS = { essencial: "Essencial", profissional: "Profissional", clinica: "Clínica" };
+  const opcoes = sel => Object.entries(PLANOS).map(([k, n]) => `<option value="${k}"${k === sel ? " selected" : ""}>${n}</option>`).join("");
+  let contas = [];
+
+  const lic = Licenca.atual();
+  if (!lic || lic.tipo !== "conta") { location.replace("/"); return; }
+  $("novoPlano").innerHTML = opcoes("profissional");
+
+  function aviso(texto, tipo) { $("msg").textContent = texto; $("msg").className = "msg " + tipo + (texto ? "" : " hidden"); }
+
+  async function chamar(corpo) {
+    const r = await fetch("/api/admin", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(corpo) });
+    const d = await r.json().catch(() => ({}));
+    if (!d.ok) throw new Error(d.erro || "Não foi possível concluir.");
+    return d;
+  }
+  async function carregar(corpo = { acao: "listar" }, okMsg = "") {
+    try {
+      const d = await chamar(corpo);
+      contas = d.contas; desenhar(); $("conteudo").classList.remove("hidden"); aviso(okMsg, "ok");
+    } catch (e) { aviso(e.message, "erro"); }
+  }
+
+  function situacao(a) {
+    if (!a) return `<span class="selo sem">sem assinatura</span>`;
+    const nome = a.origem === "cortesia" ? `<span class="selo cort">cortesia</span>` : "";
+    return `${nome}<span class="selo ${a.liberado ? "ok" : "off"}">${a.liberado ? "acesso liberado" : a.status}</span>`;
+  }
+  function desenhar() {
+    const total = contas.length, ativos = contas.filter(c => c.assinatura?.liberado).length, cort = contas.filter(c => c.assinatura?.origem === "cortesia" && c.assinatura.liberado).length;
+    $("resumo").innerHTML = `<div><b>${total}</b>e-mails</div><div><b>${ativos}</b>com acesso</div><div><b>${ativos - cort}</b>pagantes</div><div><b>${cort}</b>cortesias</div>`;
+    const termo = $("busca").value.trim().toLowerCase();
+    $("lista").innerHTML = contas.filter(c => c.email.includes(termo)).map((c, i) => {
+      const a = c.assinatura;
+      const linhaConta = c.conta ? `Conta criada em ${data(c.conta.criada)}${c.conta.confirmada ? "" : " · e-mail não confirmado"} · último login ${data(c.conta.ultimoLogin)}` : "Ainda não criou a conta no app";
+      const linhaPlano = a ? `Plano ${esc(a.planoNome)}${a.titular ? "" : " · equipe de " + esc(a.titularEmail)} · ${a.origem === "cortesia" ? (a.validoAte ? "até " + data(a.validoAte) : "sem prazo") : (a.periodo + " · até " + data(a.validoAte))} · ${a.uso.simulacoes} de ${a.limite + a.uso.extras} simulações este mês` : "";
+      const podeMexer = !a || a.titular;
+      return `<div class="ad-item" data-i="${i}">
+        <div><span class="em">${esc(c.email)}</span>${situacao(a)}<small>${linhaConta}</small>${linhaPlano ? `<small>${linhaPlano}</small>` : ""}</div>
+        <div class="ad-acoes">${podeMexer ? `<button class="btn sm pri" data-abrir>${a?.liberado ? "Alterar acesso" : "Liberar grátis"}</button>` : ""}${a?.liberado && a.titular ? `<button class="btn sm danger" data-encerrar>Encerrar acesso</button>` : ""}</div>
+        ${podeMexer ? `<form class="ad-lib"><label>Plano<select class="in" name="plano">${opcoes(a?.plano || "profissional")}</select></label><label>Válido até<input class="in" name="ate" type="date" title="Deixe vazio para não ter prazo"></label><button class="btn pri">Confirmar</button><button class="btn" type="button" data-fechar>Cancelar</button></form>` : ""}
+      </div>`;
+    }).join("") || `<p class="muted">Nenhum e-mail encontrado.</p>`;
+  }
+
+  function liberar(email, plano, ate) {
+    const pergunta = `Liberar o plano ${PLANOS[plano]} de graça para ${email}${ate ? " até " + ate.split("-").reverse().join("/") : " sem prazo"}?` +
+      (contas.find(c => c.email === email && c.assinatura?.titular && c.assinatura.origem === "kiwify" && c.assinatura.liberado) ? "\n\nAtenção: este e-mail tem uma assinatura paga ativa. Ela será substituída pela cortesia." : "");
+    if (!confirm(pergunta)) return false;
+    carregar({ acao: "liberar", email, plano, ate: ate || null }, `Acesso liberado para ${email}.`);
+    return true;
+  }
+
+  $("lista").onclick = e => {
+    const item = e.target.closest(".ad-item"); if (!item) return;
+    const c = contas[item.dataset.i], form = item.querySelector(".ad-lib");
+    if (e.target.closest("[data-abrir]")) form.classList.add("on");
+    if (e.target.closest("[data-fechar]")) form.classList.remove("on");
+    if (e.target.closest("[data-encerrar]") && confirm(`Encerrar agora o acesso de ${c.email}? A pessoa deixa de conseguir usar o app.`))
+      carregar({ acao: "encerrar", email: c.email }, `Acesso de ${c.email} encerrado.`);
+  };
+  $("lista").onsubmit = e => {
+    e.preventDefault();
+    const c = contas[e.target.closest(".ad-item").dataset.i];
+    liberar(c.email, e.target.plano.value, e.target.ate.value);
+  };
+  $("formNovo").onsubmit = e => {
+    e.preventDefault();
+    if (liberar($("novoEmail").value.trim().toLowerCase(), $("novoPlano").value, $("novoAte").value)) { $("novoEmail").value = ""; $("novoAte").value = ""; }
+  };
+  $("busca").oninput = desenhar;
+  $("btnAtualizar").onclick = () => carregar();
+  carregar();
+})();
+</script>
+</body>
+</html>

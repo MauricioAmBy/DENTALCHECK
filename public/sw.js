@@ -1,5 +1,5 @@
 /* DENTALCHECK — service worker: deixa o app funcionando offline depois da ativação */
-const VERSAO = "dc-v8";
+const VERSAO = "dc-v9";
 const BASE = [ /* endereços limpos (sem .html), iguais aos da Vercel */
   "/", "/apresentacao", "/simulador",
   "./assets/app.css", "./assets/db.js", "./assets/licenca.js", "./assets/dentes.js", "./assets/ia.js",
