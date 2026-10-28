@@ -1,0 +1,948 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0c2440">
+<title>Apresentação do paciente · DENTALCHECK</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link id="fontes" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/app.css">
+<script src="assets/licenca.js"></script>
+<script>Licenca.exigir()</script>
+<style>
+/* ---------- lista ---------- */
+.lista-top{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:6px 0 18px}
+.lista-top .in{flex:1 1 220px;max-width:380px}
+.pacientes{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.pac{display:flex;gap:14px;align-items:center;padding:14px;background:#fff;border:1px solid var(--line);border-radius:var(--r);cursor:pointer;text-align:left;width:100%;transition:border .2s,transform .2s}
+.pac:hover{border-color:var(--brand);transform:translateY(-2px)}
+.pac .av{width:52px;height:52px;border-radius:14px;background:var(--mint) center/cover;flex:none;display:grid;place-items:center;font-weight:800;color:var(--brand2)}
+.pac small{color:var(--muted);display:block}
+.vazio{text-align:center;padding:60px 20px;color:var(--muted)}
+
+/* ---------- editor ---------- */
+.editor{display:grid;grid-template-columns:230px 1fr;gap:20px;align-items:start}
+.menu{position:sticky;top:80px;display:flex;flex-direction:column;gap:4px;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:8px}
+.menu button{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:10px;text-align:left;font-weight:600;font-size:14px;color:var(--muted)}
+.menu button:hover{background:var(--sky)}
+.menu button.on{background:var(--mint);color:var(--brand2)}
+.menu .n{font-size:12px;background:var(--sky);border-radius:99px;padding:1px 8px}
+.secao{margin-bottom:20px;scroll-margin-top:80px}
+.secao>h2{margin-bottom:4px}
+.secao>.muted{margin-bottom:16px;font-size:14px}
+.fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.slot{position:relative;aspect-ratio:4/3;border:1.5px dashed var(--line2);border-radius:14px;display:grid;place-items:center;background:var(--sky) center/cover no-repeat;cursor:pointer;overflow:hidden;text-align:center;font-size:13px;color:var(--muted);padding:8px}
+.slot.tem{border-style:solid;border-color:var(--line)}
+.slot .rot{position:absolute;left:6px;bottom:6px;background:rgba(12,36,64,.75);color:#fff;font-size:11px;padding:2px 8px;border-radius:99px}
+.slot .x{position:absolute;right:6px;top:6px;width:26px;height:26px;border-radius:50%;background:#fff;color:var(--bad);display:grid;place-items:center;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.slot .girar{position:absolute;right:36px;top:6px;width:26px;height:26px;border-radius:50%;background:#fff;color:var(--navy);display:grid;place-items:center;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.slot .ia{position:absolute;left:6px;top:6px;background:var(--brand);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px}
+.slot select.rot{border:0;cursor:pointer;appearance:none;padding-right:18px;background:rgba(12,36,64,.8) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='white' stroke-width='1.5'/%3E%3C/svg%3E") right 6px center/8px no-repeat}
+.slot.processando::after{content:"IA organizando…";position:absolute;inset:0;background:rgba(12,36,64,.7);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700}
+.fotos-acoes{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+#preparando{position:fixed;inset:0;background:rgba(12,36,64,.86);z-index:400;display:grid;place-items:center;color:#fff;text-align:center}
+#preparando .spinner{width:56px;height:56px;border-radius:50%;border:5px solid rgba(255,255,255,.2);border-top-color:#4fd1c5;animation:gira 1s linear infinite;margin:0 auto 16px}
+@keyframes gira{to{transform:rotate(360deg)}}
+.item{border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;background:var(--sky)}
+.item-top{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.item-top .in{flex:1}
+.par{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* odontograma */
+.odo{overflow-x:auto;padding-bottom:6px}
+.arcada{display:grid;grid-template-columns:repeat(16,minmax(38px,1fr));gap:4px;min-width:640px}
+.dente{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;border-radius:10px;border:1px solid transparent}
+.dente:hover{background:var(--sky);border-color:var(--line)}
+.dente svg{width:30px;height:54px}
+.dente .num{font-size:11px;font-weight:700;color:var(--muted)}
+.arcada.inf .dente{flex-direction:column-reverse}
+.linha-media{height:1px;background:var(--line2);margin:8px 0}
+.legenda{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:14px;font-size:12px;color:var(--muted)}
+.legenda i{display:inline-block;width:12px;height:12px;border-radius:4px;border:1px solid var(--line2);vertical-align:-2px;margin-right:5px}
+.status-grade{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:12px 0}
+.status-grade button{display:flex;gap:8px;align-items:center;padding:9px 10px;border:1px solid var(--line);border-radius:10px;font-size:13px;text-align:left}
+.status-grade button.on{border-color:var(--brand);background:var(--mint)}
+.status-grade i{width:14px;height:14px;border-radius:4px;border:1px solid var(--line2);flex:none}
+
+/* identidade */
+.cores{display:flex;gap:8px;flex-wrap:wrap}
+.cores button{width:34px;height:34px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px var(--line2)}
+.cores button.on{box-shadow:0 0 0 2px var(--ink)}
+.logo-box{display:flex;gap:12px;align-items:center}
+.logo-box .prev{width:72px;height:72px;border-radius:14px;border:1px dashed var(--line2);background:#fff center/contain no-repeat}
+
+/* ---------- slides (apresentação e PDF) ---------- */
+#palco{position:fixed;inset:0;background:#0a1626;z-index:200;display:flex;flex-direction:column}
+#palco .barra{display:flex;align-items:center;gap:10px;padding:10px 14px;color:#fff}
+#palco .barra .sp{flex:1}
+#palco .barra .btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff}
+#palco .area{flex:1;overflow:hidden;position:relative;min-height:0}
+/* o slide (1280×720) fica preso ao centro exato da área e só então recebe o zoom: centralizado em qualquer tela */
+#palco .area .slide{position:absolute;left:50%;top:50%}
+#palco .dica-girar{display:none;color:rgba(255,255,255,.7);font-size:13px;text-align:center;padding:0 14px 6px}
+@media (max-width:760px){
+  #palco .barra{padding:8px 10px;gap:6px}
+  #palco .barra .btn{height:32px;padding:0 10px;font-size:12px}
+  #palco .area .nav{top:auto;bottom:14px;transform:none;width:44px;height:44px}
+  #palco .area .nav.ant{left:calc(50% - 54px)}#palco .area .nav.prox{right:calc(50% - 54px)}
+}
+@media (max-width:760px) and (orientation:portrait){#palco .dica-girar{display:block}}
+#palco .nav{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:22px}
+#palco .nav.ant{left:12px}#palco .nav.prox{right:12px}
+.slide{width:1280px;height:720px;background:var(--s-fundo,#fff);position:relative;overflow:hidden;font-family:var(--fs,var(--sans));color:var(--s-texto,#10233a);flex:none;transform-origin:center}
+.slide .cab{position:absolute;left:64px;right:64px;top:40px;display:flex;justify-content:space-between;align-items:center;font-size:15px;color:var(--s-suave,#5d6f84)}
+.slide .cab img{height:40px;max-width:180px;object-fit:contain}
+.slide .corpo{position:absolute;left:64px;right:64px;top:110px;bottom:56px;display:flex;flex-direction:column}
+.slide .rod{position:absolute;left:64px;right:64px;bottom:22px;font-size:13px;color:var(--s-suave2,#8a99aa);display:flex;justify-content:space-between}
+.slide .k{font-size:15px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--brand)}
+.slide .t{font-size:46px;line-height:1.1;font-weight:800;color:var(--s-texto,#0c2440);margin:8px 0 26px}
+.slide .t em{font-style:normal;color:var(--brand)}
+.slide.capa{background:linear-gradient(135deg,var(--capa1,#0c2440),var(--capa2,#0c2440))}
+.slide.capa .corpo{justify-content:center}
+.slide.capa .t{color:var(--capa-texto,#fff);font-size:72px}
+.slide.capa .k,.slide.capa .cab,.slide.capa .rod{color:var(--capa-texto,#fff);opacity:.78}
+.slide.capa .sub{color:var(--capa-texto,#fff);opacity:.88;font-size:24px;max-width:760px}
+.slide .duas{display:grid;grid-template-columns:1fr 1fr;gap:28px;flex:1;min-height:0}
+.slide .box{background:var(--s-caixa,#f3f8fb);border-radius:22px;padding:28px;font-size:21px;line-height:1.5;overflow:hidden;white-space:pre-wrap}
+.slide .box h3{font-size:16px;text-transform:uppercase;letter-spacing:.08em;color:var(--brand);margin-bottom:10px}
+/* área de imagens dos slides: 1152 × 440 px; as fotos chegam recortadas na proporção exata de cada espaço */
+.slide .galeria{display:grid;gap:14px;height:440px}
+.slide .galeria figure{position:relative;border-radius:16px;overflow:hidden;background:var(--s-caixa,#e8eef3);min-height:0}
+.slide .galeria img{display:block;width:100%;height:100%}
+.slide .galeria figcaption{position:absolute;left:12px;bottom:12px;background:rgba(12,36,64,.78);color:#fff;font-size:15px;font-weight:600;padding:4px 14px;border-radius:99px}
+.slide .comp{position:relative;height:440px;border-radius:18px;overflow:hidden;background:#000;touch-action:none;cursor:ew-resize}
+.slide .comp img{position:absolute;inset:0;width:100%;height:100%}
+.slide .par{display:grid;grid-template-columns:1fr 1fr;gap:14px;height:440px}
+.slide .par figure{position:relative;border-radius:18px;overflow:hidden;background:#000}
+.slide .par img{display:block;width:100%;height:100%}
+.slide .par figcaption{position:absolute;top:14px;left:14px;background:rgba(12,36,64,.82);color:#fff;font-size:16px;font-weight:700;padding:5px 16px;border-radius:99px;letter-spacing:.04em;text-transform:uppercase}
+.slide .par figure.dep figcaption{background:var(--brand)}
+.slide .legenda-plano{margin-top:12px;font-size:15px;color:var(--s-suave,#5d6f84)}
+/* antes e depois do rosto: duas fotos em pé (415 × 554) e o texto numa coluna à esquerda */
+.slide .rv{display:grid;grid-template-columns:1fr 415px 415px;gap:16px;height:554px}
+.slide .rv-txt{display:flex;flex-direction:column;justify-content:center;padding-right:8px}
+.slide .rv-txt .t{font-size:36px;margin:10px 0 6px}
+.slide .rv-txt .legenda-plano{font-size:16px;line-height:1.5}
+.slide .rv-nota{margin-top:20px;font-size:13px;color:var(--s-suave2,#8a99aa);line-height:1.45}
+.slide .rv figure{position:relative;border-radius:18px;overflow:hidden;background:#000}
+.slide .rv img{display:block;width:100%;height:100%}
+.slide .rv figcaption{position:absolute;top:14px;left:14px;background:rgba(12,36,64,.82);color:#fff;font-size:16px;font-weight:700;padding:5px 16px;border-radius:99px;letter-spacing:.04em;text-transform:uppercase}
+.slide .rv figure.dep figcaption{background:var(--brand)}
+.slide .comp .dep{clip-path:inset(0 0 0 50%)}
+.slide .comp .div{position:absolute;top:0;bottom:0;left:50%;width:3px;background:#fff;transform:translateX(-50%);box-shadow:0 0 12px rgba(0,0,0,.4)}
+.slide .comp .div::after{content:"⇆";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:22px;color:#0c2440}
+.slide .comp .tag{position:absolute;top:14px;background:rgba(12,36,64,.8);color:#fff;font-size:15px;padding:4px 14px;border-radius:99px}
+.slide .lado{display:grid;grid-template-columns:1fr 1fr;gap:16px;height:440px}
+.slide .lado figure{position:relative;border-radius:16px;overflow:hidden;background:#000}
+.slide .lado img{display:block;width:100%;height:100%}
+.slide .lado figcaption{position:absolute;top:12px;left:12px;background:rgba(12,36,64,.8);color:#fff;padding:3px 12px;border-radius:99px;font-size:15px}
+.slide .odo-s .arcada{min-width:0;gap:6px}
+.slide .odo-s .dente svg{width:44px;height:78px}
+.slide .odo-s .dente .num{font-size:14px}
+.slide .achados{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 20px;margin-top:18px;font-size:16px}
+.slide .achados div{display:flex;gap:8px;align-items:flex-start}
+.slide .achados i{width:14px;height:14px;border-radius:4px;flex:none;margin-top:4px;border:1px solid #c9d3de}
+.slide .props{display:grid;gap:18px;flex:1;min-height:0}
+.slide .prop{border:2px solid var(--s-borda,#e3eaf0);border-radius:22px;padding:26px;display:flex;flex-direction:column;position:relative}
+.slide .prop.dest{border-color:var(--brand);background:var(--brand-claro)}
+.slide .prop .selo{position:absolute;top:-14px;left:24px;background:var(--brand);color:#fff;font-size:13px;font-weight:700;padding:4px 12px;border-radius:99px;text-transform:uppercase;letter-spacing:.06em}
+.slide .prop h3{font-size:26px;color:var(--s-texto,#0c2440)}
+.slide .prop p{font-size:18px;color:var(--s-suave,#4a5b6e);margin-top:8px;flex:1;white-space:pre-wrap;overflow:hidden}
+.slide .prop .v{font-size:32px;font-weight:800;color:var(--brand);margin-top:14px}
+.slide .prop .s{font-size:15px;color:var(--s-suave,#5d6f84)}
+.slide .equipe{display:flex;gap:28px;flex-wrap:wrap;margin-top:24px}
+.slide .equipe div{font-size:18px}
+.slide .equipe b{display:block;font-size:22px;color:var(--capa-texto,#fff)}
+.slide .equipe .eq-sub{color:var(--capa-texto,#fff);opacity:.75}
+.slide .dente .num{color:var(--s-suave,#5d6f84)}
+.slide .contato{margin-top:28px;font-size:20px;color:var(--capa-texto,#fff);opacity:.88;display:grid;gap:6px}
+.slide .exame-nota{font-size:18px;color:var(--s-suave,#4a5b6e);margin-top:10px}
+
+/* ---------- painel de aparência (identidade visual) ---------- */
+#painelMarca{position:fixed;inset:0;z-index:300;display:flex;justify-content:flex-end;background:rgba(12,36,64,.35)}
+.pm{width:min(460px,100%);height:100%;background:#fff;display:flex;flex-direction:column;box-shadow:-20px 0 50px -20px rgba(12,36,64,.5)}
+.pm-topo{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)}
+.pm-topo h2{flex:1;font-size:18px}
+.pm-corpo{flex:1;overflow:auto;padding:16px 18px}
+.pm-base{display:flex;gap:8px;justify-content:flex-end;padding:14px 18px;border-top:1px solid var(--line)}
+.pm-linha{display:flex;gap:6px;flex-wrap:wrap}
+.pm-linha select{flex:1 1 160px}
+.pm-previa{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.pm-mini{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:8px;border:1px solid var(--line)}
+.pm-mini .slide{position:absolute;left:0;top:0;transform-origin:top left}
+.pm-temas{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
+.pm-temas button{display:flex;align-items:center;gap:4px;padding:7px 8px;border:1px solid var(--line);border-radius:10px;font-size:12px;font-weight:600;text-align:left}
+.pm-temas button:hover{border-color:var(--brand)}
+.pm-temas i{width:14px;height:14px;border-radius:50%;border:1px solid rgba(0,0,0,.15);flex:none}
+.pm-temas span{margin-left:4px}
+.pm-cores{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.pm-cor{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:12px;font-size:13px;font-weight:600;cursor:pointer}
+.pm-cor input{width:34px;height:34px;border:0;padding:0;background:none;cursor:pointer;flex:none}
+.pm details{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:4px}
+.pm summary{font-weight:700;font-size:14px;cursor:pointer;color:var(--navy)}
+.pm details[open] summary{margin-bottom:12px}
+.ident-chip{font-size:12px;font-weight:600;color:var(--muted)}
+
+#render{position:fixed;left:-99999px;top:0}
+.editor>*{min-width:0}
+@media (max-width:860px){#migalha{display:none}#tituloPac{flex-basis:100%!important;order:-1}.editor{grid-template-columns:1fr}.menu{position:static;flex-direction:row;overflow-x:auto}.menu button{white-space:nowrap}.menu .n{margin-left:6px}.par{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a class="logo" href="./index.html"><img src="icons/icon.svg" alt=""><span>DENTAL<b>CHECK</b></span></a>
+  <span class="muted" id="migalha">· Apresentações</span>
+  <div class="sp"></div>
+  <button class="btn sm" id="btnConfig" title="Aparência da apresentação">🎨<span class="so-pc"> Aparência da apresentação</span></button>
+</header>
+
+<!-- LISTA DE PACIENTES -->
+<main class="wrap" id="vLista">
+  <div class="kick">Pacientes</div>
+  <h1>Apresentações do paciente</h1>
+  <div class="lista-top">
+    <input class="in" id="busca" placeholder="Buscar paciente…" type="search">
+    <button class="btn pri" id="btnNovo">+ Novo paciente</button>
+  </div>
+  <div class="pacientes" id="pacientes"></div>
+</main>
+
+<!-- EDITOR -->
+<main class="wrap hidden" id="vEditor" style="max-width:1200px">
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px">
+    <button class="btn sm ghost" id="btnVoltar">← Pacientes</button>
+    <h1 id="tituloPac" style="font-size:26px;flex:1">Paciente</h1>
+    <span class="muted" id="salvo" style="font-size:13px"></span>
+    <button class="btn sm" id="btnIdent" title="Escolher a identidade e as cores desta apresentação">🎨 <span id="identNome"></span></button>
+    <button class="btn sm" id="btnPdf">Baixar PDF</button>
+    <button class="btn sm" id="btnCompartilhar">Compartilhar</button>
+    <button class="btn sm pri" id="btnApresentar">▶ Apresentar</button>
+  </div>
+  <div class="editor">
+    <nav class="menu" id="menu"></nav>
+    <div id="secoes"></div>
+  </div>
+</main>
+
+<div id="palco" class="hidden">
+  <div class="barra"><b id="palcoNum"></b><div class="sp"></div><button class="btn sm" id="palcoTela">Tela cheia</button><button class="btn sm" id="palcoFechar">Fechar ✕</button></div>
+  <div class="area" id="palcoArea"><button class="nav ant" id="palcoAnt">‹</button><button class="nav prox" id="palcoProx">›</button></div>
+  <div class="dica-girar">↻ Gire o celular na horizontal para ver os slides maiores</div>
+</div>
+<div id="render"></div>
+<div id="painelMarca" class="hidden"><div class="pm"><div class="pm-topo"><h2>🎨 Aparência da apresentação</h2><button class="ib" id="pmFechar" title="Fechar">✕</button></div><div class="pm-corpo" id="pmCorpo"></div><div class="pm-base"><button class="btn" id="pmCancelar">Cancelar</button><button class="btn pri" id="pmSalvar">Salvar</button></div></div></div>
+<div id="preparando" class="hidden"><div><div class="spinner"></div><h2 style="color:#fff" id="preparandoTxt">Preparando a apresentação…</h2></div></div>
+<input type="file" id="arquivo" accept="image/*" class="hidden">
+
+<script src="assets/db.js"></script>
+<script src="assets/dentes.js"></script>
+<script src="assets/ia.js"></script>
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  let cfg, pac, salvarTimer;
+
+  const ANGULOS = [
+    ["sorriso", "Rosto de frente, sorrindo"], ["perfil-esq", "Lateral esquerda"], ["perfil", "Lateral direita"], ["boca", "Boca de frente"],
+    ["repouso", "Frontal em repouso"],
+    ["intra-frontal", "Intraoral frontal"], ["intra-dir", "Intraoral lado direito"], ["intra-esq", "Intraoral lado esquerdo"],
+    ["oclusal-sup", "Oclusal superior"], ["oclusal-inf", "Oclusal inferior"]
+  ];
+  const CORES = ["#0b9e96", "#1f6fd1", "#0c2440", "#7b3fbf", "#c2417a", "#b8862b", "#2e8b57", "#d4553a"];
+  const FONTES = ["Plus Jakarta Sans", "Montserrat", "Poppins", "Playfair Display", "Lora", "Nunito"];
+  const SECOES = [
+    ["paciente", "Paciente"], ["fotos", "Fotos intraorais"], ["antesDepois", "Antes e depois"],
+    ["exames", "Radiografias e exames"], ["odonto", "Odontograma"], ["propostas", "Propostas"]
+  ];
+
+  /* ---------- utilidades ---------- */
+  function escolherImagem(multiplas) {
+    return new Promise(ok => {
+      const inp = $("arquivo");
+      inp.multiple = !!multiplas; inp.value = "";
+      inp.onchange = async () => {
+        const res = [];
+        for (const f of inp.files) res.push(await lerImagem(f));
+        ok(res);
+      };
+      inp.click();
+    });
+  }
+  const dataBR = d => d ? d.split("-").reverse().join("/") : "";
+  const primeiroNome = n => (n || "").trim().split(/\s+/)[0] || "";
+  const moeda = v => v ? (isNaN(Number(String(v).replace(",", "."))) ? v : Number(String(v).replace(",", ".")).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })) : "";
+
+  /* mistura duas cores hex (t = quanto da segunda); feito em JS porque o gerador de PDF não entende color-mix() */
+  function misturar(a, b, t) {
+    const h = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
+    const [x, y] = [h(a), h(b)];
+    return "#" + x.map((v, i) => Math.round(v + (y[i] - v) * t).toString(16).padStart(2, "0")).join("");
+  }
+  /* ---------- identidades visuais ----------
+     O doutor pode ter várias (ex.: uma por clínica). Cada paciente guarda qual usa (pac.identidade);
+     sem escolha, vale a última usada (cfg.identidadeAtual). */
+  const IDENT_PADRAO = { nome: "Minha clínica", clinica: "", slogan: "", logo: "", fonte: "Plus Jakarta Sans", destaque: "#0b9e96", fundo: "#ffffff", texto: "#10233a", capa: "#0c2440", profissionais: [], whatsapp: "", instagram: "", endereco: "" };
+  const TEMAS = [
+    { nome: "Clássico", destaque: "#0b9e96", fundo: "#ffffff", texto: "#10233a", capa: "#0c2440" },
+    { nome: "Azul clínico", destaque: "#1f6fd1", fundo: "#f6f9fc", texto: "#0f2747", capa: "#123a6b" },
+    { nome: "Escuro elegante", destaque: "#c9a96e", fundo: "#14181f", texto: "#f1f2f4", capa: "#0b0e13" },
+    { nome: "Rosé", destaque: "#b4566a", fundo: "#fbf5f3", texto: "#4a1f2a", capa: "#6b2a3a" },
+    { nome: "Minimalista", destaque: "#1b1b1b", fundo: "#ffffff", texto: "#1b1b1b", capa: "#efece6" },
+    { nome: "Verde natural", destaque: "#2e8b57", fundo: "#f7faf7", texto: "#1d3326", capa: "#1f4d35" }
+  ];
+  /* versões antigas tinham uma identidade só (cfg.clinica, cfg.cor…): vira a primeira da lista */
+  function migrarIdentidades() {
+    if (Array.isArray(cfg.identidades) && cfg.identidades.length) return;
+    cfg.identidades = [{ ...IDENT_PADRAO, id: DB.uid(), nome: cfg.clinica || IDENT_PADRAO.nome, clinica: cfg.clinica || "", slogan: cfg.slogan || "", logo: cfg.logo || "",
+      fonte: cfg.fonte || IDENT_PADRAO.fonte, destaque: cfg.cor || IDENT_PADRAO.destaque, profissionais: cfg.profissionais || [], whatsapp: cfg.whatsapp || "", instagram: cfg.instagram || "", endereco: cfg.endereco || "" }];
+    cfg.identidadeAtual = cfg.identidades[0].id;
+  }
+  const identidade = () => cfg.identidades.find(i => i.id === (pac && pac.identidade)) || cfg.identidades.find(i => i.id === cfg.identidadeAtual) || cfg.identidades[0];
+  const claridade = c => { const [r, g, b] = [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16)); return (0.299 * r + 0.587 * g + 0.114 * b) / 255; };
+
+  /* aplica a identidade como variáveis de cor; tons intermediários são calculados aqui (o gerador de PDF não entende color-mix) */
+  function aplicarMarca(I = identidade()) {
+    const raiz = document.documentElement.style, def = (k, v) => raiz.setProperty(k, v);
+    def("--brand", I.destaque);
+    def("--brand2", misturar(I.destaque, "#000000", 0.22));
+    def("--brand-claro", misturar(I.destaque, I.fundo, 0.9));
+    def("--s-fundo", I.fundo);
+    def("--s-texto", I.texto);
+    def("--s-suave", misturar(I.texto, I.fundo, 0.38));
+    def("--s-suave2", misturar(I.texto, I.fundo, 0.55));
+    def("--s-caixa", misturar(I.fundo, I.texto, 0.06));
+    def("--s-borda", misturar(I.fundo, I.texto, 0.13));
+    def("--capa1", I.capa);
+    def("--capa2", misturar(I.capa, I.destaque, 0.4));
+    def("--capa-texto", claridade(I.capa) > 0.6 ? "#14181f" : "#ffffff");   // texto escuro em capa clara
+    def("--fs", `"${I.fonte}", var(--sans)`);
+    const fam = FONTES.map(f => "family=" + f.replace(/ /g, "+") + ":wght@400;600;700;800").join("&");
+    const href = "https://fonts.googleapis.com/css2?" + fam + "&display=swap";
+    if ($("fontes").href !== href) $("fontes").href = href;
+    if ($("identNome")) $("identNome").textContent = I.nome || "Identidade";
+  }
+
+  /* desenho simplificado do dente para o odontograma */
+  function denteSVG(n, cor) {
+    const d = DENTES.porNumero(n), sup = d.superior;
+    const larg = { incisivo: 16, canino: 17, premolar: 19, molar: 24 }[d.grupo];
+    const x0 = (30 - larg) / 2, coroaY = sup ? 30 : 4, coroaH = 20;
+    let coroa;
+    if (d.grupo === "canino") coroa = sup
+      ? `M${x0} ${coroaY}h${larg}v${coroaH - 8}l-${larg / 2} 8l-${larg / 2} -8z`
+      : `M${x0 + larg / 2} ${coroaY}l${larg / 2} 8v${coroaH - 8}h-${larg}v-${coroaH - 8}z`;
+    else coroa = `M${x0} ${coroaY + 3}q0 -3 3 -3h${larg - 6}q3 0 3 3v${coroaH - 6}q0 3 -3 3h-${larg - 6}q-3 0 -3 -3z`;
+    const raizes = [];
+    const nr = d.raizes, base = sup ? coroaY : coroaY + coroaH, ponta = sup ? 2 : 52;
+    for (let i = 0; i < nr; i++) {
+      const cx = x0 + larg * (i + 1) / (nr + 1), w = nr === 1 ? larg * 0.32 : larg * 0.18;
+      raizes.push(`M${cx - w} ${base}Q${cx - w * 0.6} ${(base + ponta) / 2} ${cx} ${ponta}Q${cx + w * 0.6} ${(base + ponta) / 2} ${cx + w} ${base}z`);
+    }
+    const ausente = cor === DENTES.status("ausente").cor;
+    return `<svg viewBox="0 0 30 54"><g fill="${cor}" stroke="#7d8da0" stroke-width="1.2" opacity="${ausente ? .45 : 1}" stroke-dasharray="${ausente ? "2 2" : ""}">
+      ${raizes.map(r => `<path d="${r}" fill="${cor === "#ffffff" ? "#f4efe6" : cor}"/>`).join("")}<path d="${coroa}"/></g></svg>`;
+  }
+
+  /* ---------- lista ---------- */
+  async function renderLista() {
+    const termo = $("busca").value.trim().toLowerCase();
+    const todos = await DB.listar();
+    const lista = todos.filter(p => !termo || (p.nome || "").toLowerCase().includes(termo));
+    $("pacientes").innerHTML = lista.length ? lista.map(p => {
+      const capa = p.fotos.sorriso || p.fotos["intra-frontal"] || Object.values(p.fotos)[0];
+      return `<button class="pac" data-id="${p.id}"><div class="av" style="${capa ? `background-image:url(${capa})` : ""}">${capa ? "" : esc((p.nome || "?")[0].toUpperCase())}</div>
+        <div><b>${esc(p.nome || "Sem nome")}</b><small>Avaliação em ${dataBR(p.data)}</small></div></button>`;
+    }).join("") : `<div class="vazio" style="grid-column:1/-1"><h2>${todos.length ? "Nenhum paciente encontrado" : "Nenhum paciente ainda"}</h2><p>Crie o primeiro caso para montar a apresentação.</p></div>`;
+  }
+  $("busca").oninput = renderLista;
+  $("pacientes").onclick = e => { const b = e.target.closest(".pac"); if (b) abrir(b.dataset.id); };
+  $("btnNovo").onclick = async () => {
+    const nome = prompt("Nome do paciente:");
+    if (nome === null) return;
+    const p = await DB.salvar(DB.novoPaciente(nome.trim()));
+    abrir(p.id);
+  };
+
+  /* ---------- editor ---------- */
+  async function abrir(id) {
+    pac = await DB.obter(id);
+    if (!pac) return;
+    history.replaceState(null, "", "?paciente=" + id);
+    $("vLista").classList.add("hidden"); $("vEditor").classList.remove("hidden");
+    aplicarMarca();                                  // cores da identidade deste paciente
+    renderEditor(); scrollTo(0, 0);
+  }
+  $("btnVoltar").onclick = () => { pac = null; aplicarMarca(); history.replaceState(null, "", location.pathname); $("vEditor").classList.add("hidden"); $("vLista").classList.remove("hidden"); renderLista(); };
+
+  function salvar() {
+    $("salvo").textContent = "Salvando…";
+    clearTimeout(salvarTimer);
+    salvarTimer = setTimeout(async () => { await DB.salvar(pac); $("salvo").textContent = "✓ Salvo"; renderMenu(); }, 400);
+  }
+
+  function contagens() {
+    return {
+      paciente: "", fotos: Object.keys(pac.fotos).length || "", antesDepois: pac.antesDepois.length || "",
+      exames: pac.exames.length || "", odonto: Object.values(pac.dentes).filter(d => d.status && d.status !== "higido").length || "",
+      propostas: pac.propostas.length || ""
+    };
+  }
+  function renderMenu() {
+    const c = contagens();
+    $("menu").innerHTML = SECOES.map(([id, nome]) => `<button data-s="${id}">${nome}${c[id] ? `<span class="n">${c[id]}</span>` : ""}</button>`).join("");
+    $("tituloPac").textContent = pac.nome || "Paciente sem nome";
+  }
+  $("menu").onclick = e => { const b = e.target.closest("button"); if (b) document.getElementById("s-" + b.dataset.s).scrollIntoView({ behavior: "smooth" }); };
+
+  function renderEditor() {
+    renderMenu();
+    $("secoes").innerHTML = SECOES.map(([id]) => `<section class="secao card" id="s-${id}"></section>`).join("");
+    renderPaciente(); renderFotos(); renderAntesDepois(); renderExames(); renderOdonto(); renderPropostas();
+    $("salvo").textContent = "";
+  }
+
+  /* liga campos com data-campo ao objeto do paciente */
+  function ligar(raiz, alvo, depois) {
+    raiz.querySelectorAll("[data-campo]").forEach(el => {
+      el.oninput = () => { alvo[el.dataset.campo] = el.type === "checkbox" ? el.checked : el.value; salvar(); depois && depois(); };
+    });
+  }
+
+  function renderPaciente() {
+    const s = $("s-paciente");
+    s.innerHTML = `<h2>Paciente</h2><p class="muted">Dados que aparecem na capa e na página de avaliação.</p>
+      <div class="row"><div class="f"><label>Nome</label><input class="in" data-campo="nome" value="${esc(pac.nome)}"></div>
+      <div class="f" style="max-width:200px"><label>Data da avaliação</label><input class="in" type="date" data-campo="data" value="${esc(pac.data)}"></div>
+      <div class="f" style="max-width:220px"><label>Telefone (opcional)</label><input class="in" data-campo="telefone" value="${esc(pac.telefone)}"></div></div>
+      <div class="f"><label>O que o paciente deseja</label><textarea class="in" data-campo="desejo" placeholder="Ex.: dentes mais brancos, fechar o espaço entre os dentes da frente…">${esc(pac.desejo)}</textarea></div>
+      <div class="f"><label>Avaliação do profissional</label><textarea class="in" data-campo="avaliacao" placeholder="O que foi observado no exame clínico…">${esc(pac.avaliacao)}</textarea></div>
+      <button class="btn sm danger" id="btnExcluir">Excluir paciente</button>`;
+    ligar(s, pac, () => $("tituloPac").textContent = pac.nome || "Paciente sem nome");
+    $("btnExcluir").onclick = async () => { if (confirm("Excluir este paciente e todas as fotos?")) { await DB.excluir(pac.id); $("btnVoltar").click(); } };
+  }
+
+  /* ---------- fotos organizadas por IA ----------
+     Cada foto é analisada: a IA diz quanto girar, qual ângulo é e onde estão boca e rosto.
+     A foto é guardada já em pé, no ângulo certo, e as caixas servem para enquadrar os slides. */
+  const NOME_ANGULO = Object.fromEntries(ANGULOS);
+  const infoFotos = () => (pac.fotosInfo = pac.fotosInfo || {});
+
+  async function analisar(img) {
+    if (!navigator.onLine) return null;
+    try { return await IA.analisarFoto(img); } catch (e) { console.warn(e); return null; }
+  }
+
+  /* recebe várias fotos (cada uma com o ângulo onde o doutor a colocou, ou nenhum) e distribui pelos ângulos certos */
+  async function organizar(itens, ocupados = pac.fotos) {
+    const avisos = [], novos = {}, novasInfo = {};
+    const analisadas = await Promise.all(itens.map(async it => ({ ...it, a: await analisar(it.img) })));
+    for (const it of analisadas) {
+      let img = it.img, info = { ia: !!it.a };
+      if (it.a) {
+        if (it.a.rotacao) { img = await IA.girar(img, it.a.rotacao); avisos.push("endireitei " + (NOME_ANGULO[it.a.angulo] || "uma foto").toLowerCase()); }
+        info = { ia: true, boca: it.a.boca, rosto: it.a.rosto, angulo: it.a.angulo };
+      }
+      const sugerido = it.a && NOME_ANGULO[it.a.angulo] ? it.a.angulo : null;
+      /* nunca ocupa um ângulo que já tem foto: nada é sobrescrito */
+      const livre = id => id && !novos[id] && !ocupados[id];
+      const destino = livre(sugerido) ? sugerido : livre(it.slot) ? it.slot : ANGULOS.map(([id]) => id).find(livre);
+      if (!destino) { avisos.push("não há ângulo livre para uma das fotos"); continue; }
+      if (it.slot && destino !== it.slot) avisos.push(`movi para “${NOME_ANGULO[destino]}”`);
+      novos[destino] = img; novasInfo[destino] = info;
+    }
+    return { novos, novasInfo, avisos };
+  }
+
+  function aplicar({ novos, novasInfo, avisos }) {
+    Object.assign(pac.fotos, novos); Object.assign(infoFotos(), novasInfo);
+    salvar(); renderFotos();
+    if (avisos.length) toast("IA: " + [...new Set(avisos)].slice(0, 3).join(", ") + ".");
+  }
+
+  /* reorganiza as fotos já salvas que ainda não passaram pela IA (ou todas, se pedir) */
+  async function organizarExistentes(todas) {
+    const ids = Object.keys(pac.fotos).filter(id => todas || !(infoFotos()[id] || {}).ia);
+    if (!ids.length || !navigator.onLine) return 0;
+    const itens = ids.map(id => ({ slot: id, img: pac.fotos[id] }));
+    /* as fotos reanalisadas saem dos seus ângulos e voltam onde a IA indicar; as demais ficam onde estão */
+    const ocupados = Object.fromEntries(Object.entries(pac.fotos).filter(([id]) => !ids.includes(id)));
+    const r = await organizar(itens, ocupados);
+    ids.forEach(id => { delete pac.fotos[id]; delete infoFotos()[id]; });
+    aplicar(r);
+    return ids.length;
+  }
+
+  function renderFotos() {
+    const s = $("s-fotos");
+    s.innerHTML = `<h2>Fotos intraorais</h2><p class="muted">Adicione as fotos em qualquer ordem: a IA endireita, identifica o ângulo e enquadra cada uma para a apresentação.</p>
+      <div class="fotos-acoes"><button class="btn sm pri" id="addVarias">+ Adicionar várias fotos</button><button class="btn sm" id="reorganizar">✨ Reorganizar com IA</button></div>
+      <div class="fotos">${ANGULOS.map(([id, nome]) => {
+        const src = pac.fotos[id];
+        if (!src) return `<div class="slot" data-a="${id}">+ ${nome}</div>`;
+        const opcoes = ANGULOS.map(([a, n]) => `<option value="${a}" ${a === id ? "selected" : ""}>${n}</option>`).join("");
+        return `<div class="slot tem" data-a="${id}" style="background-image:url(${src})">${(infoFotos()[id] || {}).ia ? `<span class="ia">IA ✓</span>` : ""}
+          <select class="rot" data-mover="${id}" title="Mudar o ângulo desta foto">${opcoes}</select><button class="girar" data-girar="${id}" title="Girar 90°">↻</button><button class="x" data-del="${id}" title="Remover">×</button></div>`;
+      }).join("")}</div>`;
+    s.onclick = async e => {
+      if (e.target.closest("select")) return;
+      const del = e.target.closest("[data-del]");
+      if (del) { const id = del.dataset.del; delete pac.fotos[id]; delete infoFotos()[id]; salvar(); renderFotos(); return; }
+      const gir = e.target.closest("[data-girar]");
+      if (gir) {
+        const id = gir.dataset.girar, info = infoFotos()[id] || {};
+        pac.fotos[id] = await IA.girar(pac.fotos[id], 90);
+        infoFotos()[id] = { ...info, boca: IA.girarCaixa(info.boca, 90), rosto: IA.girarCaixa(info.rosto, 90) };
+        salvar(); renderFotos(); return;
+      }
+      if (e.target.id === "addVarias") {
+        const imgs = await escolherImagem(true); if (!imgs.length) return;
+        toast("IA organizando " + imgs.length + (imgs.length > 1 ? " fotos…" : " foto…"));
+        return aplicar(await organizar(imgs.map(img => ({ img }))));
+      }
+      if (e.target.id === "reorganizar") {
+        if (!Object.keys(pac.fotos).length) return toast("Adicione fotos primeiro.");
+        s.querySelectorAll(".slot.tem").forEach(x => x.classList.add("processando"));
+        const n = await organizarExistentes(true);
+        if (!n) { renderFotos(); toast("Sem internet: a IA precisa de conexão."); }
+        return;
+      }
+      const slot = e.target.closest(".slot");
+      if (!slot || slot.classList.contains("tem")) return;
+      const [img] = await escolherImagem();
+      if (!img) return;
+      slot.style.backgroundImage = `url(${img})`; slot.classList.add("tem", "processando"); slot.textContent = "";
+      aplicar(await organizar([{ slot: slot.dataset.a, img }]));
+    };
+    /* trocar o ângulo à mão: se o destino estiver ocupado, as duas fotos trocam de lugar */
+    s.onchange = e => {
+      const sel = e.target.closest("[data-mover]"); if (!sel) return;
+      const de = sel.dataset.mover, para = sel.value, info = infoFotos();
+      [pac.fotos[de], pac.fotos[para]] = [pac.fotos[para], pac.fotos[de]];
+      [info[de], info[para]] = [info[para], info[de]];
+      if (!pac.fotos[de]) { delete pac.fotos[de]; delete info[de]; }
+      salvar(); renderFotos();
+    };
+  }
+
+  function renderAntesDepois() {
+    const s = $("s-antesDepois");
+    s.innerHTML = `<h2>Antes e depois</h2><p class="muted">Na apresentação vira um comparador com divisória arrastável. Simulações do simulador de sorriso aparecem aqui.</p>
+      ${pac.antesDepois.map((b, i) => `<div class="item" data-i="${i}">
+        <div class="item-top"><input class="in" data-campo="titulo" placeholder="Título (ex.: Clareamento + lentes)" value="${esc(b.titulo)}"><button class="btn sm danger" data-del>Remover</button></div>
+        <div class="par">${["antes", "depois"].map(k => `<div class="slot ${b[k] ? "tem" : ""}" data-k="${k}" style="${b[k] ? `background-image:url(${b[k]})` : ""}">${b[k] ? `<span class="rot">${k === "antes" ? "Antes" : "Depois"}</span>` : "+ Foto " + k}</div>`).join("")}</div>
+      </div>`).join("")}
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn sm" id="addBA">+ Adicionar comparação</button><a class="btn sm" href="simulador.html?paciente=${pac.id}">Criar no simulador de sorriso</a></div>`;
+    s.querySelectorAll(".item").forEach(el => ligar(el, pac.antesDepois[el.dataset.i]));
+    $("addBA").onclick = () => { pac.antesDepois.push({ id: DB.uid(), titulo: "", antes: "", depois: "" }); salvar(); renderAntesDepois(); };
+    s.onclick = async e => {
+      const it = e.target.closest(".item"); if (!it) return;
+      const b = pac.antesDepois[it.dataset.i];
+      if (e.target.closest("[data-del]")) { pac.antesDepois.splice(it.dataset.i, 1); salvar(); renderAntesDepois(); return; }
+      const slot = e.target.closest(".slot");
+      if (slot) { const [img] = await escolherImagem(); if (img) { b[slot.dataset.k] = img; salvar(); renderAntesDepois(); } }
+    };
+  }
+
+  function renderExames() {
+    const s = $("s-exames");
+    s.innerHTML = `<h2>Radiografias e exames</h2><p class="muted">Panorâmica, periapicais, tomografia ou qualquer exame que ajude a explicar o caso.</p>
+      ${pac.exames.map((x, i) => `<div class="item" data-i="${i}">
+        <div class="item-top"><input class="in" data-campo="titulo" placeholder="Ex.: Radiografia panorâmica" value="${esc(x.titulo)}"><button class="btn sm danger" data-del>Remover</button></div>
+        <div class="par"><div class="slot tem" style="background-image:url(${x.img});background-size:contain;background-color:#000" data-troca></div>
+        <textarea class="in" data-campo="nota" placeholder="O que esse exame mostra (em linguagem simples para o paciente)">${esc(x.nota)}</textarea></div></div>`).join("")}
+      <button class="btn sm" id="addExame">+ Adicionar exames</button>`;
+    s.querySelectorAll(".item").forEach(el => ligar(el, pac.exames[el.dataset.i]));
+    $("addExame").onclick = async () => { const imgs = await escolherImagem(true); imgs.forEach(img => pac.exames.push({ id: DB.uid(), titulo: "", img, nota: "" })); if (imgs.length) { salvar(); renderExames(); } };
+    s.onclick = async e => {
+      const it = e.target.closest(".item"); if (!it) return;
+      if (e.target.closest("[data-del]")) { pac.exames.splice(it.dataset.i, 1); salvar(); renderExames(); return; }
+      if (e.target.closest("[data-troca]")) { const [img] = await escolherImagem(); if (img) { pac.exames[it.dataset.i].img = img; salvar(); renderExames(); } }
+    };
+  }
+
+  function arcadaHTML(ordem, cls) {
+    return `<div class="arcada ${cls}">${ordem.map(n => {
+      const st = DENTES.status((pac.dentes[n] || {}).status);
+      return `<button class="dente" data-n="${n}" title="${esc(DENTES.nomeCompleto(n))} — ${st.nome}">${denteSVG(n, st.cor)}<span class="num">${n}</span></button>`;
+    }).join("")}</div>`;
+  }
+  function renderOdonto() {
+    const s = $("s-odonto");
+    s.innerHTML = `<h2>Odontograma</h2><p class="muted">Toque em um dente para marcar a situação e escrever uma observação.</p>
+      <div class="odo">${arcadaHTML(DENTES.ORDEM_SUP, "sup")}<div class="linha-media"></div>${arcadaHTML(DENTES.ORDEM_INF, "inf")}</div>
+      <div class="legenda">${DENTES.STATUS.map(x => `<span><i style="background:${x.cor}"></i>${x.nome}</span>`).join("")}</div>`;
+    s.onclick = e => { const b = e.target.closest(".dente"); if (b) editarDente(b.dataset.n); };
+  }
+  function editarDente(n) {
+    const atual = pac.dentes[n] || { status: "higido", nota: "" };
+    const d = DENTES.porNumero(n);
+    const m = document.createElement("div");
+    m.className = "modal";
+    m.innerHTML = `<div class="card"><div class="kick">Dente ${n}</div><h2>${esc(DENTES.nomeCompleto(n))}</h2>
+      <p class="muted" style="font-size:13px;margin-top:6px">${esc(d.desc)}</p>
+      <div class="status-grade">${DENTES.STATUS.map(x => `<button data-st="${x.id}" class="${x.id === atual.status ? "on" : ""}"><i style="background:${x.cor}"></i>${x.nome}</button>`).join("")}</div>
+      <div class="f"><label>Observação</label><textarea class="in" id="notaDente" placeholder="Opcional">${esc(atual.nota)}</textarea></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px"><button class="btn" data-x>Cancelar</button><button class="btn pri" data-ok>Salvar</button></div></div>`;
+    document.body.appendChild(m);
+    let escolhido = atual.status;
+    m.onclick = e => {
+      const st = e.target.closest("[data-st]");
+      if (st) { escolhido = st.dataset.st; m.querySelectorAll("[data-st]").forEach(b => b.classList.toggle("on", b === st)); }
+      if (e.target === m || e.target.closest("[data-x]")) m.remove();
+      if (e.target.closest("[data-ok]")) {
+        const nota = m.querySelector("#notaDente").value.trim();
+        if (escolhido === "higido" && !nota) delete pac.dentes[n]; else pac.dentes[n] = { status: escolhido, nota };
+        salvar(); renderOdonto(); m.remove();
+      }
+    };
+  }
+
+  function renderPropostas() {
+    const s = $("s-propostas");
+    s.innerHTML = `<h2>Propostas de tratamento</h2><p class="muted">Mostre até 3 opções lado a lado. Marque a recomendada.</p>
+      ${pac.propostas.map((x, i) => `<div class="item" data-i="${i}">
+        <div class="item-top"><input class="in" data-campo="titulo" placeholder="Ex.: Lentes de contato em 10 dentes" value="${esc(x.titulo)}"><button class="btn sm danger" data-del>Remover</button></div>
+        <div class="f"><textarea class="in" data-campo="descricao" placeholder="O que está incluso, etapas, benefícios">${esc(x.descricao)}</textarea></div>
+        <div class="row"><div class="f"><label>Valor</label><input class="in" data-campo="valor" placeholder="Ex.: 12000 ou 10x de R$ 1.200" value="${esc(x.valor)}"></div>
+        <div class="f"><label>Sessões / prazo</label><input class="in" data-campo="sessoes" placeholder="Ex.: 4 sessões" value="${esc(x.sessoes)}"></div>
+        <label style="display:flex;gap:8px;align-items:center;flex:0 0 auto;font-size:14px"><input type="checkbox" data-campo="destaque" ${x.destaque ? "checked" : ""}> Recomendada</label></div></div>`).join("")}
+      <button class="btn sm" id="addProp" ${pac.propostas.length >= 3 ? "disabled" : ""}>+ Adicionar proposta</button>`;
+    s.querySelectorAll(".item").forEach(el => ligar(el, pac.propostas[el.dataset.i]));
+    $("addProp").onclick = () => { pac.propostas.push({ id: DB.uid(), titulo: "", descricao: "", valor: "", sessoes: "", destaque: false }); salvar(); renderPropostas(); };
+    s.onclick = e => { const it = e.target.closest(".item"); if (it && e.target.closest("[data-del]")) { pac.propostas.splice(it.dataset.i, 1); salvar(); renderPropostas(); } };
+  }
+
+  /* ---------- painel de aparência ----------
+     Rápido de usar: escolher a identidade, aplicar um tema pronto ou ajustar logo, cores e fonte, vendo a
+     prévia dos slides ao vivo. Nada é gravado até clicar em Salvar (Cancelar volta como estava). */
+  let rascunho = null;                                   // { lista: cópia das identidades, sel: id escolhido }
+  const editando = () => rascunho.lista.find(i => i.id === rascunho.sel);
+  const CAMPOS_COR = [["fundo", "Fundo dos slides"], ["texto", "Cor do texto"], ["destaque", "Cor de destaque"], ["capa", "Fundo da capa"]];
+
+  function abrirPainel() {
+    rascunho = { lista: JSON.parse(JSON.stringify(cfg.identidades)), sel: identidade().id };
+    $("painelMarca").classList.remove("hidden");
+    desenharPainel();
+  }
+  $("btnConfig").onclick = abrirPainel;
+  $("btnIdent").onclick = abrirPainel;
+
+  function desenharPainel() {
+    const I = editando();
+    $("pmCorpo").innerHTML = `
+      <div class="pm-previa"><div class="pm-mini" id="pmMini1"></div><div class="pm-mini" id="pmMini2"></div></div>
+      <div class="f"><label>Identidade ${pac ? "desta apresentação" : "padrão"}</label>
+        <div class="pm-linha"><select class="in" id="pmSel">${rascunho.lista.map(x => `<option value="${x.id}" ${x.id === I.id ? "selected" : ""}>${esc(x.nome || "Sem nome")}</option>`).join("")}</select>
+          <button class="btn sm" data-a="nova">+ Nova</button><button class="btn sm" data-a="duplicar">Duplicar</button>${rascunho.lista.length > 1 ? `<button class="btn sm danger" data-a="excluir">Excluir</button>` : ""}</div></div>
+      <div class="f"><label>Nome da identidade</label><input class="in" data-k="nome" value="${esc(I.nome)}" placeholder="Ex.: Clínica Centro"></div>
+      <div class="f"><label>Temas prontos</label><div class="pm-temas">${TEMAS.map((t, i) => `<button data-tema="${i}"><i style="background:${t.capa}"></i><i style="background:${t.fundo}"></i><i style="background:${t.destaque}"></i><span>${t.nome}</span></button>`).join("")}</div></div>
+      <div class="f"><label>Logo</label><div class="logo-box"><div class="prev" style="${I.logo ? `background-image:url(${I.logo})` : ""}"></div><button class="btn sm" data-a="logo">Escolher imagem</button>${I.logo ? `<button class="btn sm danger" data-a="semlogo">Remover</button>` : ""}</div></div>
+      <div class="f" style="margin-bottom:6px"><label>Cores</label></div>
+      <div class="pm-cores">${CAMPOS_COR.map(([k, n]) => `<label class="pm-cor"><input type="color" data-k="${k}" value="${I[k]}"><span>${n}</span></label>`).join("")}</div>
+      <div class="f"><label>Fonte</label><select class="in" data-k="fonte">${FONTES.map(f => `<option ${f === I.fonte ? "selected" : ""} style="font-family:'${f}'">${f}</option>`).join("")}</select></div>
+      <details><summary>Dados da clínica (capa e último slide)</summary>
+        <div class="f"><label>Nome da clínica</label><input class="in" data-k="clinica" value="${esc(I.clinica)}"></div>
+        <div class="f"><label>Frase (opcional)</label><input class="in" data-k="slogan" value="${esc(I.slogan)}" placeholder="Ex.: Odontologia estética e reabilitação"></div>
+        <div class="row"><div class="f"><label>WhatsApp</label><input class="in" data-k="whatsapp" value="${esc(I.whatsapp)}"></div><div class="f"><label>Instagram</label><input class="in" data-k="instagram" value="${esc(I.instagram)}" placeholder="@suaclinica"></div></div>
+        <div class="f"><label>Endereço</label><input class="in" data-k="endereco" value="${esc(I.endereco)}"></div>
+        <div class="f"><label>Profissionais</label>${(I.profissionais || []).map((p, i) => `<div class="row" style="margin-bottom:8px" data-pi="${i}"><input class="in" data-p="nome" placeholder="Nome" value="${esc(p.nome)}"><input class="in" data-p="registro" placeholder="CRO" value="${esc(p.registro)}"><input class="in" data-p="especialidade" placeholder="Especialidade" value="${esc(p.especialidade)}"><button class="btn sm danger" style="flex:0 0 auto" data-pdel="${i}">×</button></div>`).join("")}
+          <button class="btn sm" data-a="padd">+ Profissional</button></div>
+      </details>`;
+    aplicarMarca(I);
+    desenharPreviaMarca();
+  }
+
+  /* prévia: a capa e um slide de conteúdo, com os mesmos estilos da apresentação de verdade */
+  function desenharPreviaMarca() {
+    const I = editando(), nome = pac && pac.nome ? pac.nome : "Maria Souza";
+    const cab = `<div class="cab"><span>${I.logo ? `<img src="${I.logo}" alt="">` : `<b>${esc(I.clinica || "Sua clínica")}</b>`}</span><span>${esc(nome)}</span></div>`;
+    const rod = `<div class="rod"><span>${esc(I.clinica || "Sua clínica")}${I.instagram ? " · " + esc(I.instagram) : ""}</span><span>${new Date().toLocaleDateString("pt-BR")}</span></div>`;
+    $("pmMini1").innerHTML = `<div class="slide capa">${cab}<div class="corpo"><div class="k">Planejamento do sorriso</div><div class="t">Olá, ${esc(primeiroNome(nome))}.</div>
+      <div class="sub">Preparamos esta apresentação para mostrar tudo o que vimos na sua avaliação.</div></div>${rod}</div>`;
+    $("pmMini2").innerHTML = `<div class="slide">${cab}<div class="corpo"><div class="k">Sua avaliação</div><div class="t">O que você deseja e <em>o que nós vimos</em></div>
+      <div class="duas"><div class="box"><h3>Seu desejo</h3>Dentes mais brancos e alinhados.</div><div class="box"><h3>Nossa avaliação</h3>Indicadas lentes nos dentes da frente.</div></div></div>${rod}</div>`;
+    for (const id of ["pmMini1", "pmMini2"]) { const box = $(id); box.firstElementChild.style.transform = `scale(${box.clientWidth / 1280})`; }
+  }
+
+  $("pmCorpo").addEventListener("input", e => {
+    const I = editando(), el = e.target;
+    if (el.dataset.k) { I[el.dataset.k] = el.value; aplicarMarca(I); desenharPreviaMarca(); if (el.dataset.k === "nome") $("pmSel").selectedOptions[0].textContent = el.value || "Sem nome"; }
+    const linha = el.closest("[data-pi]");
+    if (linha && el.dataset.p) I.profissionais[linha.dataset.pi][el.dataset.p] = el.value;
+  });
+  $("pmCorpo").addEventListener("change", e => { if (e.target.id === "pmSel") { rascunho.sel = e.target.value; desenharPainel(); } });
+  $("pmCorpo").addEventListener("click", async e => {
+    const I = editando(), t = e.target;
+    const tema = t.closest("[data-tema]");
+    if (tema) { Object.assign(I, (({ nome, ...cores }) => cores)(TEMAS[tema.dataset.tema])); return desenharPainel(); }
+    if (t.closest("[data-pdel]")) { I.profissionais.splice(t.closest("[data-pdel]").dataset.pdel, 1); return desenharPainel(); }
+    const a = t.closest("[data-a]")?.dataset.a;
+    if (a === "nova") { const n = { ...IDENT_PADRAO, id: DB.uid(), nome: "Nova identidade", profissionais: [] }; rascunho.lista.push(n); rascunho.sel = n.id; }
+    if (a === "duplicar") { const n = { ...JSON.parse(JSON.stringify(I)), id: DB.uid(), nome: (I.nome || "Identidade") + " (cópia)" }; rascunho.lista.push(n); rascunho.sel = n.id; }
+    if (a === "excluir" && confirm(`Excluir a identidade “${I.nome}”? Apresentações que usam ela passam a usar outra.`)) { rascunho.lista = rascunho.lista.filter(x => x.id !== I.id); rascunho.sel = rascunho.lista[0].id; }
+    if (a === "logo") { const [img] = await escolherImagem(); if (img) I.logo = img; }
+    if (a === "semlogo") I.logo = "";
+    if (a === "padd") { I.profissionais = I.profissionais || []; I.profissionais.push({ nome: "", registro: "", especialidade: "" }); }
+    if (a) desenharPainel();
+  });
+
+  function fecharPainel() { rascunho = null; $("painelMarca").classList.add("hidden"); aplicarMarca(); }
+  $("pmFechar").onclick = $("pmCancelar").onclick = fecharPainel;
+  $("painelMarca").addEventListener("click", e => { if (e.target.id === "painelMarca") fecharPainel(); });
+  $("pmSalvar").onclick = async () => {
+    cfg.identidades = rascunho.lista;
+    cfg.identidadeAtual = rascunho.sel;                  // a última escolhida vira a padrão dos próximos pacientes
+    if (pac) { pac.identidade = rascunho.sel; salvar(); }
+    await DB.salvarConfig(cfg);
+    fecharPainel();
+    toast(pac ? "Aparência aplicada nesta apresentação" : "Identidade salva");
+  };
+
+  /* ---------- preparação com IA antes de apresentar ----------
+     1) fotos que ainda não passaram pela IA são organizadas (girar, ângulo, foco);
+     2) antes/depois de rosto ganham também o close do sorriso (a IA acha a boca na foto). */
+  async function prepararComIA() {
+    if (!navigator.onLine) return;
+    const pendentes = Object.keys(pac.fotos).filter(id => !(infoFotos()[id] || {}).ia).length;
+    if (pendentes) { $("preparandoTxt").textContent = "A IA está organizando as fotos…"; await organizarExistentes(false); }
+    for (const b of pac.antesDepois) {
+      if (!b.antes || !b.depois || b.tipo) continue;
+      $("preparandoTxt").textContent = "A IA está preparando o antes e depois…";
+      try {
+        const boca = await IA.localizar(b.antes);
+        b.foco = boca;
+        b.tipo = boca && boca.w * boca.h < 0.2 ? "rosto" : "close";
+      } catch (e) { b.tipo = "close"; }
+      salvar();
+    }
+  }
+
+  /* caixa aproximada do rosto a partir da boca (boca ≈ 40% da largura do rosto, no terço inferior) */
+  async function rostoPelaBoca(src, boca) {
+    const img = await IA.carregar(src), W = img.width, H = img.height;
+    const mw = boca.w * W, fw = mw * 2.6, fh = mw * 3.5, cx = (boca.x + boca.w / 2) * W, cy = (boca.y + boca.h / 2) * H;
+    const y0 = cy - fh * 0.74;
+    return { x: (cx - fw / 2) / W, y: y0 / H, w: fw / W, h: fh / H };
+  }
+
+  /* exame inteiro dentro do espaço (sem cortar), com fundo preto */
+  async function conter(src, aspecto) {
+    const img = await IA.carregar(src), c = document.createElement("canvas");
+    c.height = 900; c.width = Math.round(900 * aspecto);
+    const x = c.getContext("2d"), k = Math.min(c.width / img.width, c.height / img.height);
+    x.fillStyle = "#000"; x.fillRect(0, 0, c.width, c.height);
+    x.drawImage(img, (c.width - img.width * k) / 2, (c.height - img.height * k) / 2, img.width * k, img.height * k);
+    return c.toDataURL("image/jpeg", 0.9);
+  }
+
+  /* foco de cada ângulo: sorriso e intraorais na boca; repouso e perfil no rosto */
+  function focoFoto(id) {
+    const info = infoFotos()[id] || {};
+    if (id === "sorriso") return info.boca ? { foco: info.boca, margem: 2.2 } : { foco: info.rosto, margem: 1.15 };
+    if (id === "repouso" || id === "perfil" || id === "perfil-esq") return { foco: info.rosto, margem: 1.2 };
+    if (id === "boca") return { foco: info.boca, margem: 1.25 };
+    return { foco: info.boca, margem: 1.12 };
+  }
+
+  /* ---------- montagem dos slides ----------
+     Área útil de imagem: 1152 × 440 px. Toda imagem é recortada na proporção exata do seu espaço,
+     então não sobra faixa preta e o PDF não distorce (o gerador de PDF ignora object-fit). */
+  async function montarSlides(paraPDF) {
+    const I = identidade();                          // identidade escolhida para este paciente
+    const cab = () => `<div class="cab"><span>${I.logo ? `<img src="${I.logo}" alt="">` : `<b>${esc(I.clinica || "")}</b>`}</span><span>${esc(pac.nome)}</span></div>`;
+    const rod = () => `<div class="rod"><span>${esc(I.clinica || "")}${I.instagram ? " · " + esc(I.instagram) : ""}</span><span>${dataBR(pac.data)}</span></div>`;
+    const sl = (cls, corpo) => `<div class="slide ${cls}">${cab()}<div class="corpo">${corpo}</div>${rod()}</div>`;
+    const out = [];
+
+    const idCapa = pac.fotos.sorriso ? "sorriso" : pac.fotos.repouso ? "repouso" : null;
+    let capa = "";
+    if (idCapa) {
+      const info = infoFotos()[idCapa] || {};
+      capa = await IA.enquadrar(pac.fotos[idCapa], 460 / 520, info.rosto || null, { margem: 1.12, alinharY: 0.4 });
+    }
+    out.push(`<div class="slide capa">${cab()}<div class="corpo" style="${capa ? "right:560px" : ""}">
+      <div class="k">Planejamento do sorriso · ${dataBR(pac.data)}</div>
+      <div class="t">${pac.nome ? "Olá, " + esc(primeiroNome(pac.nome)) + "." : "Seu novo sorriso."}</div>
+      <div class="sub">Preparamos esta apresentação para mostrar, com calma, tudo o que vimos na sua avaliação e os caminhos para chegar ao sorriso que você quer.</div></div>
+      ${capa ? `<img src="${capa}" style="position:absolute;right:64px;top:110px;width:460px;height:520px;border-radius:28px">` : ""}${rod()}</div>`);
+
+    if (pac.desejo || pac.avaliacao) out.push(sl("", `<div class="k">Sua avaliação</div><div class="t">O que você deseja e <em>o que nós vimos</em></div>
+      <div class="duas"><div class="box"><h3>Seu desejo</h3>${esc(pac.desejo || "—")}</div><div class="box"><h3>Nossa avaliação</h3>${esc(pac.avaliacao || "—")}</div></div>`));
+
+    /* fotos: até 3 por slide — 1 inteira; 2 lado a lado; 3 = uma grande + duas empilhadas */
+    const LAYOUT = {
+      1: { grade: "grid-template-columns:1fr", tam: [[1152, 440]] },
+      2: { grade: "grid-template-columns:1fr 1fr", tam: [[569, 440], [569, 440]] },
+      3: { grade: "grid-template-columns:740px 1fr;grid-template-rows:1fr 1fr", tam: [[740, 440], [398, 213], [398, 213]], primeira: "grid-row:1/3" }
+    };
+    const fotos = ANGULOS.filter(([id]) => pac.fotos[id]);
+    for (let i = 0; i < fotos.length; i += 3) {
+      const grupo = fotos.slice(i, i + 3), L = LAYOUT[grupo.length];
+      const figs = await Promise.all(grupo.map(async ([id, nome], j) => {
+        const [w, h] = L.tam[j], { foco, margem } = focoFoto(id);
+        const src = await IA.enquadrar(pac.fotos[id], w / h, foco || null, { margem });
+        return `<figure style="${j === 0 && L.primeira ? L.primeira : ""}"><img src="${src}" alt=""><figcaption>${nome}</figcaption></figure>`;
+      }));
+      out.push(sl("", `<div class="k">Fotos intraorais</div><div class="t">Seu sorriso <em>hoje</em></div><div class="galeria" style="${L.grade}">${figs.join("")}</div>`));
+    }
+
+    /* antes e depois: rosto lado a lado + close do sorriso (deslizante na apresentação, lado a lado no PDF) */
+    const par = (a, d) => `<div class="par"><figure><img src="${a}" alt=""><figcaption>Antes</figcaption></figure><figure class="dep"><img src="${d}" alt=""><figcaption>Depois</figcaption></figure></div>`;
+    const legenda = b => b.plano ? `<div class="legenda-plano">${esc(b.plano)}</div>` : "";
+    for (const b of pac.antesDepois.filter(b => b.antes && b.depois)) {
+      const titulo = esc(b.titulo || "Veja a diferença");
+      if (b.tipo === "rosto" && b.foco) {
+        /* rosto inteiro em pé, lado a lado: as fotos ocupam a altura toda do slide e o texto fica numa coluna
+           à esquerda. Usa a caixa do rosto marcada pela IA quando a foto é a mesma do paciente; senão estima pela boca. */
+        const info = pac.fotos.sorriso === b.antes ? infoFotos().sorriso || {} : {};
+        const r0 = info.rosto || await rostoPelaBoca(b.antes, b.foco);
+        const cabeca = { x: r0.x, y: r0.y - r0.h * 0.2, w: r0.w, h: r0.h * 1.32 };   // inclui cabelo em cima e um pouco do pescoço
+        const p = await IA.recortarPar(b.antes, b.depois, cabeca, 415 / 554, 1.1);
+        out.push(`<div class="slide">${cab()}<div class="corpo"><div class="rv">
+          <div class="rv-txt"><div class="k">Antes e depois · rosto</div><div class="t">${titulo}</div>${legenda(b)}
+            <div class="rv-nota">Simulação ilustrativa feita a partir da foto do paciente. O resultado final depende da avaliação clínica.</div></div>
+          <figure><img src="${p.antes}" alt=""><figcaption>Antes</figcaption></figure>
+          <figure class="dep"><img src="${p.depois}" alt=""><figcaption>Depois</figcaption></figure>
+        </div></div>${rod()}</div>`);
+      }
+      const foco = b.tipo === "rosto" ? b.foco : null;   // fotos que já são close: usa a imagem toda
+      if (paraPDF) {
+        const p = foco ? await IA.recortarPar(b.antes, b.depois, foco, 569 / 440, 1.35) : await IA.recortarPar(b.antes, b.depois, null, 569 / 440);
+        out.push(sl("", `<div class="k">Antes e depois · sorriso de perto</div><div class="t">${titulo}</div>${par(p.antes, p.depois)}${legenda(b)}`));
+      } else {
+        const p = foco ? await IA.recortarPar(b.antes, b.depois, foco, 1152 / 440, 1.3) : await IA.recortarPar(b.antes, b.depois, null, 1152 / 440);
+        out.push(sl("", `<div class="k">Antes e depois · sorriso de perto</div><div class="t">${titulo}</div>
+          <div class="comp"><img src="${p.antes}" alt=""><img class="dep" src="${p.depois}" alt=""><span class="tag" style="left:14px">Antes</span><span class="tag" style="right:14px">Depois</span><div class="div"></div></div>${legenda(b)}`));
+      }
+    }
+
+    for (const x of pac.exames) {
+      const img = await conter(x.img, x.nota ? 569 / 440 : 1152 / 440);
+      out.push(sl("", `<div class="k">Radiografias e exames</div><div class="t">${esc(x.titulo || "O que o exame mostra")}</div>
+        <div class="lado" style="${x.nota ? "" : "grid-template-columns:1fr"}"><figure><img src="${img}" alt=""></figure>${x.nota ? `<div class="box">${esc(x.nota)}</div>` : ""}</div>`));
+    }
+
+    const achados = Object.entries(pac.dentes).filter(([, d]) => d.status !== "higido" || d.nota);
+    if (achados.length) out.push(sl("", `<div class="k">Odontograma</div><div class="t">Dente a dente, <em>o seu mapa</em></div>
+      <div class="odo-s">${arcadaHTML(DENTES.ORDEM_SUP, "sup")}<div class="linha-media"></div>${arcadaHTML(DENTES.ORDEM_INF, "inf")}</div>
+      <div class="achados">${achados.slice(0, 12).map(([n, d]) => { const st = DENTES.status(d.status); return `<div><i style="background:${st.cor}"></i><span><b>${n}</b> · ${st.nome}${d.nota ? " — " + esc(d.nota) : ""}</span></div>`; }).join("")}</div>`));
+
+    if (pac.propostas.length) out.push(sl("", `<div class="k">Propostas de tratamento</div><div class="t">Opções para <em>o seu sorriso</em></div>
+      <div class="props" style="grid-template-columns:repeat(${pac.propostas.length},1fr)">${pac.propostas.map(x => `<div class="prop ${x.destaque ? "dest" : ""}">${x.destaque ? `<span class="selo">Recomendada</span>` : ""}
+        <h3>${esc(x.titulo || "Proposta")}</h3><p>${esc(x.descricao)}</p>${x.valor ? `<div class="v">${esc(moeda(x.valor))}</div>` : ""}${x.sessoes ? `<div class="s">${esc(x.sessoes)}</div>` : ""}</div>`).join("")}</div>`));
+
+    out.push(`<div class="slide capa">${cab()}<div class="corpo"><div class="k">Próximo passo</div><div class="t">Vamos cuidar do <br>seu sorriso?</div>
+      ${I.profissionais.length ? `<div class="equipe">${I.profissionais.map(p => `<div><b>${esc(p.nome)}</b><span class="eq-sub">${esc([p.especialidade, p.registro].filter(Boolean).join(" · "))}</span></div>`).join("")}</div>` : ""}
+      <div class="contato">${I.whatsapp ? `<span>WhatsApp: ${esc(I.whatsapp)}</span>` : ""}${I.instagram ? `<span>Instagram: ${esc(I.instagram)}</span>` : ""}${I.endereco ? `<span>${esc(I.endereco)}</span>` : ""}</div></div>${rod()}</div>`);
+    return out;
+  }
+
+  /* ---------- modo apresentação ---------- */
+  let slides = [], atual = 0;
+  function ajustarEscala() {
+    const area = $("palcoArea"), s = area.querySelector(".slide");
+    if (!s) return;
+    const k = Math.min(area.clientWidth / 1280, area.clientHeight / 720) * 0.96;
+    s.style.transform = `translate(-50%, -50%) scale(${k})`;
+  }
+  function mostrarSlide(i) {
+    atual = Math.max(0, Math.min(slides.length - 1, i));
+    const area = $("palcoArea");
+    area.querySelector(".slide")?.remove();
+    area.insertAdjacentHTML("afterbegin", slides[atual]);
+    $("palcoNum").textContent = `${atual + 1} / ${slides.length}`;
+    ajustarEscala();
+    const comp = area.querySelector(".comp");
+    if (comp) ativarComparador(comp);
+  }
+  function ativarComparador(comp) {
+    const dep = comp.querySelector(".dep"), div = comp.querySelector(".div");
+    const mover = e => {
+      const r = comp.getBoundingClientRect();
+      const p = Math.max(0, Math.min(100, (e.clientX - r.left) / r.width * 100));
+      dep.style.clipPath = `inset(0 0 0 ${p}%)`; div.style.left = p + "%";
+    };
+    comp.onpointerdown = e => { comp.setPointerCapture(e.pointerId); mover(e); comp.onpointermove = mover; };
+    comp.onpointerup = () => comp.onpointermove = null;
+  }
+  /* mostra o aviso "preparando" enquanto a IA organiza e as imagens são recortadas */
+  async function preparar(paraPDF) {
+    $("preparandoTxt").textContent = "Preparando a apresentação…";
+    $("preparando").classList.remove("hidden");
+    try {
+      await prepararComIA();
+      $("preparandoTxt").textContent = paraPDF ? "Montando o PDF…" : "Montando os slides…";
+      return await montarSlides(paraPDF);
+    } finally { $("preparando").classList.add("hidden"); }
+  }
+  $("btnApresentar").onclick = async () => {
+    try { slides = await preparar(false); } catch (e) { console.error(e); return toast("Não foi possível montar a apresentação."); }
+    $("palco").classList.remove("hidden"); mostrarSlide(0);
+  };
+  $("palcoFechar").onclick = () => { $("palco").classList.add("hidden"); if (document.fullscreenElement) document.exitFullscreen(); };
+  $("palcoAnt").onclick = () => mostrarSlide(atual - 1);
+  $("palcoProx").onclick = () => mostrarSlide(atual + 1);
+  $("palcoTela").onclick = () => document.fullscreenElement ? document.exitFullscreen() : $("palco").requestFullscreen?.();
+  addEventListener("resize", ajustarEscala);
+  addEventListener("keydown", e => {
+    if ($("palco").classList.contains("hidden")) return;
+    if (["ArrowRight", "PageDown", " "].includes(e.key)) { e.preventDefault(); mostrarSlide(atual + 1); }
+    if (["ArrowLeft", "PageUp"].includes(e.key)) mostrarSlide(atual - 1);
+    if (e.key === "Escape") $("palcoFechar").click();
+  });
+  let toqueX = null;
+  $("palcoArea").addEventListener("touchstart", e => { if (!e.target.closest(".comp")) toqueX = e.touches[0].clientX; }, { passive: true });
+  $("palcoArea").addEventListener("touchend", e => { if (toqueX === null) return; const dx = e.changedTouches[0].clientX - toqueX; if (Math.abs(dx) > 50) mostrarSlide(atual + (dx < 0 ? 1 : -1)); toqueX = null; });
+
+  /* ---------- PDF ---------- */
+  function carregarScript(src) {
+    return new Promise((ok, erro) => { if (document.querySelector(`script[src="${src}"]`)) return ok(); const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = erro; document.head.appendChild(s); });
+  }
+  async function gerarPDF() {
+    await carregarScript("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js");
+    await carregarScript("https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js");
+    await document.fonts.ready;
+    const pdf = new window.jspdf.jsPDF({ orientation: "landscape", unit: "px", format: [1280, 720], hotfixes: ["px_scaling"] });
+    const lista = await preparar(true), box = $("render");   // no PDF o antes/depois já vem lado a lado
+    for (let i = 0; i < lista.length; i++) {
+      toast(`Gerando PDF… ${i + 1}/${lista.length}`);
+      box.innerHTML = lista[i];
+      const s = box.firstElementChild;
+      await Promise.all([...s.querySelectorAll("img")].map(img => img.complete ? 0 : new Promise(r => img.onload = img.onerror = r)));
+      const canvas = await html2canvas(s, { scale: 1.5, backgroundColor: "#ffffff", useCORS: true, logging: false });
+      if (i) pdf.addPage([1280, 720], "landscape");
+      pdf.addImage(canvas.toDataURL("image/jpeg", 0.9), "JPEG", 0, 0, 1280, 720);
+    }
+    box.innerHTML = "";
+    return pdf.output("blob");
+  }
+  const nomeArquivo = () => `Planejamento - ${(pac.nome || "paciente").replace(/[\\/:*?"<>|]/g, "")}.pdf`;
+  async function comPDF(fn) {
+    if (!navigator.onLine && !window.jspdf) return toast("Abra o PDF uma vez com internet para baixar o gerador.");
+    try { await fn(await gerarPDF()); } catch (e) { console.error(e); toast("Não foi possível gerar o PDF."); }
+  }
+  $("btnPdf").onclick = () => comPDF(blob => {
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = nomeArquivo(); a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000); toast("PDF pronto!");
+  });
+  $("btnCompartilhar").onclick = () => comPDF(async blob => {
+    const arq = new File([blob], nomeArquivo(), { type: "application/pdf" });
+    if (navigator.canShare && navigator.canShare({ files: [arq] })) {
+      try { await navigator.share({ files: [arq], title: nomeArquivo(), text: `Olá, ${primeiroNome(pac.nome)}! Segue a apresentação do seu planejamento.` }); } catch (e) {}
+    } else { $("btnPdf").click(); toast("Seu aparelho não compartilha arquivos direto: o PDF foi baixado."); }
+  });
+
+  /* ---------- início ---------- */
+  (async () => {
+    cfg = await DB.config(); migrarIdentidades(); aplicarMarca();
+    const id = new URLSearchParams(location.search).get("paciente");
+    if (id) abrir(id); else renderLista();
+  })();
+})();
+</script>
+</body>
+</html>

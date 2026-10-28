@@ -1,0 +1,6 @@
+.env
+server/servidor.log
+node_modules
+INICIAR-DENTALCHECK.bat
+scripts
+.env.local

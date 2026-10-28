@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0c2440">
+<meta name="description" content="DENTALCHECK — modelo 3D, simulador de sorriso e apresentação do paciente.">
+<title>DENTALCHECK</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DENTALCHECK">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/app.css">
+<style>
+/* ativação */
+#ativacao{min-height:100vh;display:grid;grid-template-columns:1.05fr 1fr}
+.at-lado{background:linear-gradient(160deg,var(--navy),var(--navy2) 60%,#0d4f60);color:#fff;padding:48px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.at-lado::after{content:"";position:absolute;width:520px;height:520px;border-radius:50%;right:-180px;bottom:-200px;background:radial-gradient(circle,rgba(11,158,150,.55),transparent 70%)}
+.at-lado h1{color:#fff;font-size:clamp(28px,4vw,44px);max-width:460px;margin:18px 0 14px}
+.at-lado p{color:rgba(255,255,255,.75);max-width:420px}
+.at-lado ul{list-style:none;display:grid;gap:10px;margin-top:26px;position:relative;z-index:1}
+.at-lado li{display:flex;gap:10px;align-items:center;color:rgba(255,255,255,.88)}
+.at-lado li span{width:26px;height:26px;border-radius:50%;background:rgba(11,158,150,.3);display:grid;place-items:center;font-size:13px}
+.at-form{display:grid;place-items:center;padding:32px 20px;background:#fff}
+.at-form form{width:min(380px,100%)}
+.at-form h2{font-size:26px;margin-bottom:6px}
+.erro{background:#fdecec;color:#9b1c1c;padding:10px 14px;border-radius:var(--r-sm);font-size:14px;margin-bottom:14px}
+.ajuda{font-size:13px;color:var(--muted);margin-top:16px}
+
+/* hub */
+.hub-ola{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin:10px 0 24px}
+.sistemas{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}
+.sis.principal .arte{aspect-ratio:16/7}
+.passos{margin:10px 0 0 18px;display:grid;gap:6px;color:var(--muted);font-size:14px}
+.passos b{color:var(--navy)}
+.sis{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:var(--shadow);transition:transform .25s var(--ease),box-shadow .25s}
+.sis:hover{transform:translateY(-4px);box-shadow:0 28px 50px -26px rgba(12,36,64,.55)}
+.sis .arte{aspect-ratio:4/3;display:grid;place-items:center;position:relative}
+.sis .arte svg{width:46%;height:auto}
+.sis .txt{padding:18px 20px 22px}
+.sis .txt p{color:var(--muted);font-size:14px;margin-top:6px}
+.sis .ir{margin-top:14px;font-weight:700;color:var(--brand);font-size:14px}
+.a1{background:linear-gradient(150deg,#0c2440,#16508a)}
+.a2{background:linear-gradient(150deg,#0b9e96,#4fd1c5)}
+.a3{background:linear-gradient(150deg,#eef6fb,#cfe7f2)}
+.dica{margin-top:22px;display:flex;gap:12px;align-items:center;padding:14px 18px;border-radius:var(--r);background:var(--mint);font-size:14px}
+@media (max-width:860px){#ativacao{grid-template-columns:1fr}.at-lado{padding:32px 22px}.at-lado ul{display:none}.sistemas{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ATIVAÇÃO -->
+<section id="ativacao" class="hidden">
+  <div class="at-lado">
+    <div class="logo" style="color:#fff"><img src="icons/icon.svg" alt=""><span>DENTAL<b>CHECK</b></span></div>
+    <div style="position:relative;z-index:1">
+      <h1>Mostre ao paciente o sorriso que ele vai ter.</h1>
+      <p>Anatomia em 3D, simulação do sorriso na foto do paciente e uma apresentação pronta em PDF — tudo no seu celular, tablet ou computador.</p>
+      <ul>
+        <li><span>✓</span> Funciona offline depois da ativação</li>
+        <li><span>✓</span> Fotos e dados ficam só no seu aparelho</li>
+        <li><span>✓</span> Até 3 aparelhos por acesso</li>
+      </ul>
+    </div>
+    <small style="color:rgba(255,255,255,.5);position:relative;z-index:1">© DENTALCHECK</small>
+  </div>
+  <div class="at-form">
+    <form id="formAtivar" autocomplete="on">
+      <div class="kick">Acesso de teste</div>
+      <h2>Entrar no DENTALCHECK</h2>
+      <p class="muted" style="margin-bottom:22px">Digite a senha de acesso. Ela fica salva neste aparelho e você não precisa digitar de novo.</p>
+      <div id="erroAtivar" class="erro hidden"></div>
+      <div class="f"><label for="senha">Senha de acesso</label><input class="in" id="senha" type="password" required placeholder="••••••••" autocomplete="current-password"></div>
+      <button class="btn pri" id="btnAtivar" style="width:100%;height:48px;margin-top:6px">Entrar</button>
+      <button type="button" class="btn ghost hidden" id="btnTeste" style="width:100%;margin-top:8px">Entrar em modo de teste (só no computador local)</button>
+      <p class="ajuda">Precisa de internet só nesta etapa.</p>
+    </form>
+  </div>
+</section>
+
+<!-- HUB -->
+<section id="hub" class="hidden">
+  <header class="top">
+    <a class="logo" href="./index.html"><img src="icons/icon.svg" alt=""><span>DENTAL<b>CHECK</b></span></a>
+    <div class="sp"></div>
+    <button class="btn sm hidden" id="btnInstalar">Instalar app</button>
+    <button class="btn sm ghost" id="btnSair" title="Desconectar este aparelho">Sair</button>
+  </header>
+  <main class="wrap">
+    <div class="hub-ola">
+      <div>
+        <div class="kick" id="ola">Olá!</div>
+        <h1>O que vamos fazer hoje?</h1>
+      </div>
+    </div>
+    <div class="sistemas">
+      <a class="sis principal" href="simulador.html">
+        <div class="arte a2">
+          <svg viewBox="0 0 120 100" fill="none"><path d="M18 44c14 26 70 26 84 0" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path d="M28 48c10 14 54 14 64 0" fill="#fff"/><path d="M60 10l4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#fff"/><path d="M94 14l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#fff" opacity=".8"/></svg>
+        </div>
+        <div class="txt"><div class="kick">Comece por aqui</div><h2>Novo procedimento</h2>
+          <ol class="passos"><li><b>Fotos</b> — capture com o guia passo a passo ou envie as que já tem</li><li><b>Planejamento</b> — lentes, clareamento ou implantes, dente a dente</li><li><b>Simulação com IA</b> — antes e depois do novo sorriso</li><li><b>Apresentação</b> — slides e PDF com a sua marca</li></ol>
+          <div class="btn pri" style="margin-top:16px">+ Novo procedimento</div></div>
+      </a>
+      <a class="sis" href="apresentacao.html">
+        <div class="arte a3">
+          <svg viewBox="0 0 120 100" fill="none"><rect x="22" y="14" width="76" height="72" rx="8" fill="#fff" stroke="#0c2440" stroke-width="3"/><rect x="32" y="26" width="56" height="26" rx="4" fill="#0b9e96" opacity=".25"/><path d="M32 62h40M32 72h28" stroke="#0c2440" stroke-width="4" stroke-linecap="round"/><circle cx="86" cy="76" r="12" fill="#0b9e96"/><path d="M80 76l4 4 8-8" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="txt"><div class="kick">Casos salvos</div><h2>Pacientes e apresentações</h2><p>Abra um paciente para revisar fotos, simulações, odontograma e propostas, apresentar na consulta e gerar o PDF.</p><div class="ir">Ver pacientes →</div></div>
+      </a>
+    </div>
+    <div class="dica"><b>Dica:</b> instale o DENTALCHECK na tela inicial para abrir como aplicativo, mesmo sem internet.</div>
+  </main>
+</section>
+
+<script src="assets/licenca.js"></script>
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+
+  function mostrar() {
+    const lic = Licenca.atual();
+    $("ativacao").classList.toggle("hidden", !!lic);
+    $("hub").classList.toggle("hidden", !lic);
+    if (lic) $("ola").textContent = lic.nome ? "Olá, " + lic.nome.split(" ")[0] + "!" : "Olá!";
+  }
+
+  if (Licenca.LOCAL) $("btnTeste").classList.remove("hidden");
+  $("btnTeste").onclick = () => { Licenca.ativarTeste(); mostrar(); };
+
+  $("formAtivar").onsubmit = async e => {
+    e.preventDefault();
+    const b = $("btnAtivar"), erro = $("erroAtivar");
+    erro.classList.add("hidden");
+    if (!navigator.onLine) { erro.textContent = "Conecte-se à internet para a primeira ativação."; erro.classList.remove("hidden"); return; }
+    b.disabled = true; b.textContent = "Entrando…";
+    try { await Licenca.ativar($("senha").value); mostrar(); }
+    catch (err) { erro.textContent = err.message; erro.classList.remove("hidden"); }
+    finally { b.disabled = false; b.textContent = "Entrar"; }
+  };
+
+  $("btnSair").onclick = () => {
+    if (confirm("Desconectar este aparelho? Seus pacientes salvos continuam guardados aqui.")) { Licenca.sair(); mostrar(); }
+  };
+
+  /* instalação como app (Android / Chrome) */
+  let pedidoInstalar;
+  addEventListener("beforeinstallprompt", e => { e.preventDefault(); pedidoInstalar = e; $("btnInstalar").classList.remove("hidden"); });
+  $("btnInstalar").onclick = async () => { if (!pedidoInstalar) return; pedidoInstalar.prompt(); await pedidoInstalar.userChoice; pedidoInstalar = null; $("btnInstalar").classList.add("hidden"); };
+
+  if ("serviceWorker" in navigator && location.protocol !== "file:") navigator.serviceWorker.register("sw.js");
+  mostrar();
+})();
+</script>
+</body>
+</html>

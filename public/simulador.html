@@ -1,0 +1,1319 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0c2440">
+<title>Simulador de sorriso com IA · DENTALCHECK</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/app.css">
+<script src="assets/licenca.js"></script>
+<script>Licenca.exigir()</script>
+<style>
+/* etapas */
+.etapas{display:flex;gap:6px;align-items:center;font-size:13px;font-weight:600;color:var(--muted)}
+.etapas span{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px}
+.etapas b{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--sky);font-size:12px}
+.etapas span.on{background:var(--mint);color:var(--brand2)}
+.etapas span.on b{background:var(--brand);color:#fff}
+.etapas span.feita b{background:var(--navy);color:#fff}
+.etapas i{width:18px;height:1px;background:var(--line2)}
+
+/* etapa 1: foto */
+.foto-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:20px;align-items:start}
+.exemplos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0 18px}
+.exemplo{border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center;background:var(--sky)}
+.exemplo svg{width:100%;height:auto;max-height:140px}
+.exemplo b{display:block;margin-top:6px;font-size:14px}
+.exemplo small{color:var(--muted)}
+.checklist{list-style:none;display:grid;gap:10px;font-size:14px}
+.checklist li{display:flex;gap:10px;align-items:flex-start}
+.checklist .ok{color:var(--ok);font-weight:800}
+.checklist .no{color:var(--bad);font-weight:800}
+.drop{border:2px dashed var(--line2);border-radius:var(--r);padding:36px 20px;text-align:center;background:#fff;cursor:pointer;transition:.2s}
+.drop:hover,.drop.sobre{border-color:var(--brand);background:var(--mint)}
+.drop .ico{width:56px;height:56px;border-radius:16px;background:var(--mint);display:grid;place-items:center;margin:0 auto 12px;color:var(--brand2);font-size:26px}
+.avisos{margin-top:14px;display:grid;gap:8px}
+.aviso{padding:10px 14px;border-radius:12px;font-size:14px;background:#fff7e6;color:#8a5a00}
+.aviso.bom{background:#e8f7ef;color:#1f7a45}
+.fotos-pac{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.fotos-pac img{width:84px;height:63px;object-fit:cover;border-radius:10px;cursor:pointer;border:2px solid transparent}
+.fotos-pac img:hover{border-color:var(--brand)}
+
+/* etapa 2: planejamento */
+.plano-grid{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:20px;align-items:start}
+.foto-box{position:sticky;top:80px}
+.palco{position:relative;border-radius:var(--r);overflow:hidden;background:#000;user-select:none;touch-action:none}
+.palco img{width:100%;display:block;pointer-events:none}
+.regiao{position:absolute;border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 9999px rgba(12,36,64,.45),0 0 0 2px var(--brand) inset;cursor:move}
+.regiao .alca{position:absolute;right:-9px;bottom:-9px;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--brand);cursor:nwse-resize}
+.regiao .rot{position:absolute;left:50%;top:-30px;transform:translateX(-50%);background:var(--brand);color:#fff;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap}
+.dica-reg{font-size:13px;color:var(--muted);margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.painel-plano{display:grid;gap:14px}
+.bloco{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.bloco h3{font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.bloco h3 small{text-transform:none;letter-spacing:0;font-weight:600;color:var(--brand2)}
+.opcoes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.op{border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;text-align:left;font-size:13px;transition:.15s;background:#fff}
+.op b{display:block;font-size:14px;color:var(--navy)}
+.op small{color:var(--muted)}
+.op.on{border-color:var(--brand);background:var(--mint)}
+.seg{display:flex;background:var(--sky);border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg button{flex:1;padding:7px 6px;border-radius:999px;font-size:13px;font-weight:600;color:var(--muted)}
+.seg button.on{background:var(--navy);color:#fff}
+.arco{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;margin-bottom:6px}
+.dt{aspect-ratio:3/4;border:1.5px solid var(--line2);border-radius:8px 8px 12px 12px;font-size:11px;font-weight:700;color:var(--muted);background:#fff;display:grid;place-items:center;transition:.12s}
+.arco.inf .dt{border-radius:12px 12px 8px 8px}
+.dt.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.dt.meio{margin-right:6px}
+.rotulo-arco{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;margin:2px 2px 4px}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.presets button{font-size:12px;font-weight:600;padding:5px 10px;border-radius:99px;border:1px solid var(--line2)}
+.presets button:hover{background:var(--mint)}
+.cores{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cor{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--muted)}
+.cor i{width:100%;aspect-ratio:3/4;border-radius:10px 10px 14px 14px;border:2px solid var(--line);box-shadow:inset 0 -8px 12px rgba(0,0,0,.06)}
+.cor.on i{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand)}
+.cor.on{color:var(--brand2)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:flex;gap:8px;align-items:center;border:1.5px solid var(--line);border-radius:12px;padding:8px 11px;font-size:13px;font-weight:600;text-align:left}
+.chip::before{content:"";width:16px;height:16px;border-radius:5px;border:1.5px solid var(--line2);flex:none}
+.chip.on{border-color:var(--brand);background:var(--mint);color:var(--brand2)}
+.chip.on::before{background:var(--brand) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8l3 3 5-6' fill='none' stroke='white' stroke-width='2.2'/%3E%3C/svg%3E") center/12px no-repeat;border-color:var(--brand)}
+.resumo{background:var(--navy);color:#fff;border-radius:var(--r);padding:16px}
+.resumo p{font-size:14px;color:rgba(255,255,255,.8);margin:6px 0 14px}
+.previa{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:-4px 0 14px;font-size:13px}
+.previa span{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#4fd1c5;margin-bottom:4px}
+.previa div:last-child span{color:rgba(255,255,255,.55)}
+.previa ul{list-style:none;display:grid;gap:3px;color:rgba(255,255,255,.88)}
+.previa li::before{content:"• ";color:#4fd1c5}
+.previa div:last-child li{color:rgba(255,255,255,.6)}
+.previa div:last-child li::before{color:rgba(255,255,255,.4)}
+.calibrar{display:flex;gap:8px;align-items:flex-start;font-size:13px;margin-bottom:14px;cursor:pointer}
+.calibrar small{display:block;color:rgba(255,255,255,.6)}
+.calibrar input{margin-top:3px;accent-color:#4fd1c5}
+@media (max-width:600px){.previa{grid-template-columns:1fr}}
+.btn-ia{width:100%;height:52px;font-size:16px;background:linear-gradient(135deg,var(--teal),#4fd1c5);border:0;color:#fff}
+.btn-ia:hover{filter:brightness(1.05);background:linear-gradient(135deg,var(--teal),#4fd1c5)}
+
+/* etapa 3: resultado */
+.res-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start}
+.comp{position:relative;border-radius:var(--r);overflow:hidden;background:#000;touch-action:none;cursor:ew-resize;user-select:none}
+.comp img{display:block;width:100%;max-height:72vh;object-fit:contain}
+.comp .dep{position:absolute;inset:0;width:100%;height:100%;max-height:none;clip-path:inset(0 0 0 50%)}
+.comp .linha{position:absolute;top:0;bottom:0;left:50%;width:3px;background:#fff;transform:translateX(-50%);box-shadow:0 0 10px rgba(0,0,0,.4)}
+.comp .linha::after{content:"⇆";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:20px;color:var(--navy)}
+.comp .tag{position:absolute;top:12px;background:rgba(12,36,64,.8);color:#fff;font-size:13px;font-weight:600;padding:4px 12px;border-radius:99px}
+.lado{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lado figure{position:relative;border-radius:var(--r);overflow:hidden;background:#000}
+.lado img{display:block;width:100%;max-height:72vh;object-fit:contain}
+.lado figcaption{position:absolute;top:10px;left:10px;background:rgba(12,36,64,.8);color:#fff;font-size:13px;font-weight:600;padding:4px 12px;border-radius:99px}
+.versoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.versoes button{width:86px;border-radius:10px;overflow:hidden;border:2px solid transparent;position:relative}
+.versoes button.on{border-color:var(--brand)}
+.versoes img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.versoes span{position:absolute;left:4px;top:4px;background:rgba(12,36,64,.8);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px}
+.acoes{display:grid;gap:8px}
+.acoes .btn{width:100%}
+.plano-txt{font-size:13px;color:var(--muted);white-space:pre-line}
+
+/* carregando */
+#gerando{position:fixed;inset:0;background:rgba(12,36,64,.86);z-index:300;display:grid;place-items:center;color:#fff;text-align:center;padding:20px}
+.spinner{width:64px;height:64px;border-radius:50%;border:5px solid rgba(255,255,255,.2);border-top-color:#4fd1c5;animation:gira 1s linear infinite;margin:0 auto 18px}
+@keyframes gira{to{transform:rotate(360deg)}}
+#gerando p{color:rgba(255,255,255,.7);margin-top:6px}
+
+/* etapa 1: fotos guiadas */
+.fotos-topo{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.slot{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
+.slot .img{position:relative;aspect-ratio:3/4;background:var(--sky);display:grid;place-items:center}
+.slot .img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.slot .img svg{width:58%;opacity:.55}
+.slot .img .proc{position:absolute;inset:0;background:rgba(12,36,64,.65);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700}
+.slot .img .x{position:absolute;right:8px;top:8px;width:28px;height:28px;border-radius:50%;background:#fff;color:var(--bad);font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.slot .info{padding:12px;display:flex;flex-direction:column;gap:8px;flex:1}
+.slot .info b{font-size:14px;color:var(--navy)}
+.slot .info small{color:var(--muted);font-size:12px;line-height:1.35}
+.slot .bts{display:flex;gap:6px;margin-top:auto}
+.slot .bts .btn{flex:1;padding:0 8px}
+.slot .base{display:flex;gap:6px;align-items:center;font-size:12px;font-weight:600;color:var(--brand2);cursor:pointer}
+.slot.ok{border-color:var(--brand)}
+/* câmera */
+#camera{position:fixed;inset:0;background:#000;z-index:500;color:#fff}
+#camera video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#camera video.espelho{transform:scaleX(-1)}
+.guia{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);border:3px dashed rgba(255,255,255,.85);box-shadow:0 0 0 9999px rgba(0,0,0,.35);pointer-events:none}
+.guia.rosto{width:62vmin;height:82vmin;border-radius:50%}
+.guia.perfil,.guia.perfil-esq{width:56vmin;height:80vmin;border-radius:46% 54% 50% 50%}
+.guia.boca{width:84vmin;height:42vmin;border-radius:40%}
+.guia.ok{border-color:#4fd1c5;border-style:solid}
+.cam-topo{position:absolute;left:0;right:0;top:0;padding:18px 18px 40px;background:linear-gradient(rgba(0,0,0,.75),transparent);text-align:center;display:grid;gap:4px}
+.cam-topo b{font-size:20px}
+.cam-topo span{font-size:14px;color:rgba(255,255,255,.85);max-width:520px;margin:0 auto}
+.cam-topo small{color:#4fd1c5;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.cam-aviso{position:absolute;left:50%;bottom:130px;transform:translateX(-50%);background:rgba(12,36,64,.85);padding:6px 14px;border-radius:99px;font-size:13px;white-space:nowrap}
+.cam-base{position:absolute;left:0;right:0;bottom:0;padding:22px;display:flex;justify-content:space-around;align-items:center;background:linear-gradient(transparent,rgba(0,0,0,.75))}
+.obturador{width:76px;height:76px;border-radius:50%;background:#fff;border:6px solid rgba(255,255,255,.45);background-clip:padding-box}
+.obturador:active{transform:scale(.94)}
+.cam-bt{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.15);color:#fff;font-size:20px}
+.cam-previa{position:absolute;inset:0;background:#000;display:flex;flex-direction:column}
+.cam-previa img{flex:1;min-height:0;object-fit:contain;width:100%}
+.cam-previa-bts{display:flex;gap:10px;padding:16px;justify-content:center}
+@media (max-width:980px){.slots{grid-template-columns:repeat(2,1fr)}}
+/* celular: botões do cartão de foto um embaixo do outro e números dos dentes menores */
+@media (max-width:600px){
+  .slots{gap:10px}
+  .slot .info{padding:10px}
+  .slot .bts{flex-direction:column}
+  .slot .bts .btn{width:100%}
+  .zoom-dentes .marca{min-width:22px;height:22px;font-size:10px;padding:0 3px;border-width:1.5px}
+  .etapas{gap:2px}.etapas i{width:8px}
+}
+/* etapa 2: dentes identificados sobre a foto */
+.marca{position:absolute;transform:translate(-50%,-50%);min-width:26px;height:26px;padding:0 5px;border-radius:99px;background:rgba(255,255,255,.92);color:var(--navy);font-size:11px;font-weight:800;border:2px solid rgba(12,36,64,.25);display:grid;place-items:center;z-index:3;cursor:pointer}
+.marca.on{background:var(--brand);color:#fff;border-color:#fff}
+.zoom-dentes{position:relative;margin-top:12px;border-radius:var(--r);overflow:hidden;background:#000;user-select:none}
+.zoom-dentes img{display:block;width:100%}
+.zoom-dentes .marca{min-width:32px;height:32px;font-size:13px}
+.zoom-rot{position:absolute;left:10px;top:10px;background:rgba(12,36,64,.8);color:#fff;font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px}
+.palco.selecionando .regiao{box-shadow:0 0 0 9999px rgba(12,36,64,.2),0 0 0 2px var(--brand) inset}
+.status-dentes{font-size:13px;color:var(--muted);margin:-2px 0 10px}
+
+.pacientes-m{display:grid;gap:6px;max-height:300px;overflow:auto;margin:12px 0}
+.pacientes-m button{text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:10px}
+.pacientes-m button:hover{border-color:var(--brand);background:var(--mint)}
+
+@media (max-width:980px){.plano-grid,.res-grid,.foto-grid{grid-template-columns:1fr}.foto-box{position:static}}
+@media (max-width:600px){.etapas .txt{display:none}.etapas span{padding:4px}.cores{grid-template-columns:repeat(4,1fr)}.opcoes{grid-template-columns:1fr}.lado{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="./index.html"><img src="icons/icon.svg" alt=""><span>DENTAL<b>CHECK</b></span></a>
+  <span class="muted">· Novo procedimento</span>
+  <div class="sp"></div>
+  <nav class="etapas" id="etapas">
+    <span data-e="1"><b>1</b><em class="txt" style="font-style:normal">Foto</em></span><i></i>
+    <span data-e="2"><b>2</b><em class="txt" style="font-style:normal">Planejamento</em></span><i></i>
+    <span data-e="3"><b>3</b><em class="txt" style="font-style:normal">Simulação</em></span><i></i>
+    <span data-e="4"><b>4</b><em class="txt" style="font-style:normal">Apresentação</em></span>
+  </nav>
+</header>
+
+<!-- ETAPA 1: FOTO -->
+<main class="wrap" id="e1">
+  <div class="kick">Novo procedimento · Etapa 1 de 3</div>
+  <h1>Paciente e fotos</h1>
+  <p class="muted" style="margin:6px 0 20px">Capture as fotos com o guia passo a passo ou envie as que você já tem. A IA endireita e identifica cada foto sozinha.</p>
+  <div class="card" style="margin-bottom:16px">
+    <div class="f" style="margin:0"><label for="nomePac">Nome do paciente</label><input class="in" id="nomePac" placeholder="Ex.: Maria Souza" autocomplete="off"></div>
+  </div>
+  <div class="fotos-topo">
+    <button class="btn pri" id="btnCapturar">📷 Capturar com guia passo a passo</button>
+    <button class="btn" id="btnEnviar">⤒ Enviar fotos que já tenho</button>
+  </div>
+  <div class="slots" id="slots"></div>
+  <div class="avisos" id="avisos"></div>
+  <button class="btn pri" id="irPlano" style="width:100%;margin-top:16px;height:50px" disabled>Continuar para o planejamento →</button>
+</main>
+
+<!-- CÂMERA GUIADA -->
+<div id="camera" class="hidden">
+  <video id="video" playsinline muted autoplay></video>
+  <div class="guia" id="guia"></div>
+  <div class="cam-topo"><small id="camContagem"></small><b id="camPasso"></b><span id="camDica"></span></div>
+  <div class="cam-aviso" id="camAviso"></div>
+  <div class="cam-base">
+    <button class="cam-bt" id="camFechar" title="Fechar">✕</button>
+    <button class="obturador" id="camCaptura" title="Capturar"></button>
+    <button class="cam-bt" id="camVirar" title="Trocar câmera">⟲</button>
+  </div>
+  <div class="cam-previa hidden" id="camPrevia">
+    <img id="camImg" alt="">
+    <div class="cam-previa-bts"><button class="btn" id="camRefazer">↺ Refazer</button><button class="btn pri" id="camUsar">Usar esta foto →</button></div>
+  </div>
+</div>
+
+<!-- ETAPA 2: PLANEJAMENTO -->
+<main class="wrap hidden" id="e2" style="max-width:1240px">
+  <div class="kick">Novo procedimento · Etapa 2 de 3</div>
+  <h1>Planejamento do sorriso</h1>
+  <p class="muted" style="margin:6px 0 20px">Escolha o procedimento e marque os dentes (tocando nos números sobre a foto ou no mapa). A IA altera somente os dentes marcados.</p>
+  <div class="plano-grid">
+    <div class="foto-box">
+      <div class="palco" id="palco"><img id="fotoPlano" alt="Foto do paciente"><div class="regiao" id="regiao"><span class="rot">Região do sorriso</span><span class="alca" id="alca"></span></div></div>
+      <div class="dica-reg">
+        <span>Arraste o círculo para cima da boca e use a alça para ajustar o tamanho. Só essa área é alterada.</span>
+        <div class="seg" id="tipoFoto" style="min-width:230px"><button data-t="rosto">Rosto inteiro</button><button data-t="close">Close do sorriso</button></div>
+      </div>
+      <div class="zoom-dentes hidden" id="zoomDentes"><img id="zoomImg" alt="Boca ampliada"><span class="zoom-rot">Toque nos dentes para marcar</span></div>
+      <button class="btn sm ghost" id="trocarFoto" style="margin-top:8px">← Voltar para as fotos</button>
+    </div>
+
+    <div class="painel-plano">
+      <div class="bloco">
+        <h3>Procedimento</h3>
+        <div class="opcoes" id="procedimento">
+          <button class="op" data-v="lentes"><b>Lentes dentais</b><small>lentes de contato / laminados</small></button>
+          <button class="op" data-v="clareamento"><b>Clareamento</b><small>só a cor, sem mudar formato</small></button>
+          <button class="op" data-v="implantes"><b>Implantes</b><small>coroa nova no espaço ou dente perdido</small></button>
+        </div>
+      </div>
+
+      <div class="bloco" id="blocoMaterial">
+        <h3>Material</h3>
+        <div class="seg" id="material"><button data-v="porcelana">Porcelana</button><button data-v="resina">Resina</button></div>
+      </div>
+
+      <div class="bloco">
+        <h3>Dentes <small id="qtdDentes"></small></h3>
+        <p class="status-dentes" id="statusDentes">Toque nos números sobre a foto ou no mapa abaixo. A IA altera somente os dentes marcados.</p>
+        <div class="rotulo-arco"><span>Direito do paciente</span><span>Superior</span><span>Esquerdo</span></div>
+        <div class="arco" id="arcoSup"></div>
+        <div class="arco inf" id="arcoInf"></div>
+        <div class="rotulo-arco"><span></span><span>Inferior</span><span></span></div>
+        <div class="presets" id="presets">
+          <button data-p="13-23">6 superiores</button><button data-p="14-24">8 superiores</button><button data-p="15-25">10 superiores</button>
+          <button data-p="16-26">12 superiores</button><button data-p="15-25,45-35">Sup. + inf. (20)</button><button data-p="">Limpar</button>
+        </div>
+      </div>
+
+      <div class="bloco">
+        <h3>Cor <small id="corNome"></small></h3>
+        <div class="cores" id="cores"></div>
+      </div>
+
+      <div class="bloco" id="blocoFormato">
+        <h3>Formato dos dentes</h3>
+        <div class="opcoes" id="formato">
+          <button class="op" data-v="natural"><b>Natural</b><small>mantém o formato atual</small></button>
+          <button class="op" data-v="oval"><b>Oval</b><small>cantos arredondados</small></button>
+          <button class="op" data-v="quadrado"><b>Quadrado</b><small>bordas retas</small></button>
+          <button class="op" data-v="triangular"><b>Triangular</b><small>afilado no colo</small></button>
+        </div>
+      </div>
+
+      <div class="bloco" id="blocoComprimento">
+        <h3>Comprimento dos dentes</h3>
+        <div class="seg" id="comprimento"><button data-v="manter">Manter</button><button data-v="pouco">+0,5 a 1 mm</button><button data-v="mais">+1,5 a 2 mm</button></div>
+      </div>
+
+      <div class="bloco" id="blocoTranslucidez">
+        <h3>Translucidez da borda</h3>
+        <div class="seg" id="translucidez"><button data-v="natural">Natural</button><button data-v="alta">Alta (jovem)</button><button data-v="baixa">Baixa (opaca)</button></div>
+      </div>
+
+      <div class="bloco">
+        <h3>Ajustes <small>desmarcado = a IA mantém como está</small></h3>
+        <div class="chips" id="ajustes">
+          <button class="chip" data-v="diastemas">Fechar diastemas</button>
+          <button class="chip" data-v="alinhar">Alinhar dentes</button>
+          <button class="chip" data-v="bordas">Nivelar bordas</button>
+          <button class="chip" data-v="desgastes">Corrigir desgastes e manchas</button>
+          <button class="chip" data-v="harmonizar">Clarear os demais dentes</button>
+        </div>
+      </div>
+
+      <div class="bloco">
+        <h3>Gengivoplastia</h3>
+        <div class="seg" id="gengiva"><button data-v="">Não</button><button data-v="leve">Leve (~1 mm)</button><button data-v="moderada">Moderada (~2 mm)</button></div>
+      </div>
+
+      <div class="bloco">
+        <h3>Intensidade do resultado</h3>
+        <div class="seg" id="intensidade"><button data-v="sutil">Sutil</button><button data-v="natural">Natural</button><button data-v="marcante">Marcante</button></div>
+      </div>
+
+      <div class="bloco">
+        <h3>Observações para a IA <small>opcional</small></h3>
+        <textarea class="in" id="observacoes" maxlength="400" placeholder="Ex.: deixar os incisivos centrais levemente mais longos que os laterais"></textarea>
+      </div>
+
+      <div class="resumo">
+        <b>O que será pedido à IA</b>
+        <p id="resumo"></p>
+        <div class="previa"><div><span>A IA vai</span><ul id="vaiFazer"></ul></div><div><span>A IA vai manter</span><ul id="vaiManter"></ul></div></div>
+        <label class="calibrar"><input type="checkbox" id="calibrarCor" checked> Garantir a cor exata escolhida <small>(o app ajusta o tom dos dentes tratados depois da IA)</small></label>
+        <button class="btn btn-ia" id="gerar">✨ Gerar simulação com IA</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ETAPA 3: RESULTADO -->
+<main class="wrap hidden" id="e3" style="max-width:1240px">
+  <div class="kick">Novo procedimento · Etapa 3 de 3</div>
+  <h1>Antes e depois</h1>
+  <div class="res-grid" style="margin-top:18px">
+    <div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+        <div class="seg hidden" id="vista" style="min-width:300px"><button data-v="rosto">Rosto inteiro</button><button data-v="close">Sorriso de perto</button></div>
+        <div class="seg" id="modoComp" style="min-width:240px"><button data-m="deslizar">Deslizar</button><button data-m="lado">Lado a lado</button></div>
+      </div>
+      <div id="vComp"></div>
+      <div class="versoes" id="versoes"></div>
+    </div>
+    <aside class="acoes">
+      <div class="bloco"><h3>Planejamento usado</h3><div class="plano-txt" id="planoUsado"></div></div>
+      <button class="btn pri" id="salvarPac">Salvar e ir para a apresentação →</button>
+      <button class="btn" id="baixarComp">Baixar antes e depois</button>
+      <button class="btn" id="baixarDepois">Baixar só o resultado</button>
+      <button class="btn" id="outraVersao">✨ Gerar outra versão</button>
+      <button class="btn ghost" id="voltarPlano">← Ajustar planejamento</button>
+    </aside>
+  </div>
+</main>
+
+<div id="gerando" class="hidden"><div><div class="spinner"></div><h2 style="color:#fff" id="gerandoTxt">Analisando o sorriso…</h2><p id="gerandoTempo">Isso leva de 10 a 30 segundos.</p></div></div>
+<input type="file" id="arquivo" accept="image/jpeg,image/png,image/*" class="hidden">
+
+<script src="assets/db.js"></script>
+<script src="assets/dentes.js"></script>
+<script src="assets/ia.js"></script>
+<script>
+(function () {
+  const $ = id => document.getElementById(id);
+  const MAX_FOTO = 2400, MAX_IA = 1024;
+
+  /* paleta aproximada da escala de cor (apenas visual) */
+  const CORES = [
+    ["BL1", "#fbfbf7", "Bleach máximo"], ["BL2", "#f7f6ef", "Bleach muito claro"], ["BL3", "#f3f0e4", "Bleach natural"],
+    ["BL4", "#efe9d9", "Branco natural"], ["A1", "#ece0c7", "Natural claro (quente)"], ["B1", "#eee6cf", "Natural claro (neutro)"], ["A2", "#e5d3b2", "Natural médio"]
+  ];
+  const NOMES_PROC = { lentes: "Lentes dentais", clareamento: "Clareamento", implantes: "Implantes" };
+  /* material só existe para lentes; implante é coroa de porcelana */
+  const comMaterial = p => p.procedimento === "lentes" ? " em " + p.material : p.procedimento === "implantes" ? " (coroas sobre implante)" : "";
+  const NOMES_AJ = { diastemas: "fechar diastemas", alinhar: "alinhar dentes", bordas: "nivelar bordas", desgastes: "corrigir desgastes e manchas", harmonizar: "clarear os demais dentes" };
+  /* como cada ajuste aparece na prévia quando NÃO está marcado */
+  const MANTER_AJ = { diastemas: "os espaços (diastemas)", alinhar: "a posição de cada dente", bordas: "a linha das bordas", desgastes: "as características naturais", harmonizar: "a cor dos dentes não tratados" };
+  const NOMES_COMP = { manter: "", pouco: "alongar 0,5 a 1 mm", mais: "alongar 1,5 a 2 mm" };
+  const NOMES_TRANSL = { natural: "", alta: "translucidez alta na borda", baixa: "borda opaca (sem translucidez)" };
+  const SUP = [16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26], INF = [46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36];
+
+  const plano = { procedimento: "lentes", material: "porcelana", dentes: [15, 14, 13, 12, 11, 21, 22, 23, 24, 25], cor: "BL2", formato: "natural", comprimento: "manter", translucidez: "natural", ajustes: ["diastemas", "bordas"], gengiva: "", intensidade: "natural", observacoes: "", calibrarCor: true };
+  let original = null;          // canvas com a foto
+  let regiao = null;            // {x,y,w,h} em fração da imagem
+  let tipoFoto = "rosto";
+  let versoes = [], atual = 0, modoComp = "deslizar", vista = "rosto";
+  let antesURL = "";             // foto original em dataURL (calculada uma vez por foto)
+  let pacienteId = new URLSearchParams(location.search).get("paciente");
+
+  /* ---------- etapas ---------- */
+  function irEtapa(n) {
+    [1, 2, 3].forEach(i => $("e" + i).classList.toggle("hidden", i !== n));
+    document.querySelectorAll("#etapas span").forEach(s => { const e = Number(s.dataset.e); s.classList.toggle("on", e === n); s.classList.toggle("feita", e < n); });
+    scrollTo(0, 0);
+    if (n === 2) requestAnimationFrame(posicionarRegiao);
+  }
+  $("etapas").onclick = e => {
+    const s = e.target.closest("span"); if (!s) return;
+    const n = Number(s.dataset.e);
+    if (n === 4 && pacienteId) return (location.href = "apresentacao.html?paciente=" + pacienteId);
+    if (n === 1 || (n === 2 && original) || (n === 3 && versoes.length)) irEtapa(n);
+  };
+
+  /* ---------- etapa 1: paciente e fotos ----------
+     Quatro fotos guiadas, como no consultório: rosto de frente sorrindo, laterais e boca de frente.
+     A foto de frente (rosto ou boca) é a base da simulação; todas vão para o paciente e para a apresentação. */
+  const PASSOS = [
+    { id: "sorriso", nome: "Rosto de frente, sorrindo", dica: "Rosto inteiro dentro do contorno, olhando para a câmera, sorriso aberto mostrando os dentes.", guia: "rosto", base: true },
+    { id: "perfil-esq", nome: "Lateral esquerda", dica: "O paciente vira o rosto mostrando o lado ESQUERDO, sorrindo. Câmera na altura da boca.", guia: "perfil-esq" },
+    { id: "perfil", nome: "Lateral direita", dica: "O paciente vira o rosto mostrando o lado DIREITO, sorrindo. Câmera na altura da boca.", guia: "perfil" },
+    { id: "boca", nome: "Boca de frente", dica: "Aproxime a câmera: só os lábios e os dentes, de frente, com sorriso aberto.", guia: "boca", base: true }
+  ];
+  const ICONES = {
+    rosto: `<svg viewBox="0 0 100 120" fill="none" stroke="#0c2440" stroke-width="3"><ellipse cx="50" cy="58" rx="34" ry="46"/><path d="M34 76q16 14 32 0" /><circle cx="37" cy="50" r="3" fill="#0c2440"/><circle cx="63" cy="50" r="3" fill="#0c2440"/></svg>`,
+    "perfil-esq": `<svg viewBox="0 0 100 120" fill="none" stroke="#0c2440" stroke-width="3"><path d="M64 12c-26 0-40 20-40 42 0 6-8 14-8 18s6 4 8 6c0 8 0 16 8 20 10 4 22 2 30 6 6-14 14-30 14-52 0-24-6-40-12-40z"/><path d="M24 80q6 4 12 0"/></svg>`,
+    perfil: `<svg viewBox="0 0 100 120" fill="none" stroke="#0c2440" stroke-width="3"><path d="M36 12c26 0 40 20 40 42 0 6 8 14 8 18s-6 4-8 6c0 8 0 16-8 20-10 4-22 2-30 6-6-14-14-30-14-52 0-24 6-40 12-40z"/><path d="M76 80q-6 4-12 0"/></svg>`,
+    boca: `<svg viewBox="0 0 100 120" fill="none" stroke="#0c2440" stroke-width="3"><path d="M10 60q40-30 80 0q-40 36-80 0z"/><path d="M20 60q30-12 60 0l-4 8q-26-8-52 0z" fill="#0c2440" fill-opacity=".15"/><path d="M36 54v12M50 52v14M64 54v12"/></svg>`
+  };
+  const fotos = {}, infoFotos = {};          // id → dataURL / { ia, boca, rosto, angulo }
+  const processando = new Set();
+  let base = null;
+  /* ângulo identificado pela IA → qual das 4 fotos ele preenche */
+  const MAPA_IA = { sorriso: "sorriso", repouso: "sorriso", perfil: "perfil", "perfil-esq": "perfil-esq", boca: "boca", "intra-frontal": "boca" };
+
+  function desenharSlots() {
+    if (!fotos[base]) base = fotos.sorriso ? "sorriso" : fotos.boca ? "boca" : null;
+    $("slots").innerHTML = PASSOS.map(p => `<div class="slot ${fotos[p.id] ? "ok" : ""}" data-id="${p.id}">
+      <div class="img">${fotos[p.id] ? `<img src="${fotos[p.id]}" alt=""><button class="x" data-acao="remover" title="Remover">×</button>` : ICONES[p.guia]}${processando.has(p.id) ? `<div class="proc">IA organizando…</div>` : ""}</div>
+      <div class="info"><b>${p.nome}</b><small>${p.dica}</small>
+        ${p.base && fotos[p.id] ? `<label class="base"><input type="radio" name="base" value="${p.id}" ${base === p.id ? "checked" : ""}> Usar na simulação</label>` : ""}
+        <div class="bts"><button class="btn sm" data-acao="capturar">📷 Capturar</button><button class="btn sm" data-acao="enviar">⤒ Enviar</button></div></div></div>`).join("");
+    $("irPlano").disabled = !base || processando.size > 0;
+    if (base) checarQualidade(fotos[base]);
+    else $("avisos").innerHTML = `<div class="aviso">Adicione pelo menos a foto do rosto de frente ou da boca de frente: ela é a base da simulação.</div>`;
+  }
+
+  $("slots").onclick = async e => {
+    const s = e.target.closest(".slot"), a = e.target.closest("[data-acao]");
+    if (!s || !a) return;
+    const id = s.dataset.id;
+    if (a.dataset.acao === "remover") { delete fotos[id]; delete infoFotos[id]; desenharSlots(); }
+    if (a.dataset.acao === "capturar") abrirCamera([id]);
+    if (a.dataset.acao === "enviar") { const [img] = await escolherArquivos(false); if (img) receberFotos([{ img, slot: id }]); }
+  };
+  $("slots").onchange = e => { if (e.target.name === "base") { base = e.target.value; desenharSlots(); } };
+
+  function escolherArquivos(multiplas) {
+    return new Promise(ok => {
+      const inp = $("arquivo"); inp.multiple = multiplas; inp.value = "";
+      inp.onchange = async () => { const r = []; for (const f of inp.files) r.push(await lerImagem(f, MAX_FOTO, 0.95)); ok(r); };
+      inp.click();
+    });
+  }
+  $("btnEnviar").onclick = async () => { const lista = await escolherArquivos(true); if (lista.length) receberFotos(lista.map(img => ({ img }))); };
+
+  /* a IA endireita cada foto e diz qual ângulo é; foto enviada sem ângulo definido vai para o ângulo identificado */
+  async function receberFotos(itens) {
+    const livres = () => PASSOS.map(p => p.id).filter(id => !fotos[id] && !processando.has(id));
+    const reservas = itens.map(it => { const id = it.slot || livres()[0]; if (id) processando.add(id); return id; });
+    desenharSlots();
+    const res = await Promise.all(itens.map(async (it, i) => {
+      let a = null;
+      try { if (navigator.onLine) a = await IA.analisarFoto(it.img); } catch (e) { console.warn(e); }
+      return { ...it, img: a && a.rotacao ? await IA.girar(it.img, a.rotacao) : it.img, a, reserva: reservas[i] };
+    }));
+    reservas.forEach(id => id && processando.delete(id));
+    for (const r of res) {
+      let destino = r.slot;
+      if (!destino) {
+        const sugerido = r.a && MAPA_IA[r.a.angulo];
+        destino = sugerido && !fotos[sugerido] ? sugerido : r.reserva && !fotos[r.reserva] ? r.reserva : livres()[0];
+      }
+      if (!destino) { toast("As 4 fotos já foram adicionadas. Remova uma para trocar."); continue; }
+      fotos[destino] = r.img;
+      infoFotos[destino] = r.a ? { ia: true, boca: r.a.boca, rosto: r.a.rosto, angulo: r.a.angulo } : { ia: false };
+    }
+    desenharSlots();
+  }
+
+  /* ---------- câmera guiada ---------- */
+  let stream = null, filaCamera = [], frontal = false, timerLuz = null;
+  async function abrirCamera(ids) {
+    filaCamera = ids.slice();
+    $("camera").classList.remove("hidden");
+    mostrarPassoCamera();
+    await ligarCamera();
+  }
+  async function ligarCamera() {
+    pararCamera();
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: frontal ? "user" : "environment", width: { ideal: 1920 }, height: { ideal: 1440 } }, audio: false });
+      $("video").srcObject = stream;
+      $("video").classList.toggle("espelho", frontal);
+      await $("video").play().catch(() => {});
+      timerLuz = setInterval(medirLuz, 700);
+    } catch (e) {
+      fecharCamera();
+      toast(window.isSecureContext ? "Não foi possível abrir a câmera. Libere a permissão no navegador ou use “Enviar fotos”." : "A câmera só funciona em endereço seguro (https ou localhost). Use “Enviar fotos”.");
+    }
+  }
+  function pararCamera() { clearInterval(timerLuz); if (stream) stream.getTracks().forEach(t => t.stop()); stream = null; }
+  function fecharCamera() { pararCamera(); $("camera").classList.add("hidden"); $("camPrevia").classList.add("hidden"); desenharSlots(); }
+  function mostrarPassoCamera() {
+    const p = PASSOS.find(x => x.id === filaCamera[0]);
+    if (!p) return fecharCamera();
+    $("camContagem").textContent = `Foto ${PASSOS.indexOf(p) + 1} de ${PASSOS.length}`;
+    $("camPasso").textContent = p.nome;
+    $("camDica").textContent = p.dica;
+    $("guia").className = "guia " + p.guia;
+  }
+  /* aviso de luz ao vivo: o contorno fica verde quando a iluminação está boa */
+  function medirLuz() {
+    const v = $("video"); if (!v.videoWidth) return;
+    const c = document.createElement("canvas"); c.width = 48; c.height = 36;
+    const x = c.getContext("2d", { willReadFrequently: true }); x.drawImage(v, 0, 0, 48, 36);
+    const d = x.getImageData(0, 0, 48, 36).data; let soma = 0;
+    for (let i = 0; i < d.length; i += 4) soma += 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+    const m = soma / (d.length / 4), boa = m >= 55 && m <= 215;
+    $("camAviso").textContent = m < 55 ? "💡 Pouca luz: aproxime de uma janela ou acenda a luz" : m > 215 ? "☀ Luz forte demais: evite luz direta no rosto" : "✓ Boa luz — encaixe no contorno e capture";
+    $("guia").classList.toggle("ok", boa);
+  }
+  $("camCaptura").onclick = () => {
+    const v = $("video"); if (!v.videoWidth) return;
+    const c = document.createElement("canvas"); c.width = v.videoWidth; c.height = v.videoHeight;
+    c.getContext("2d").drawImage(v, 0, 0);
+    $("camImg").src = c.toDataURL("image/jpeg", 0.92);
+    $("camPrevia").classList.remove("hidden");
+  };
+  $("camRefazer").onclick = () => $("camPrevia").classList.add("hidden");
+  $("camUsar").onclick = () => {
+    const id = filaCamera.shift(), img = $("camImg").src;
+    $("camPrevia").classList.add("hidden");
+    fotos[id] = img; infoFotos[id] = { ia: false };
+    analisarEmSegundoPlano(id, img);
+    if (filaCamera.length) mostrarPassoCamera(); else fecharCamera();
+  };
+  $("camFechar").onclick = fecharCamera;
+  $("camVirar").onclick = () => { frontal = !frontal; ligarCamera(); };
+  $("btnCapturar").onclick = () => {
+    const faltam = PASSOS.map(p => p.id).filter(id => !fotos[id]);
+    abrirCamera(faltam.length ? faltam : PASSOS.map(p => p.id));
+  };
+  /* foto da câmera já está no ângulo certo; a IA só endireita (se precisar) e marca boca e rosto */
+  async function analisarEmSegundoPlano(id, img) {
+    processando.add(id); desenharSlots();
+    try {
+      const a = await IA.analisarFoto(img);
+      if (fotos[id] === img) {
+        fotos[id] = a.rotacao ? await IA.girar(img, a.rotacao) : img;
+        infoFotos[id] = { ia: true, boca: a.boca, rosto: a.rosto, angulo: a.angulo };
+      }
+    } catch (e) { console.warn(e); }
+    processando.delete(id); desenharSlots();
+  }
+
+  async function checarQualidade(src) {
+    const img = await IA.carregar(src), avisos = [];
+    if (Math.max(img.width, img.height) < 1000) avisos.push(["Foto de base com resolução baixa (" + img.width + "×" + img.height + "). O resultado pode ficar menos nítido.", false]);
+    const c = document.createElement("canvas"); c.width = 64; c.height = 64;
+    const x = c.getContext("2d"); x.drawImage(img, 0, 0, 64, 64);
+    const d = x.getImageData(0, 0, 64, 64).data; let soma = 0;
+    for (let i = 0; i < d.length; i += 4) soma += 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+    const media = soma / (d.length / 4);
+    if (media < 60) avisos.push(["A foto de base parece escura. Se puder, use mais luz ou flash frontal.", false]);
+    if (media > 215) avisos.push(["A foto de base parece estourada (clara demais). Detalhes dos dentes podem se perder.", false]);
+    if (!avisos.length) avisos.push(["Foto de base com boa resolução e iluminação. ✓", true]);
+    $("avisos").innerHTML = avisos.map(([t, ok]) => `<div class="aviso ${ok ? "bom" : ""}">${t}</div>`).join("");
+  }
+
+  /* continua: cria (ou atualiza) o paciente com as fotos e abre a foto de base no planejamento */
+  $("irPlano").onclick = async () => {
+    if (!base) return;
+    const nome = $("nomePac").value.trim() || "Paciente sem nome";
+    let p = pacienteId ? await DB.obter(pacienteId) : null;
+    if (!p) p = DB.novoPaciente(nome);
+    p.nome = nome; p.fotosInfo = p.fotosInfo || {};
+    for (const [id, img] of Object.entries(fotos)) { p.fotos[id] = img; p.fotosInfo[id] = infoFotos[id] || { ia: false }; }
+    await DB.salvar(p);
+    pacienteId = p.id;
+    history.replaceState(null, "", "?paciente=" + p.id);
+    carregarFoto(fotos[base], base === "boca" ? "close" : null);
+    irEtapa(2);
+  };
+  $("trocarFoto").onclick = () => irEtapa(1);
+
+  function carregarFoto(src, tipo) {
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, MAX_FOTO / Math.max(img.width, img.height));
+      original = document.createElement("canvas");
+      original.width = Math.round(img.width * k); original.height = Math.round(img.height * k);
+      original.getContext("2d").drawImage(img, 0, 0, original.width, original.height);
+      antesURL = original.toDataURL("image/jpeg", 0.92);
+      $("fotoPlano").src = antesURL;
+      versoes = []; dentesFoto = null; desenharMarcas();
+      /* posição inicial pelo tipo/formato da foto; logo em seguida a IA procura a boca e numera os dentes */
+      definirTipo(tipo || (original.width / original.height > 1.25 ? "close" : "rosto"));
+      localizarBoca();
+    };
+    img.src = src;
+  }
+
+  /* paciente já existente (vindo da apresentação): traz nome e fotos */
+  if (pacienteId) DB.obter(pacienteId).then(p => {
+    if (!p) return (pacienteId = null);
+    $("nomePac").value = p.nome || "";
+    for (const passo of PASSOS) if (p.fotos[passo.id]) { fotos[passo.id] = p.fotos[passo.id]; infoFotos[passo.id] = (p.fotosInfo || {})[passo.id] || { ia: false }; }
+    desenharSlots();
+  });
+  desenharSlots();
+
+  /* ---------- etapa 2: dentes identificados na foto ----------
+     A IA numera cada dente (FDI) no mesmo recorte que vai para a simulação. Os números aparecem sobre a foto
+     para o doutor marcar os dentes, e as caixas servem para colar a simulação SÓ nos dentes marcados. */
+  let dentesFoto = null, buscaDentes = 0;    // { r: recorte em px, lista: [{ n, caixa (fração do recorte) }] }
+  async function identificarDentes() {
+    if (!original || !regiao) return;
+    const minha = ++buscaDentes, r = calcularRecorte();
+    $("statusDentes").textContent = "Identificando os dentes na foto…";
+    try {
+      const imagem = recortar(r);
+      const resp = await fetch("/api/dentes", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ imagem }) });
+      const j = await resp.json();
+      if (minha !== buscaDentes) return;
+      if (!j.ok || !j.dentes.length) throw new Error("sem dentes");
+      dentesFoto = { r, lista: j.dentes, url: "data:image/jpeg;base64," + imagem };
+      $("statusDentes").textContent = `${j.dentes.length} dentes identificados. Toque nos números sobre a foto (ou no mapa) para marcar. A IA altera somente os marcados.`;
+    } catch (e) {
+      if (minha !== buscaDentes) return;
+      dentesFoto = null;
+      $("statusDentes").textContent = "Não foi possível numerar os dentes nesta foto. Marque pelo mapa abaixo.";
+    }
+    desenharMarcas();
+  }
+  /* os números ficam numa ampliação da boca (o mesmo recorte numerado pela IA): na foto de rosto inteiro,
+     marcados direto sobre a foto, eles ficariam pequenos e amontoados demais para tocar */
+  function desenharMarcas() {
+    const zoom = $("zoomDentes");
+    zoom.querySelectorAll(".marca").forEach(m => m.remove());
+    zoom.classList.toggle("hidden", !dentesFoto);
+    if (!dentesFoto) return;
+    if ($("zoomImg").src !== dentesFoto.url) $("zoomImg").src = dentesFoto.url;
+    for (const { n, caixa: c } of dentesFoto.lista) {
+      zoom.insertAdjacentHTML("beforeend", `<button class="marca ${plano.dentes.includes(n) ? "on" : ""}" data-n="${n}" style="left:${(c.x + c.w / 2) * 100}%;top:${(c.y + c.h / 2) * 100}%" title="${esc(DENTES.nomeCompleto(n))}">${n}</button>`);
+    }
+  }
+  $("zoomDentes").addEventListener("click", e => {
+    const m = e.target.closest(".marca"); if (!m) return;
+    const n = Number(m.dataset.n), i = plano.dentes.indexOf(n);
+    i >= 0 ? plano.dentes.splice(i, 1) : plano.dentes.push(n);
+    atualizarPainel();
+  });
+
+  /* ---------- etapa 2: região do sorriso ---------- */
+  let regiaoConferida = false;   // true quando a IA achou a boca ou o doutor ajustou o círculo
+  function definirTipo(t) {
+    tipoFoto = t;
+    document.querySelectorAll("#tipoFoto button").forEach(b => b.classList.toggle("on", b.dataset.t === t));
+    regiao = t === "close" ? { x: 0.06, y: 0.1, w: 0.88, h: 0.8 } : { x: 0.3, y: 0.6, w: 0.4, h: 0.17 };
+    regiaoConferida = false;
+    posicionarRegiao();
+  }
+  $("tipoFoto").onclick = e => { const b = e.target.closest("button"); if (b) definirTipo(b.dataset.t); };
+
+  /* pede à IA a posição da boca e encaixa o círculo nela, com uma pequena folga */
+  let buscaBoca = 0;
+  async function localizarBoca() {
+    const minha = ++buscaBoca, rot = $("regiao").querySelector(".rot");
+    rot.textContent = "Localizando o sorriso…";
+    try {
+      const c = document.createElement("canvas"), k = Math.min(1, 768 / Math.max(original.width, original.height));
+      c.width = Math.round(original.width * k); c.height = Math.round(original.height * k);
+      c.getContext("2d").drawImage(original, 0, 0, c.width, c.height);
+      const r = await fetch("/api/localizar", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ imagem: c.toDataURL("image/jpeg", 0.85).split(",")[1] }) });
+      const d = await r.json().catch(() => ({}));
+      if (minha !== buscaBoca) return;                       // a foto foi trocada no meio da busca
+      if (d.ok && d.caixa && d.caixa.w > 0.01 && d.caixa.h > 0.01) {
+        const { x, y, w, h } = d.caixa, fw = w * 0.12, fh = h * 0.2;
+        regiao = { x: Math.max(0, x - fw), y: Math.max(0, y - fh), w: Math.min(1, w + fw * 2), h: Math.min(1, h + fh * 2) };
+        regiao.w = Math.min(regiao.w, 1 - regiao.x); regiao.h = Math.min(regiao.h, 1 - regiao.y);
+        regiaoConferida = true;
+        posicionarRegiao();
+        rot.textContent = "Sorriso localizado ✓";
+      } else rot.textContent = "Arraste o círculo até a boca";
+    } catch (e) {
+      if (minha === buscaBoca) rot.textContent = "Arraste o círculo até a boca";
+    }
+    if (minha === buscaBoca) identificarDentes();
+  }
+
+  function posicionarRegiao() {
+    if (!regiao) return;
+    const r = $("regiao").style;
+    r.left = regiao.x * 100 + "%"; r.top = regiao.y * 100 + "%"; r.width = regiao.w * 100 + "%"; r.height = regiao.h * 100 + "%";
+  }
+  (function arrastarRegiao() {
+    let modo = null, ini = null, base = null;
+    const palco = $("palco");
+    palco.addEventListener("pointerdown", e => {
+      if (e.target.closest(".marca")) return;               // toque num número de dente: só marca/desmarca
+      const caixa = palco.getBoundingClientRect();
+      const p = { x: (e.clientX - caixa.left) / caixa.width, y: (e.clientY - caixa.top) / caixa.height };
+      if (e.target.id === "alca") modo = "tamanho";
+      else if (e.target.closest("#regiao")) modo = "mover";
+      else { modo = "tamanho"; regiao = { x: p.x, y: p.y, w: 0.02, h: 0.02 }; }   // fora: desenha uma nova região
+      ini = p; base = { ...regiao };
+      regiaoConferida = true; buscaBoca++;                   // o doutor ajustou: vale a posição dele
+      $("regiao").querySelector(".rot").textContent = "Região do sorriso";
+      palco.setPointerCapture(e.pointerId);
+    });
+    palco.addEventListener("pointermove", e => {
+      if (!modo) return;
+      const caixa = palco.getBoundingClientRect();
+      const dx = (e.clientX - caixa.left) / caixa.width - ini.x, dy = (e.clientY - caixa.top) / caixa.height - ini.y;
+      if (modo === "mover") { regiao.x = Math.min(1 - base.w, Math.max(0, base.x + dx)); regiao.y = Math.min(1 - base.h, Math.max(0, base.y + dy)); }
+      else { regiao.w = Math.max(0.06, Math.min(1 - base.x, base.w + dx)); regiao.h = Math.max(0.05, Math.min(1 - base.y, base.h + dy)); }
+      posicionarRegiao();
+    });
+    /* a região mudou: os dentes são numerados de novo no novo recorte */
+    const fim = () => { if (modo) { buscaDentes++; setTimeout(identificarDentes, 50); } modo = null; };
+    palco.addEventListener("pointerup", fim); palco.addEventListener("pointercancel", fim);
+  })();
+
+  /* ---------- etapa 2: painel do planejamento ---------- */
+  function marcarUnico(id, valor) { document.querySelectorAll(`#${id} [data-v]`).forEach(b => b.classList.toggle("on", b.dataset.v === valor)); }
+
+  function desenharArcos() {
+    const chip = (n, i) => `<button class="dt ${plano.dentes.includes(n) ? "on" : ""} ${i === 5 ? "meio" : ""}" data-n="${n}" title="${esc(DENTES.nomeCompleto(n))}">${n}</button>`;
+    $("arcoSup").innerHTML = SUP.map(chip).join("");
+    $("arcoInf").innerHTML = INF.map(chip).join("");
+    const n = plano.dentes.length;
+    $("qtdDentes").textContent = n ? n + (n === 1 ? " dente" : " dentes") : "nenhum";
+  }
+  const alternarDente = e => {
+    const b = e.target.closest("[data-n]"); if (!b) return;
+    const n = Number(b.dataset.n), i = plano.dentes.indexOf(n);
+    i >= 0 ? plano.dentes.splice(i, 1) : plano.dentes.push(n);
+    atualizarPainel();
+  };
+  $("arcoSup").onclick = $("arcoInf").onclick = alternarDente;
+  $("presets").onclick = e => {
+    const b = e.target.closest("[data-p]"); if (!b) return;
+    plano.dentes = [];
+    b.dataset.p.split(",").filter(Boolean).forEach(faixa => {
+      const [a, z] = faixa.split("-").map(Number);
+      /* "13-23" = do 13 ao 11 e do 21 ao 23 (mesmo para o inferior) */
+      for (let i = 1; i <= a % 10; i++) plano.dentes.push(Math.floor(a / 10) * 10 + i);
+      for (let i = 1; i <= z % 10; i++) plano.dentes.push(Math.floor(z / 10) * 10 + i);
+    });
+    atualizarPainel();
+  };
+
+  $("cores").innerHTML = CORES.map(([id, hex]) => `<button class="cor" data-v="${id}"><i style="background:${hex}"></i>${id}</button>`).join("");
+
+  $("calibrarCor").onchange = e => { plano.calibrarCor = e.target.checked; };
+  for (const id of ["procedimento", "material", "cores", "formato", "comprimento", "translucidez", "gengiva", "intensidade"]) {
+    $(id).addEventListener("click", e => {
+      const b = e.target.closest("[data-v]"); if (!b) return;
+      plano[id === "cores" ? "cor" : id] = b.dataset.v;
+      atualizarPainel();
+    });
+  }
+  $("ajustes").onclick = e => {
+    const b = e.target.closest("[data-v]"); if (!b) return;
+    const i = plano.ajustes.indexOf(b.dataset.v);
+    i >= 0 ? plano.ajustes.splice(i, 1) : plano.ajustes.push(b.dataset.v);
+    atualizarPainel();
+  };
+  $("observacoes").oninput = e => { plano.observacoes = e.target.value; atualizarPainel(); };
+
+  function textoPlano(p) {
+    const cor = CORES.find(c => c[0] === p.cor);
+    const partes = [];
+    partes.push(NOMES_PROC[p.procedimento] + comMaterial(p));
+    if (p.dentes.length) partes.push(`${p.dentes.length} dentes (${[...p.dentes].sort((a, b) => a - b).join(", ")})`);
+    partes.push(`cor ${p.cor}${cor ? " — " + cor[2].toLowerCase() : ""}`);
+    if (p.procedimento !== "clareamento") {
+      if (p.formato !== "natural") partes.push("formato " + p.formato);
+      if (NOMES_COMP[p.comprimento]) partes.push(NOMES_COMP[p.comprimento]);
+      if (NOMES_TRANSL[p.translucidez]) partes.push(NOMES_TRANSL[p.translucidez]);
+    }
+    if (p.ajustes.length) partes.push(p.ajustes.filter(a => NOMES_AJ[a]).map(a => NOMES_AJ[a]).join(", "));
+    if (p.gengiva) partes.push("gengivoplastia " + p.gengiva);
+    partes.push("intensidade " + p.intensidade);
+    return partes.join(" · ");
+  }
+  const tituloCurto = p => `${NOMES_PROC[p.procedimento]}${p.procedimento === "lentes" ? " em " + p.material : ""} · ${p.cor} · ${p.dentes.length} ${p.dentes.length === 1 ? "dente" : "dentes"}`;
+
+  function atualizarPainel() {
+    marcarUnico("procedimento", plano.procedimento);
+    marcarUnico("material", plano.material);
+    marcarUnico("cores", plano.cor);
+    marcarUnico("formato", plano.formato);
+    marcarUnico("comprimento", plano.comprimento);
+    marcarUnico("translucidez", plano.translucidez);
+    marcarUnico("gengiva", plano.gengiva);
+    marcarUnico("intensidade", plano.intensidade);
+    document.querySelectorAll("#ajustes [data-v]").forEach(b => b.classList.toggle("on", plano.ajustes.includes(b.dataset.v)));
+    const soClarear = plano.procedimento === "clareamento";
+    ["blocoFormato", "blocoComprimento", "blocoTranslucidez"].forEach(id => $(id).classList.toggle("hidden", soClarear));
+    $("blocoMaterial").classList.toggle("hidden", plano.procedimento !== "lentes");
+    $("corNome").textContent = (CORES.find(c => c[0] === plano.cor) || [])[2] || "";
+    desenharArcos();
+    $("resumo").textContent = textoPlano(plano);
+    desenharPrevia();
+    desenharMarcas();
+    $("gerar").disabled = !plano.dentes.length;
+  }
+
+  /* prévia em linguagem do doutor: o que muda e o que a IA é instruída a manter */
+  function desenharPrevia() {
+    const p = plano, soClarear = p.procedimento === "clareamento", faz = [], mantem = [];
+    const sup = p.dentes.filter(n => n < 30).length, inf = p.dentes.length - sup;
+    faz.push(`${NOMES_PROC[p.procedimento]}${comMaterial(p)} somente em: ${[...p.dentes].sort((a, b) => a - b).join(", ")}`);
+    faz.push(`cor ${p.cor} nos dentes tratados`);
+    if (soClarear) mantem.push("formato, tamanho e posição dos dentes");
+    else {
+      faz.push(p.formato === "natural" ? "refinar o contorno atual" : "formato " + p.formato);
+      if (NOMES_COMP[p.comprimento]) faz.push(NOMES_COMP[p.comprimento]); else mantem.push("o comprimento dos dentes");
+      if (NOMES_TRANSL[p.translucidez]) faz.push(NOMES_TRANSL[p.translucidez]);
+    }
+    for (const a of Object.keys(NOMES_AJ)) {
+      if (soClarear && !["harmonizar", "desgastes"].includes(a)) continue;
+      if (p.ajustes.includes(a)) faz.push(NOMES_AJ[a]); else if (MANTER_AJ[a]) mantem.push(MANTER_AJ[a]);
+    }
+    if (p.gengiva) faz.push("gengivoplastia " + p.gengiva); else mantem.push("a gengiva");
+    if (!inf) mantem.push("os dentes inferiores"); if (!sup) mantem.push("os dentes superiores");
+    mantem.push("lábios, pele e rosto");
+    $("vaiFazer").innerHTML = faz.map(t => `<li>${esc(t)}</li>`).join("");
+    $("vaiManter").innerHTML = mantem.map(t => `<li>${esc(t)}</li>`).join("");
+  }
+  atualizarPainel();
+
+  /* ---------- geração com IA ---------- */
+  const MENSAGENS = ["Analisando o sorriso…", "Mapeando os dentes selecionados…", "Aplicando o planejamento…", "Ajustando cor e translucidez…", "Refinando os detalhes…", "Quase pronto…"];
+
+  /* recorte 4:3 ao redor da região marcada, com margem para a IA entender o contexto */
+  function calcularRecorte() {
+    const W = original.width, H = original.height;
+    const rx = regiao.x * W, ry = regiao.y * H, rw = regiao.w * W, rh = regiao.h * H;
+    const cx = rx + rw / 2, cy = ry + rh / 2;
+    let w = Math.max(rw * 1.35, rh * 1.35 * 4 / 3), h = w * 3 / 4;
+    if (w > W) { w = W; h = Math.min(H, w * 3 / 4); }
+    if (h > H) { h = H; w = Math.min(W, h * 4 / 3); }
+    const x = Math.min(W - w, Math.max(0, cx - w / 2)), y = Math.min(H - h, Math.max(0, cy - h / 2));
+    return { x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h), reg: { x: rx, y: ry, w: rw, h: rh } };
+  }
+
+  function recortar(r) {
+    const k = Math.min(1, MAX_IA / Math.max(r.w, r.h));
+    const c = document.createElement("canvas"); c.width = Math.round(r.w * k); c.height = Math.round(r.h * k);
+    c.getContext("2d").drawImage(original, r.x, r.y, r.w, r.h, 0, 0, c.width, c.height);
+    return c.toDataURL("image/jpeg", 0.92).split(",")[1];
+  }
+
+  async function chamarIA(imagem) {
+    const lic = Licenca.atual();
+    let r;
+    try {
+      r = await fetch("/api/simular", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ licenca: lic, imagem, plano }) });
+    } catch (e) { r = null; }
+    /* sem servidor no computador local: resultado de demonstração para testar a tela */
+    if ((!r || r.status === 404) && lic && lic.token === "local") return { demo: true };
+    if (!r) throw new Error("Sem conexão com a internet. A simulação com IA precisa de internet.");
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok || !d.ok) throw new Error(d.erro || "Não foi possível gerar a simulação.");
+    return { src: `data:${d.mime || "image/png"};base64,${d.imagem}` };
+  }
+
+  const carregarImg = src => new Promise((ok, erro) => { const i = new Image(); i.onload = () => ok(i); i.onerror = erro; i.src = src; });
+
+  /* ---------- calibração da cor dos dentes ----------
+     A IA não distingue bem tons vizinhos da escala (BL2 × BL3 × BL4…). Depois da IA, o app acha os dentes
+     tratados (pixels de dente que mudaram em relação à foto original) e desloca a cor média deles até o tom
+     escolhido, mantendo textura e reflexos. O alvo é relativo à cor original do paciente na própria foto,
+     então funciona com qualquer iluminação. Valores Lab aproximados da escala: só as diferenças importam. */
+  const LAB_VITA = { A3: [72, 2.5, 21], A2: [76, 1.5, 17], A1: [80, 0.5, 13], B1: [81, -0.5, 9.5], BL4: [84, -0.5, 7], BL3: [87, -1, 5], BL2: [89.5, -1, 3], BL1: [92, -1.2, 1.5] };
+  const linear = v => (v /= 255) <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  const gama = v => 255 * (v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055);
+  function rgbLab(r, g, b, out, o) {
+    r = linear(r); g = linear(g); b = linear(b);
+    const f = t => t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116;
+    const x = f((0.4124 * r + 0.3576 * g + 0.1805 * b) / 0.95047), y = f(0.2126 * r + 0.7152 * g + 0.0722 * b), z = f((0.0193 * r + 0.1192 * g + 0.9505 * b) / 1.08883);
+    out[o] = 116 * y - 16; out[o + 1] = 500 * (x - y); out[o + 2] = 200 * (y - z);
+  }
+  function labRgb(L, a, bb, d, o) {
+    const fy = (L + 16) / 116, fx = fy + a / 500, fz = fy - bb / 200;
+    const inv = t => t ** 3 > 0.008856 ? t ** 3 : (t - 16 / 116) / 7.787;
+    const x = inv(fx) * 0.95047, y = inv(fy), z = inv(fz) * 1.08883;
+    d[o] = gama(3.2406 * x - 1.5372 * y - 0.4986 * z); d[o + 1] = gama(-0.9689 * x + 1.8758 * y + 0.0415 * z); d[o + 2] = gama(0.0557 * x - 0.2040 * y + 1.0570 * z);
+  }
+  const pareceDente = (L, a, b) => L > 45 && a < 10 && b < 42 && a > -8;   // claro e pouco avermelhado (lábio e gengiva ficam de fora)
+
+  function calibrarCor(orig, ia, mascara, w, h, p, dentesRecorte) {
+    const cor = p.cor, V = LAB_VITA[cor], A3 = LAB_VITA.A3;
+    if (!V) return;
+    const n = w * h, lo = new Float32Array(n * 3), li = new Float32Array(n * 3), dentro = new Uint8Array(n), peso = new Uint8Array(n);
+    let nMudou = 0;
+    for (let k = 0; k < n; k++) {
+      if (mascara[k * 4 + 3] < 200) continue;
+      dentro[k] = 1;
+      rgbLab(orig[k * 4], orig[k * 4 + 1], orig[k * 4 + 2], lo, k * 3);
+      rgbLab(ia[k * 4], ia[k * 4 + 1], ia[k * 4 + 2], li, k * 3);
+      const o = k * 3;
+      /* dente tratado = parece dente no resultado e mudou em relação à foto original */
+      if (pareceDente(li[o], li[o + 1], li[o + 2]) && Math.hypot(li[o] - lo[o], li[o + 1] - lo[o + 1], li[o + 2] - lo[o + 2]) > 7) { peso[k] = 1; nMudou++; }
+    }
+
+    /* ---------- separação das arcadas (superior × inferior) ----------
+       Errar aqui deixava uma LINHA HORIZONTAL marcada no meio dos dentes: quando os dentes de baixo quase não
+       aparecem, a "faixa com menos dente" caía no meio dos de cima, e cada metade do dente recebia um ajuste.
+       1) com os dentes numerados pela IA: a divisa fica entre a base dos de cima e o topo dos de baixo;
+       2) sem numeração: só divide se houver uma linha de mordida clara (uma faixa quase sem dente);
+       3) senão: não divide — a calibração trata tudo como uma arcada só. */
+    const linhas = new Float32Array(h);
+    for (let k = 0; k < n; k++) if (dentro[k] && pareceDente(li[k * 3], li[k * 3 + 1], li[k * 3 + 2])) linhas[(k / w) | 0]++;
+    const y0 = linhas.findIndex(v => v > 0);
+    if (y0 < 0) return;
+    const y1 = h - 1 - [...linhas].reverse().findIndex(v => v > 0);
+    const mediana = v => v.slice().sort((a, b) => a - b)[v.length >> 1];
+    const dSup = (dentesRecorte || []).filter(d => d.n < 30), dInf = (dentesRecorte || []).filter(d => d.n >= 30);
+    let corte = h + 1;                                           // padrão: tudo na arcada superior (não divide)
+    if (dentesRecorte && dentesRecorte.length) {
+      if (dSup.length && dInf.length) corte = (mediana(dSup.map(d => (d.caixa.y + d.caixa.h) * h)) + mediana(dInf.map(d => d.caixa.y * h))) / 2;
+      else if (!dSup.length) corte = -1;                         // só aparecem dentes de baixo
+    } else {
+      let maior = 0, menor = Infinity, linha = -1;
+      for (let y = y0; y <= y1; y++) if (linhas[y] > maior) maior = linhas[y];
+      for (let y = Math.round(y0 + (y1 - y0) * 0.35); y <= Math.round(y0 + (y1 - y0) * 0.85); y++) if (linhas[y] < menor) { menor = linhas[y]; linha = y; }
+      if (linha > 0 && menor < maior * 0.25) corte = linha;      // linha de mordida clara
+    }
+    const divide = corte > 0 && corte < h;
+    let trataSup = p.dentes.some(d => d < 30) || p.ajustes.includes("harmonizar");
+    let trataInf = p.dentes.some(d => d >= 30) || p.ajustes.includes("harmonizar");
+    if (!divide) trataSup = trataInf = trataSup || trataInf;     // arcada única: vale o que foi pedido
+    console.log(`[arcadas] ${divide ? "divisa em " + Math.round(corte / h * 100) + "% da altura" : "sem divisão (uma arcada só)"}${dentesRecorte ? " — pela numeração dos dentes" : ""}`);
+
+    /* a IA mudou pouco (ex.: plano sutil): usa os dentes da(s) arcada(s) tratada(s) */
+    if (nMudou < 150) for (let k = 0; k < n; k++) {
+      const y = (k / w) | 0;
+      peso[k] = dentro[k] && pareceDente(li[k * 3], li[k * 3 + 1], li[k * 3 + 2]) && (y < corte ? trataSup : trataInf) ? 1 : 0;
+    }
+
+    /* ONDE ajustar: por faixas suaves, nunca pelo contorno pixel a pixel da diferença com a foto original.
+       O contorno trazia de volta o desenho das manchas antigas (onde a mancha branca original já era clara,
+       a diferença era pequena e aquele ponto ficava sem ajuste, mais escuro que o resto do dente).
+       Aqui a diferença só serve para achar as COLUNAS dos dentes tratados em cada arcada. */
+    const faixa = [0, 1].map(arc => {
+      const col = new Float32Array(w);
+      for (let k = 0; k < n; k++) if (peso[k] && ((((k / w) | 0) < corte) ? 0 : 1) === arc) col[k % w]++;
+      /* arcada que o plano manda tratar, mas a IA não mexeu: usa toda a largura de dentes dessa arcada */
+      if (col.every(v => v < 2) && (arc ? trataInf : trataSup))
+        for (let k = 0; k < n; k++) if (dentro[k] && ((((k / w) | 0) < corte) ? 0 : 1) === arc && pareceDente(li[k * 3], li[k * 3 + 1], li[k * 3 + 2])) col[k % w]++;
+      let maior = 0; for (let x = 0; x < w; x++) if (col[x] > maior) maior = col[x];
+      const minimo = Math.max(2, maior * 0.08);
+      const x0 = col.findIndex(v => v >= minimo); if (x0 < 0) return null;
+      let x1 = w - 1; while (x1 > x0 && col[x1] < minimo) x1--;
+      return [x0 - w * 0.03, x1 + w * 0.03];
+    });
+    const lim = v => Math.max(0, Math.min(1, v));
+    /* passagem suave entre as arcadas: nenhum ajuste muda de uma linha de pixel para a outra */
+    const rampa = Math.max(4, w * 0.025), transicao = Math.max(6, h * 0.05);
+    const pesoFaixa = (x, y, arc) => {
+      const F = faixa[arc];
+      if (!F || !(arc ? trataInf : trataSup)) return 0;
+      const vertical = arc ? lim((y - corte) / transicao + 0.5) : lim((corte - y) / transicao + 0.5);
+      return vertical * lim((x - F[0]) / rampa) * lim((F[1] - x) / rampa);
+    };
+    const camada = (valores, desfoque) => {
+      const c = document.createElement("canvas"); c.width = w; c.height = h;
+      const cx = c.getContext("2d"), im = cx.createImageData(w, h);
+      for (let k = 0; k < n; k++) im.data[k * 4 + 3] = valores(k) * 255;
+      cx.putImageData(im, 0, 0);
+      const c2 = document.createElement("canvas"); c2.width = w; c2.height = h;
+      const cx2 = c2.getContext("2d", { willReadFrequently: true }); cx2.filter = `blur(${desfoque}px)`; cx2.drawImage(c, 0, 0);
+      return cx2.getImageData(0, 0, w, h).data;
+    };
+    /* "quanto parece dente" no resultado da IA, contínuo: claro e pouco avermelhado → 1; gengiva, lábio e espaços escuros → 0 */
+    const dente = camada(k => dentro[k] ? lim((li[k * 3] - 42) / 10) * lim((10.5 - li[k * 3 + 1]) / 5) : 0, 2);
+
+    /* cada arcada tem a sua referência: os dentes de baixo ficam naturalmente na sombra */
+    const arcadas = [0, 1].map(() => ({ ref: [0, 0, 0], nRef: 0, trat: [0, 0, 0], nTrat: 0, Ls: [] }));
+    for (let k = 0; k < n; k++) {
+      if (!dentro[k]) continue;
+      const x = k % w, y = (k / w) | 0, arc = y < corte ? 0 : 1, A = arcadas[arc], o = k * 3;
+      if (pareceDente(lo[o], lo[o + 1], lo[o + 2])) { A.ref[0] += lo[o]; A.ref[1] += lo[o + 1]; A.ref[2] += lo[o + 2]; A.nRef++; }
+      const f = pesoFaixa(x, y, arc) * dente[k * 4 + 3] / 255;
+      if (f > 0.3) { A.trat[0] += li[o] * f; A.trat[1] += li[o + 1] * f; A.trat[2] += li[o + 2] * f; A.nTrat += f; if (f > 0.7 && k % 3 === 0) A.Ls.push(li[o]); }
+    }
+    const teto = [[-8, 8], [-3, 3], [-10, 8]];   // deslocamento máximo em L, a e b sobre o resultado da IA
+    const PISO_B = 1.5;                          // dente natural nunca é azulado: o amarelo (b) não fica abaixo disso
+    const deltas = arcadas.map((A, i) => {
+      if (A.nTrat < 80 || A.nRef < 80) return null;
+      const ref = A.ref.map(v => v / A.nRef), trat = A.trat.map(v => v / A.nTrat);
+      /* L: diferença de claridade entre o tom escolhido e um dente comum (A3), na escala de luz desta foto.
+         b (amarelo): PROPORCIONAL ao amarelo original — em foto de luz fria o dente já parece pouco amarelo.
+         a: só corrige se a IA sair da faixa natural. */
+      const alvo = [
+        Math.min(93, ref[0] + (V[0] - A3[0]) * ref[0] / A3[0]),
+        Math.max(-1, Math.min(2.5, trat[1])),
+        Math.max(PISO_B, Math.max(0, ref[2]) * V[2] / A3[2])
+      ];
+      const d = alvo.map((v, j) => Math.max(teto[j][0], Math.min(teto[j][1], v - trat[j])));
+      /* não estoura os brilhos: os 5% mais claros do dente não passam de L 97, então a textura continua visível */
+      A.Ls.sort((a, b) => a - b);
+      const p95 = A.Ls[Math.floor(A.Ls.length * 0.95)] ?? 90;
+      d[0] = Math.min(d[0], Math.max(0, 97 - p95));
+      console.log(`[cor] ${cor} ${i ? "inferior" : "superior"}: original L${ref[0].toFixed(0)} b${ref[2].toFixed(0)} → IA L${trat[0].toFixed(0)} b${trat[2].toFixed(0)} → ajuste L${d[0] >= 0 ? "+" : ""}${d[0].toFixed(1)} b${d[2] >= 0 ? "+" : ""}${d[2].toFixed(1)}`);
+      /* diferença pequena: o resultado da IA já está no tom — não mexe */
+      return Math.abs(d[0]) < 2 && Math.abs(d[2]) < 2 ? null : d;
+    });
+    if (!deltas[0] && !deltas[1]) return;
+
+    for (let k = 0; k < n; k++) {
+      if (!dentro[k]) continue;
+      const x = k % w, y = (k / w) | 0, arc = y < corte ? 0 : 1, delta = deltas[arc];
+      if (!delta) continue;
+      const f = pesoFaixa(x, y, arc) * dente[k * 4 + 3] / 255; if (f < 0.02) continue;
+      const o = k * 3;
+      labRgb(Math.min(98, li[o] + delta[0] * f), li[o + 1] + delta[1] * f, li[o + 2] + delta[2] * f, ia, k * 4);
+    }
+  }
+
+  /* ---------- alinhamento ----------
+     A IA às vezes devolve o recorte com outro zoom ou um pouco deslocado. Colar assim mistura dentes antigos e
+     novos na borda e borra a barba/pele. Antes de colar, procura a escala e o deslocamento que fazem a pele ao
+     redor da boca (fora da elipse) encaixar na foto original. Retorna também o erro que sobrou (0–255). */
+  function alinhar(origCrop, pedaco, ex, ey, ax, ay) {
+    const W = pedaco.width, H = pedaco.height, S = 128, k = S / W, w = S, h = Math.max(8, Math.round(H * k));
+    const cinza = fonte => {
+      const c = document.createElement("canvas"); c.width = w; c.height = h;
+      const x = c.getContext("2d", { willReadFrequently: true }); x.drawImage(fonte, 0, 0, w, h);
+      const d = x.getImageData(0, 0, w, h).data, g = new Float32Array(w * h);
+      for (let i = 0; i < g.length; i++) g[i] = 0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2];
+      return g;
+    };
+    const go = cinza(origCrop), gi = cinza(pedaco);
+    const pts = [];
+    for (let y = Math.round(h * 0.06); y < h * 0.94; y += 2) for (let x = Math.round(w * 0.06); x < w * 0.94; x += 2) {
+      const dx = (x / k - ex) / (ax * 1.12), dy = (y / k - ey) / (ay * 1.12);
+      if (dx * dx + dy * dy > 1) pts.push(x, y);
+    }
+    if (pts.length < 200) return null;
+    const amostra = (x, y) => {
+      if (x < 0 || y < 0 || x > w - 1.001 || y > h - 1.001) return NaN;
+      const x0 = x | 0, y0 = y | 0, fx = x - x0, fy = y - y0, i = y0 * w + x0;
+      return (gi[i] * (1 - fx) + gi[i + 1] * fx) * (1 - fy) + (gi[i + w] * (1 - fx) + gi[i + w + 1] * fx) * fy;
+    };
+    const cx = w / 2, cy = h / 2, dif = new Float32Array(pts.length / 2);
+    const erro = (s, tx, ty) => {
+      let soma = 0, n = 0;
+      for (let j = 0; j < pts.length; j += 2) {
+        const v = amostra((pts[j] - cx) * s + cx + tx, (pts[j + 1] - cy) * s + cy + ty);
+        if (v !== v) continue;
+        dif[n++] = go[pts[j + 1] * w + pts[j]] - v; soma += dif[n - 1];
+      }
+      if (n < pts.length / 4) return Infinity;
+      const media = soma / n; let e = 0;                     // ignora diferença uniforme de brilho
+      for (let j = 0; j < n; j++) e += Math.abs(dif[j] - media);
+      return e / n;
+    };
+    let melhor = { s: 1, tx: 0, ty: 0, e: erro(1, 0, 0) };
+    const base = melhor.e;
+    for (let s = 0.84; s <= 1.2001; s += 0.02) for (let tx = -14; tx <= 14; tx += 2) for (let ty = -14; ty <= 14; ty += 2) {
+      const e = erro(s, tx, ty); if (e < melhor.e) melhor = { s, tx, ty, e };
+    }
+    const g = { ...melhor };                                   // refinamento fino ao redor do melhor
+    for (let s = g.s - 0.02; s <= g.s + 0.0201; s += 0.005) for (let tx = g.tx - 2; tx <= g.tx + 2; tx += 0.5) for (let ty = g.ty - 2; ty <= g.ty + 2; ty += 0.5) {
+      const e = erro(s, tx, ty); if (e < melhor.e) melhor = { s, tx, ty, e };
+    }
+    return { s: melhor.s, tx: melhor.tx / k, ty: melhor.ty / k, erro: melhor.e, erroAntes: base };
+  }
+
+  /* ---------- trava por dente ----------
+     A IA de imagem às vezes "espalha" o tratamento para os vizinhos. Com os dentes numerados no recorte,
+     a simulação só é colada nas caixas dos dentes marcados (com folga para gengiva/comprimento); os outros
+     dentes continuam com os pixels da foto original. Devolve null quando não dá para travar com segurança. */
+  function travaDentes(r, p, lista) {
+    if (!lista || !lista.length || p.ajustes.includes("harmonizar")) return null;
+    const marcados = lista.filter(d => p.dentes.includes(d.n));
+    if (!marcados.length || marcados.length === lista.length) return null;   // nada marcado achado, ou todos marcados
+    /* dente marcado que deveria aparecer (entre os achados da mesma arcada) mas não foi achado: melhor não travar */
+    const achados = new Set(lista.map(d => d.n));
+    for (const arco of [SUP, INF]) {
+      const idx = arco.map((n, i) => achados.has(n) ? i : -1).filter(i => i >= 0);
+      if (!idx.length) continue;
+      if (arco.some((n, i) => p.dentes.includes(n) && !achados.has(n) && i > Math.min(...idx) && i < Math.max(...idx))) return null;
+    }
+    const c = document.createElement("canvas"); c.width = r.w; c.height = r.h;
+    const x = c.getContext("2d"); x.fillStyle = "#fff";
+    const alonga = p.comprimento && p.comprimento !== "manter" ? 0.3 : 0.12, gengiva = p.gengiva ? 0.4 : 0.15;
+    for (const { n, caixa: b } of marcados) {
+      const bx = b.x * r.w, by = b.y * r.h, bw = b.w * r.w, bh = b.h * r.h, sup = n < 30;
+      const cima = bh * (sup ? gengiva : alonga), baixo = bh * (sup ? alonga : gengiva), lado = bw * 0.1;
+      x.beginPath(); x.roundRect(bx - lado, by - cima, bw + 2 * lado, bh + cima + baixo, Math.min(bw, bh) * 0.25); x.fill();
+    }
+    const suave = document.createElement("canvas"); suave.width = r.w; suave.height = r.h;
+    const sx = suave.getContext("2d"); sx.filter = `blur(${Math.max(2, r.w * 0.005)}px)`; sx.drawImage(c, 0, 0);
+    return suave;
+  }
+
+  /* devolve o resultado da IA para a foto inteira: só dentro da elipse marcada (e, se possível, só nos dentes
+     marcados), com borda suave e cor equalizada */
+  function compor(r, imgIA, p, dentesRecorte) {
+    let pedaco = document.createElement("canvas"); pedaco.width = r.w; pedaco.height = r.h;
+    let pc = pedaco.getContext("2d", { willReadFrequently: true });
+    const k = Math.max(r.w / imgIA.width, r.h / imgIA.height);         // "cover", caso a IA mude levemente a proporção
+    pc.drawImage(imgIA, (r.w - imgIA.width * k) / 2, (r.h - imgIA.height * k) / 2, imgIA.width * k, imgIA.height * k);
+
+    /* máscara elíptica um pouco maior que a região, com degradê nas bordas */
+    const mascara = document.createElement("canvas"); mascara.width = r.w; mascara.height = r.h;
+    const mc = mascara.getContext("2d");
+    const ex = r.reg.x - r.x + r.reg.w / 2, ey = r.reg.y - r.y + r.reg.h / 2, ax = r.reg.w / 2 * 1.1, ay = r.reg.h / 2 * 1.1;
+
+    /* encaixa o resultado da IA na foto original (zoom e posição) antes de colar */
+    const origCrop = document.createElement("canvas"); origCrop.width = r.w; origCrop.height = r.h;
+    origCrop.getContext("2d").drawImage(original, r.x, r.y, r.w, r.h, 0, 0, r.w, r.h);
+    const al = alinhar(origCrop, pedaco, ex, ey, ax, ay);
+    if (al && (Math.abs(al.s - 1) > 0.004 || Math.abs(al.tx) > 1 || Math.abs(al.ty) > 1)) {
+      const novo = document.createElement("canvas"); novo.width = r.w; novo.height = r.h;
+      const nc = novo.getContext("2d", { willReadFrequently: true });
+      nc.drawImage(origCrop, 0, 0);                                    // bordas que sobrarem ficam com a foto original
+      nc.translate(r.w / 2, r.h / 2); nc.scale(1 / al.s, 1 / al.s); nc.translate(-r.w / 2 - al.tx, -r.h / 2 - al.ty);
+      nc.drawImage(pedaco, 0, 0);
+      nc.setTransform(1, 0, 0, 1, 0, 0);
+      pedaco = novo; pc = nc;
+    }
+    if (al) console.log(`[alinhamento] escala ${al.s.toFixed(3)}, desloc. ${al.tx.toFixed(0)},${al.ty.toFixed(0)} px, erro ${al.erroAntes.toFixed(1)} → ${al.erro.toFixed(1)}`);
+    mc.translate(ex, ey); mc.scale(1, ay / ax);
+    const g = mc.createRadialGradient(0, 0, 0, 0, 0, ax);
+    g.addColorStop(0, "#fff"); g.addColorStop(0.84, "#fff"); g.addColorStop(1, "rgba(255,255,255,0)");
+    mc.fillStyle = g; mc.beginPath(); mc.arc(0, 0, ax, 0, Math.PI * 2); mc.fill();
+    mc.setTransform(1, 0, 0, 1, 0, 0);
+    const trava = p ? travaDentes(r, p, dentesRecorte) : null;
+    if (trava) { mc.globalCompositeOperation = "destination-in"; mc.drawImage(trava, 0, 0); mc.globalCompositeOperation = "source-over"; }
+    console.log(trava ? `[trava] simulação colada só nos dentes ${p.dentes.join(", ")}` : "[trava] sem trava por dente (região inteira)");
+
+    /* equaliza a cor: compara a pele fora da elipse (original × IA) e corrige pequenas mudanças de tom */
+    const orig = original.getContext("2d").getImageData(r.x, r.y, r.w, r.h).data;
+    const ia = pc.getImageData(0, 0, r.w, r.h);
+    const m = mc.getImageData(0, 0, r.w, r.h).data;
+    const so = [0, 0, 0], si = [0, 0, 0]; let n = 0;
+    for (let i = 0; i < m.length; i += 16) if (m[i + 3] === 0) { for (let c = 0; c < 3; c++) { so[c] += orig[i + c]; si[c] += ia.data[i + c]; } n++; }
+    if (n > 200) {
+      const ganho = so.map((v, c) => Math.min(1.15, Math.max(0.87, v / Math.max(1, si[c]))));
+      for (let i = 0; i < ia.data.length; i += 4) for (let c = 0; c < 3; c++) ia.data[i + c] *= ganho[c];
+    }
+    if (p && p.calibrarCor !== false) calibrarCor(orig, ia.data, m, r.w, r.h, p, dentesRecorte);
+    pc.putImageData(ia, 0, 0);
+    pc.globalCompositeOperation = "destination-in"; pc.drawImage(mascara, 0, 0);
+
+    const final = document.createElement("canvas"); final.width = original.width; final.height = original.height;
+    const fc = final.getContext("2d");
+    fc.drawImage(original, 0, 0); fc.drawImage(pedaco, r.x, r.y);
+    /* erro alto mesmo depois de alinhar = a IA mexeu no rosto/lábios: vale pedir de novo */
+    return { final, erro: al ? al.erro : 0, ruim: !!al && al.erro > ERRO_MAXIMO };
+  }
+  const ERRO_MAXIMO = 14;
+
+  /* modo de teste local (sem servidor): só clareia a região para testar a tela */
+  async function resultadoDemo(r) {
+    const c = document.createElement("canvas"); c.width = r.w; c.height = r.h;
+    const x = c.getContext("2d"); x.drawImage(original, r.x, r.y, r.w, r.h, 0, 0, r.w, r.h);
+    const d = x.getImageData(0, 0, r.w, r.h);
+    for (let i = 0; i < d.data.length; i += 4) {
+      const l = 0.299 * d.data[i] + 0.587 * d.data[i + 1] + 0.114 * d.data[i + 2];
+      if (l > 120) for (let k = 0; k < 3; k++) d.data[i + k] += (250 - d.data[i + k]) * 0.55;
+    }
+    x.putImageData(d, 0, 0);
+    return carregarImg(c.toDataURL());
+  }
+
+  async function gerar() {
+    if (!navigator.onLine) return toast("A simulação com IA precisa de internet.");
+    if (!regiaoConferida && !confirm("O círculo “Região do sorriso” está mesmo sobre a boca do paciente?\n\nSó a área dentro dele é alterada. Toque em Cancelar para ajustar.")) {
+      irEtapa(2); return;
+    }
+    const r = calcularRecorte();
+    $("gerando").classList.remove("hidden");
+    let passo = 0; const inicio = Date.now();
+    const timer = setInterval(() => {
+      passo = Math.min(MENSAGENS.length - 1, passo + 1);
+      $("gerandoTxt").textContent = MENSAGENS[passo];
+      $("gerandoTempo").textContent = Math.round((Date.now() - inicio) / 1000) + " s · isso leva de 10 a 30 segundos.";
+    }, 3500);
+    $("gerandoTxt").textContent = MENSAGENS[0];
+    try {
+      /* até 2 tentativas: se a IA mexer no rosto/lábios (não encaixa na foto), pede de novo e fica com a melhor */
+      let melhor = null, res;
+      const imagem = recortar(r);
+      /* dentes numerados no MESMO recorte: reaproveita os da tela se o recorte não mudou; senão pede em paralelo */
+      const mesmoRecorte = dentesFoto && ["x", "y", "w", "h"].every(k => dentesFoto.r[k] === r[k]);
+      const pedidoDentes = mesmoRecorte ? Promise.resolve(dentesFoto.lista)
+        : fetch("/api/dentes", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ imagem }) })
+            .then(x => x.json()).then(j => j.ok ? j.dentes : null).catch(() => null);
+      for (let tentativa = 0; tentativa < 2; tentativa++) {
+        res = await chamarIA(imagem);
+        const imgIA = res.demo ? await resultadoDemo(r) : await carregarImg(res.src);
+        const c = compor(r, imgIA, res.demo ? null : plano, await pedidoDentes);
+        if (!melhor || c.erro < melhor.erro) melhor = c;
+        if (!c.ruim || res.demo) break;
+        $("gerandoTxt").textContent = "Refinando: a IA mexeu no enquadramento, gerando de novo…";
+      }
+      const depois = melhor.final.toDataURL("image/jpeg", 0.92);
+      /* foto de rosto: além do rosto inteiro, gera o antes e depois de perto da boca (mesmo recorte nas duas) */
+      const ehRosto = regiao.w * regiao.h < 0.2;
+      const close = ehRosto ? await IA.recortarPar(antesURL, depois, regiao, 2, 1.45) : null;
+      versoes.push({ depois, close, foco: { ...regiao }, plano: JSON.parse(JSON.stringify(plano)), demo: !!res.demo });
+      atual = versoes.length - 1;
+      vista = close ? "close" : "rosto";
+      if (res.demo) toast("Modo de teste: resultado ilustrativo, sem IA.");
+      mostrarResultado(); irEtapa(3);
+    } catch (e) {
+      toast(e.message);
+    } finally {
+      clearInterval(timer); $("gerando").classList.add("hidden");
+    }
+  }
+  $("gerar").onclick = gerar;
+  $("outraVersao").onclick = gerar;
+  $("voltarPlano").onclick = () => irEtapa(2);
+
+  /* ---------- etapa 3: resultado ---------- */
+  /* par de imagens da vista atual: rosto inteiro ou sorriso de perto */
+  function parAtual() {
+    const v = versoes[atual];
+    return vista === "close" && v.close ? v.close : { antes: antesURL, depois: v.depois };
+  }
+
+  function mostrarResultado() {
+    const v = versoes[atual], { antes, depois } = parAtual();
+    $("vista").classList.toggle("hidden", !v.close);
+    document.querySelectorAll("#vista button").forEach(b => b.classList.toggle("on", b.dataset.v === (v.close ? vista : "rosto")));
+    document.querySelectorAll("#modoComp button").forEach(b => b.classList.toggle("on", b.dataset.m === modoComp));
+    if (modoComp === "deslizar") {
+      $("vComp").innerHTML = `<div class="comp" id="comp"><img src="${antes}" alt="Antes"><img class="dep" src="${depois}" alt="Depois"><div class="linha"></div><span class="tag" style="left:12px">Antes</span><span class="tag" style="right:12px">Depois</span></div>`;
+      const comp = $("comp"), dep = comp.querySelector(".dep"), linha = comp.querySelector(".linha");
+      const mover = e => { const b = comp.getBoundingClientRect(); const p = Math.max(0, Math.min(100, (e.clientX - b.left) / b.width * 100)); dep.style.clipPath = `inset(0 0 0 ${p}%)`; linha.style.left = p + "%"; };
+      comp.onpointerdown = e => { comp.setPointerCapture(e.pointerId); mover(e); comp.onpointermove = mover; };
+      comp.onpointerup = comp.onpointercancel = () => comp.onpointermove = null;
+    } else {
+      $("vComp").innerHTML = `<div class="lado"><figure><img src="${antes}" alt=""><figcaption>Antes</figcaption></figure><figure><img src="${depois}" alt=""><figcaption>Depois</figcaption></figure></div>`;
+    }
+    $("versoes").innerHTML = versoes.length > 1 ? versoes.map((x, i) => `<button class="${i === atual ? "on" : ""}" data-i="${i}"><img src="${x.depois}" alt=""><span>V${i + 1}</span></button>`).join("") : "";
+    $("planoUsado").textContent = textoPlano(v.plano) + (v.demo ? "\n\n(Modo de teste — resultado ilustrativo, sem IA)" : "");
+  }
+  $("modoComp").onclick = e => { const b = e.target.closest("[data-m]"); if (b) { modoComp = b.dataset.m; mostrarResultado(); } };
+  $("vista").onclick = e => { const b = e.target.closest("[data-v]"); if (b) { vista = b.dataset.v; mostrarResultado(); } };
+  $("versoes").onclick = e => { const b = e.target.closest("[data-i]"); if (b) { atual = Number(b.dataset.i); mostrarResultado(); } };
+
+  function baixar(dataURL, nome) { const a = document.createElement("a"); a.href = dataURL; a.download = nome; a.click(); }
+  $("baixarDepois").onclick = () => baixar(parAtual().depois, "simulacao-sorriso.jpg");
+  $("baixarComp").onclick = async () => {
+    const par = parAtual();
+    const [a, d] = await Promise.all([carregarImg(par.antes), carregarImg(par.depois)]);
+    const gap = Math.round(a.width * 0.02), faixa = Math.round(a.width * 0.09);
+    const c = document.createElement("canvas"); c.width = a.width * 2 + gap; c.height = a.height + faixa;
+    const x = c.getContext("2d");
+    x.fillStyle = "#0c2440"; x.fillRect(0, 0, c.width, c.height);
+    x.drawImage(a, 0, faixa); x.drawImage(d, a.width + gap, faixa);
+    x.fillStyle = "#fff"; x.font = `700 ${Math.round(faixa * 0.42)}px "Plus Jakarta Sans",sans-serif`; x.textAlign = "center"; x.textBaseline = "middle";
+    x.fillText("ANTES", a.width / 2, faixa / 2); x.fillText("DEPOIS", a.width * 1.5 + gap, faixa / 2);
+    baixar(c.toDataURL("image/jpeg", 0.92), "antes-e-depois.jpg");
+  };
+
+  $("salvarPac").onclick = async () => {
+    if (pacienteId) return salvarEm(pacienteId);
+    const lista = await DB.listar();
+    const m = document.createElement("div"); m.className = "modal";
+    m.innerHTML = `<div class="card"><h2>Salvar em qual paciente?</h2><p class="muted" style="font-size:14px">A simulação entra em “Antes e depois” da apresentação.</p>
+      <div class="pacientes-m">${lista.map(p => `<button data-id="${p.id}"><b>${esc(p.nome || "Sem nome")}</b></button>`).join("") || `<p class="muted">Nenhum paciente ainda.</p>`}</div>
+      <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" data-x>Cancelar</button><button class="btn pri" data-novo>+ Novo paciente</button></div></div>`;
+    document.body.appendChild(m);
+    m.onclick = async e => {
+      if (e.target === m || e.target.closest("[data-x]")) return m.remove();
+      const b = e.target.closest("[data-id]");
+      if (b) { m.remove(); salvarEm(b.dataset.id); }
+      if (e.target.closest("[data-novo]")) {
+        const nome = prompt("Nome do paciente:"); if (!nome) return;
+        const p = await DB.salvar(DB.novoPaciente(nome.trim())); m.remove(); salvarEm(p.id);
+      }
+    };
+  };
+  async function salvarEm(id) {
+    const p = await DB.obter(id); if (!p) return toast("Paciente não encontrado.");
+    const v = versoes[atual];
+    /* um item só, com o rosto inteiro e (se houver) o close do sorriso; a apresentação gera os dois slides.
+       A mesma versão não é salva duas vezes (ex.: voltou da apresentação e clicou de novo). */
+    if (!v.salvaEm || v.salvaEm !== id) {
+      p.antesDepois.push({ id: DB.uid(), titulo: tituloCurto(v.plano), tipo: v.close ? "rosto" : "close", antes: antesURL, depois: v.depois, close: v.close, foco: v.foco, plano: textoPlano(v.plano) });
+      if (!p.fotos.sorriso && !p.fotos.boca) p.fotos.sorriso = antesURL;
+      await DB.salvar(p);
+      v.salvaEm = id;
+    }
+    pacienteId = id;
+    /* etapa 4: a apresentação do paciente, já com fotos e simulação */
+    location.href = "apresentacao.html?paciente=" + id;
+  }
+
+  irEtapa(1);
+})();
+</script>
+</body>
+</html>
