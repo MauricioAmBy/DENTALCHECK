@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0c2440">
+<meta name="theme-color" content="#151719">
 <meta name="description" content="DENTALCHECK — simulação de sorriso com IA e apresentação do paciente.">
 <title>DENTALCHECK</title>
 <link rel="manifest" href="manifest.webmanifest">
@@ -13,18 +13,18 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="DENTALCHECK">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/app.css">
 <style>
 /* ativação */
 #ativacao{min-height:100vh;display:grid;grid-template-columns:1.05fr 1fr}
-.at-lado{background:linear-gradient(160deg,var(--navy),var(--navy2) 60%,#0d4f60);color:#fff;padding:48px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
-.at-lado::after{content:"";position:absolute;width:520px;height:520px;border-radius:50%;right:-180px;bottom:-200px;background:radial-gradient(circle,rgba(11,158,150,.55),transparent 70%)}
+.at-lado{background:linear-gradient(160deg,var(--navy),var(--navy2) 60%,var(--preto));color:#fff;padding:48px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.at-lado::after{content:"";position:absolute;width:520px;height:520px;border-radius:50%;right:-180px;bottom:-200px;background:radial-gradient(circle,rgba(195,232,107,.28),transparent 70%)}
 .at-lado h1{color:#fff;font-size:clamp(28px,4vw,44px);max-width:460px;margin:18px 0 14px}
 .at-lado p{color:rgba(255,255,255,.75);max-width:420px}
 .at-lado ul{list-style:none;display:grid;gap:10px;margin-top:26px;position:relative;z-index:1}
 .at-lado li{display:flex;gap:10px;align-items:center;color:rgba(255,255,255,.88)}
-.at-lado li span{width:26px;height:26px;border-radius:50%;background:rgba(11,158,150,.3);display:grid;place-items:center;font-size:13px}
+.at-lado li span{width:26px;height:26px;border-radius:50%;background:var(--lima);color:var(--preto);font-weight:800;display:grid;place-items:center;font-size:13px}
 .at-form{display:grid;place-items:center;padding:32px 20px;background:#fff}
 .at-form form{width:min(380px,100%)}
 .at-form h2{font-size:26px;margin-bottom:6px}
@@ -37,7 +37,7 @@
 .mp{display:block;text-decoration:none;color:inherit;background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:transform .2s,box-shadow .2s}
 .mp:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
 .mp .img{aspect-ratio:4/3;background:var(--mint) center/cover;display:grid;place-items:center;font-size:30px;font-weight:800;color:var(--brand2);position:relative}
-.mp .tag{position:absolute;left:8px;bottom:8px;background:rgba(12,36,64,.82);color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px}
+.mp .tag{position:absolute;left:8px;bottom:8px;background:rgba(21,23,25,.82);color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px}
 .mp .txt{padding:10px 12px}.mp b{display:block;color:var(--navy);font-size:14px}.mp small{color:var(--muted);font-size:12px}
 .okmsg{background:#e8f7ef;color:#1f7a45;padding:10px 14px;border-radius:var(--r-sm);font-size:14px;margin-bottom:14px}
 .abas{display:flex;background:var(--sky);border:1px solid var(--line);border-radius:999px;padding:3px;margin-bottom:16px}
@@ -66,15 +66,15 @@
 .passos{margin:10px 0 0 18px;display:grid;gap:6px;color:var(--muted);font-size:14px}
 .passos b{color:var(--navy)}
 .sis{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:var(--shadow);transition:transform .25s var(--ease),box-shadow .25s}
-.sis:hover{transform:translateY(-4px);box-shadow:0 28px 50px -26px rgba(12,36,64,.55)}
+.sis:hover{transform:translateY(-4px);box-shadow:0 28px 50px -26px rgba(21,23,25,.55)}
 .sis .arte{aspect-ratio:4/3;display:grid;place-items:center;position:relative}
 .sis .arte svg{width:46%;height:auto}
 .sis .txt{padding:18px 20px 22px}
 .sis .txt p{color:var(--muted);font-size:14px;margin-top:6px}
 .sis .ir{margin-top:14px;font-weight:700;color:var(--brand);font-size:14px}
-.a1{background:linear-gradient(150deg,#0c2440,#16508a)}
-.a2{background:linear-gradient(150deg,#0b9e96,#4fd1c5)}
-.a3{background:linear-gradient(150deg,#eef6fb,#cfe7f2)}
+.a1{background:linear-gradient(150deg,#151719,#2a2d31)}
+.a2{background:linear-gradient(150deg,#c3e86b,#aed44f)}
+.a3{background:linear-gradient(150deg,#f4f4f0,#dcdfe0)}
 .dica{margin-top:22px;display:flex;gap:12px;align-items:center;padding:14px 18px;border-radius:var(--r);background:var(--mint);font-size:14px}
 @media (max-width:860px){#ativacao{grid-template-columns:1fr}.at-lado{padding:32px 22px}.at-lado ul{display:none}.sistemas{grid-template-columns:1fr}}
 </style>
@@ -84,7 +84,7 @@
 <!-- ATIVAÇÃO -->
 <section id="ativacao" class="hidden">
   <div class="at-lado">
-    <div class="logo" style="color:#fff"><img src="icons/icon.svg" alt=""><span>DENTAL<b>CHECK</b></span></div>
+    <div class="logo" style="color:#fff"><img src="icons/marca-branca.svg" alt=""><span>DENTALCHECK</span></div>
     <div style="position:relative;z-index:1">
       <h1>Mostre ao paciente o sorriso que ele vai ter.</h1>
       <p>Simulação do sorriso com IA na foto do paciente, dente a dente, e uma apresentação com a sua marca pronta em PDF — no celular, tablet ou computador.</p>
@@ -120,7 +120,7 @@
 <!-- HUB -->
 <section id="hub" class="hidden">
   <header class="top">
-    <a class="logo" href="/"><img src="icons/icon.svg" alt=""><span>DENTAL<b>CHECK</b></span></a>
+    <a class="logo" href="/"><img src="icons/marca.svg" alt=""><span>DENTALCHECK</span></a>
     <div class="sp"></div>
     <a class="btn sm hidden" id="btnAdmin" href="/admin">Administração</a>
     <button class="btn sm hidden" id="btnInstalar">Instalar app</button>
@@ -151,7 +151,7 @@
     <div class="sistemas" id="sistemas">
       <a class="sis principal" href="/simulador">
         <div class="arte a2">
-          <svg viewBox="0 0 120 100" fill="none"><path d="M18 44c14 26 70 26 84 0" stroke="#fff" stroke-width="5" stroke-linecap="round"/><path d="M28 48c10 14 54 14 64 0" fill="#fff"/><path d="M60 10l4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#fff"/><path d="M94 14l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#fff" opacity=".8"/></svg>
+          <svg viewBox="0 0 120 100" fill="none"><path d="M18 44c14 26 70 26 84 0" stroke="#151719" stroke-width="5" stroke-linecap="round"/><path d="M28 48c10 14 54 14 64 0" fill="#151719"/><path d="M60 10l4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#151719"/><path d="M94 14l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#151719" opacity=".8"/></svg>
         </div>
         <div class="txt"><div class="kick">Comece por aqui</div><h2>Novo procedimento</h2>
           <ol class="passos"><li><b>Fotos</b> — capture com o guia passo a passo ou envie as que já tem</li><li><b>Planejamento</b> — lentes, clareamento ou implantes, dente a dente</li><li><b>Simulação com IA</b> — antes e depois do novo sorriso</li><li><b>Apresentação</b> — slides e PDF com a sua marca</li></ol>
@@ -159,7 +159,7 @@
       </a>
       <a class="sis" href="/apresentacao">
         <div class="arte a3">
-          <svg viewBox="0 0 120 100" fill="none"><rect x="22" y="14" width="76" height="72" rx="8" fill="#fff" stroke="#0c2440" stroke-width="3"/><rect x="32" y="26" width="56" height="26" rx="4" fill="#0b9e96" opacity=".25"/><path d="M32 62h40M32 72h28" stroke="#0c2440" stroke-width="4" stroke-linecap="round"/><circle cx="86" cy="76" r="12" fill="#0b9e96"/><path d="M80 76l4 4 8-8" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg viewBox="0 0 120 100" fill="none"><rect x="22" y="14" width="76" height="72" rx="8" fill="#fff" stroke="#151719" stroke-width="3"/><rect x="32" y="26" width="56" height="26" rx="4" fill="#c3e86b" opacity=".7"/><path d="M32 62h40M32 72h28" stroke="#151719" stroke-width="4" stroke-linecap="round"/><circle cx="86" cy="76" r="12" fill="#151719"/><path d="M80 76l4 4 8-8" stroke="#c3e86b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <div class="txt"><div class="kick">Casos salvos</div><h2>Pacientes e apresentações</h2><p>Abra um paciente para revisar fotos, simulações, odontograma e propostas, apresentar na consulta e gerar o PDF.</p><div class="ir">Ver pacientes →</div></div>
       </a>

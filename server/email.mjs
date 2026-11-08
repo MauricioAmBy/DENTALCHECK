@@ -30,22 +30,22 @@ export async function emailBoasVindas({ email, nome, plano }) {
     ["Confirme o e-mail", "Você vai receber um link de confirmação. Clique nele e depois entre com o seu e-mail e senha."],
     ["Faça a primeira simulação", "Toque em “Novo procedimento”, envie a foto do sorriso e escolha o planejamento."]
   ];
-  const html = `<!doctype html><html lang="pt-BR"><body style="margin:0;background:#f3f8fb;font-family:Arial,Helvetica,sans-serif;color:#10233a">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f8fb;padding:24px 12px"><tr><td align="center">
+  const html = `<!doctype html><html lang="pt-BR"><body style="margin:0;background:#f4f4f0;font-family:Arial,Helvetica,sans-serif;color:#151719">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f0;padding:24px 12px"><tr><td align="center">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:18px;overflow:hidden">
-    <tr><td style="background:#0c2440;padding:22px 28px;color:#ffffff;font-size:20px;font-weight:bold;letter-spacing:.5px">DENTAL<span style="color:#4fd1c5">CHECK</span></td></tr>
+    <tr><td style="background:#151719;padding:22px 28px;color:#ffffff;font-size:20px;font-weight:bold;letter-spacing:2px">DENTALCHECK</td></tr>
     <tr><td style="padding:28px">
-      <p style="margin:0 0 6px;font-size:13px;font-weight:bold;letter-spacing:1px;color:#0b9e96;text-transform:uppercase">Compra confirmada · Plano ${esc(planoNome)}</p>
-      <h1 style="margin:0 0 14px;font-size:24px;line-height:1.25;color:#0c2440">${primeiro ? `Bem-vindo(a), ${esc(primeiro)}!` : "Bem-vindo(a) ao DENTALCHECK!"}</h1>
-      <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#5d6f84">Sua assinatura já está ativa. Falta só um passo: criar a sua conta no app. Leva menos de um minuto.</p>
+      <p style="margin:0 0 6px;font-size:13px;font-weight:bold;letter-spacing:1px;color:#151719;text-transform:uppercase">Compra confirmada · Plano ${esc(planoNome)}</p>
+      <h1 style="margin:0 0 14px;font-size:24px;line-height:1.25;color:#151719">${primeiro ? `Bem-vindo(a), ${esc(primeiro)}!` : "Bem-vindo(a) ao DENTALCHECK!"}</h1>
+      <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#64686d">Sua assinatura já está ativa. Falta só um passo: criar a sua conta no app. Leva menos de um minuto.</p>
       ${passos.map(([t, d], i) => `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 14px"><tr>
-        <td valign="top" style="width:34px"><div style="width:26px;height:26px;border-radius:13px;background:#0b9e96;color:#fff;font-weight:bold;font-size:14px;line-height:26px;text-align:center">${i + 1}</div></td>
-        <td style="font-size:15px;line-height:1.5"><b style="color:#0c2440">${t}</b><br><span style="color:#5d6f84">${d}</span></td></tr></table>`).join("")}
-      <table role="presentation" cellpadding="0" cellspacing="0" style="margin:22px 0 8px"><tr><td style="border-radius:99px;background:#0b9e96">
+        <td valign="top" style="width:34px"><div style="width:26px;height:26px;border-radius:13px;background:#c3e86b;color:#151719;font-weight:bold;font-size:14px;line-height:26px;text-align:center">${i + 1}</div></td>
+        <td style="font-size:15px;line-height:1.5"><b style="color:#151719">${t}</b><br><span style="color:#64686d">${d}</span></td></tr></table>`).join("")}
+      <table role="presentation" cellpadding="0" cellspacing="0" style="margin:22px 0 8px"><tr><td style="border-radius:99px;background:#151719">
         <a href="${link}" style="display:inline-block;padding:14px 28px;color:#ffffff;font-weight:bold;font-size:15px;text-decoration:none">Criar minha conta</a></td></tr></table>
-      <p style="margin:18px 0 0;font-size:13px;line-height:1.6;color:#8a99aa">Dica: no celular, adicione o DENTALCHECK à tela inicial para abrir como aplicativo. Você tem 7 dias de garantia incondicional.</p>
+      <p style="margin:18px 0 0;font-size:13px;line-height:1.6;color:#8b8f93">Dica: no celular, adicione o DENTALCHECK à tela inicial para abrir como aplicativo. Você tem 7 dias de garantia incondicional.</p>
     </td></tr>
-    <tr><td style="padding:16px 28px;background:#f3f8fb;font-size:12px;color:#8a99aa">Você recebeu este e-mail porque assinou o DENTALCHECK com ${esc(email)}.</td></tr>
+    <tr><td style="padding:16px 28px;background:#f4f4f0;font-size:12px;color:#8b8f93">Você recebeu este e-mail porque assinou o DENTALCHECK com ${esc(email)}.</td></tr>
   </table></td></tr></table></body></html>`;
   const texto = `Compra confirmada — Plano ${planoNome}\n\nSua assinatura do DENTALCHECK está ativa. Para entrar:\n` +
     passos.map(([t, d], i) => `${i + 1}. ${t}: ${d.replace(/<[^>]+>/g, "")}`).join("\n") + `\n\nCriar minha conta: ${link}\n`;

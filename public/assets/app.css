@@ -1,13 +1,18 @@
 /* DENTALCHECK — estilos compartilhados */
 :root{
-  --navy:#0c2440; --navy2:#16365c; --teal:#0b9e96; --teal2:#087a74; --mint:#dff5f2;
-  --sky:#f3f8fb; --white:#fff; --ink:#10233a; --muted:#5d6f84;
-  --line:rgba(12,36,64,.12); --line2:rgba(12,36,64,.22);
-  --ok:#1f9d55; --warn:#d98a00; --bad:#d64545;
+  /* identidade DENTALCHECK: preto, off-white, cinza claro e verde-limão como acento */
+  --preto:#151719; --preto2:#2a2d31; --offwhite:#f4f4f0; --cinza:#dcdfe0;
+  --lima:#c3e86b; --lima2:#aed44f; --lima-claro:#eef6db;
+  /* nomes antigos mantidos para as páginas: agora apontam para a paleta nova */
+  --navy:var(--preto); --navy2:var(--preto2); --teal:var(--preto); --teal2:var(--preto); --mint:var(--lima-claro);
+  --sky:var(--offwhite); --white:#fff; --ink:var(--preto); --muted:#64686d; --aqua:var(--lima);
+  --line:rgba(21,23,25,.1); --line2:rgba(21,23,25,.2);
+  --ok:#3f8a1c; --warn:#d98a00; --bad:#d64545;
   --brand:var(--teal); --brand2:var(--teal2);
   --r:18px; --r-sm:12px;
   --sans:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --shadow:0 18px 40px -24px rgba(12,36,64,.45);
+  --display:"Montserrat","Plus Jakarta Sans",system-ui,sans-serif;
+  --shadow:0 18px 40px -24px rgba(21,23,25,.4);
   --ease:cubic-bezier(.2,.7,.2,1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -25,7 +30,7 @@ a{color:var(--brand2)}
 .btn:active{transform:scale(.97)}
 .btn:hover{background:var(--mint)}
 .btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
-.btn.pri:hover{background:var(--brand2)}
+.btn.pri:hover{background:var(--lima);border-color:var(--lima);color:var(--preto)}
 .btn.dark{background:var(--navy);border-color:var(--navy);color:#fff}
 .btn.ghost{border-color:transparent;background:transparent}
 .btn.sm{height:34px;padding:0 13px;font-size:13px}
@@ -38,7 +43,7 @@ a{color:var(--brand2)}
 .f{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
 .f label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
 .in{width:100%;min-height:44px;padding:10px 14px;border-radius:var(--r-sm);border:1px solid var(--line2);background:#fff;outline:none;transition:border .2s,box-shadow .2s}
-.in:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(11,158,150,.2)}
+.in:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(195,232,107,.55)}
 textarea.in{min-height:90px;resize:vertical}
 .row{display:flex;gap:12px;flex-wrap:wrap}
 .row>*{flex:1 1 180px}
@@ -46,15 +51,17 @@ textarea.in{min-height:90px;resize:vertical}
 /* topo */
 .top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:12px 18px;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .top .sp{flex:1}
-.logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.02em;color:var(--navy);text-decoration:none}
-.logo img{width:30px;height:30px}
-.logo b{color:var(--teal)}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;letter-spacing:.04em;color:var(--preto);text-decoration:none}
+.logo img{width:auto;height:26px}
+.logo b{color:inherit;font-weight:inherit}
 
 .wrap{max-width:1080px;margin:0 auto;padding:22px 16px 60px}
 .card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
 .muted{color:var(--muted)}
-.kick{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}
-h1{font-size:clamp(24px,4vw,34px);line-height:1.15;color:var(--navy)}
+.kick{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--preto)}
+.kick::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--lima);flex:none}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.01em}
+h1{font-size:clamp(24px,4vw,34px);line-height:1.15;color:var(--navy);font-weight:800}
 h2{font-size:20px;color:var(--navy)}
 h3{font-size:16px;color:var(--navy)}
 
@@ -63,7 +70,7 @@ h3{font-size:16px;color:var(--navy)}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* modal */
-.modal{position:fixed;inset:0;background:rgba(12,36,64,.5);display:grid;place-items:center;z-index:100;padding:16px}
+.modal{position:fixed;inset:0;background:rgba(21,23,25,.55);display:grid;place-items:center;z-index:100;padding:16px}
 .modal>.card{width:min(520px,100%);max-height:90vh;overflow:auto}
 
 @media (max-width:600px){.top{padding:10px 12px;gap:8px}.top>.muted{display:none}.wrap{padding:16px 12px 50px}.so-pc{display:none}.logo{font-size:15px;flex:none}}

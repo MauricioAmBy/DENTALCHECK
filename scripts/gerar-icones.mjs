@@ -1,5 +1,5 @@
 /* Gera os ícones PNG do app (192 e 512) sem dependências externas.
-   Desenho: quadrado azul-marinho arredondado, dente branco e "check" verde-água. */
+   Desenho: quadrado preto arredondado com o "D" da marca em off-white. */
 import { writeFileSync, mkdirSync } from "node:fs";
 import { deflateSync } from "node:zlib";
 
@@ -30,24 +30,26 @@ function png(S, pixel) {
   return Buffer.concat([Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]), chunk("IHDR", ihdr), chunk("IDAT", deflateSync(raw)), chunk("IEND", Buffer.alloc(0))]);
 }
 
-const NAVY = [12, 36, 64, 1], BRANCO = [255, 255, 255, 1], TEAL = [11, 158, 150, 1], NADA = [0, 0, 0, 0];
-const dentro = (x, y) => {
-  /* coroa: elipse larga; raízes: duas elipses estreitas */
-  const coroa = ((x - 256) / 132) ** 2 + ((y - 230) / 110) ** 2 < 1;
-  const r1 = ((x - 196) / 40) ** 2 + ((y - 330) / 100) ** 2 < 1 && y > 260;
-  const r2 = ((x - 316) / 40) ** 2 + ((y - 330) / 100) ** 2 < 1 && y > 260;
-  return coroa || r1 || r2;
-};
+const PRETO = [21, 23, 25, 1], CLARO = [244, 244, 240, 1], NADA = [0, 0, 0, 0];
+/* mesmo desenho de public/icons/icon.svg: "D" claro com corte curvo no pé da haste */
+const bez = (t, a, b, c, d) => (1 - t) ** 3 * a + 3 * (1 - t) ** 2 * t * b + 3 * (1 - t) * t * t * c + t ** 3 * d;
+const CORTE = Array.from({ length: 81 }, (_, i) => [bez(i / 80, 128, 146, 182, 250), bez(i / 80, 226, 300, 336, 336)]);
 const distSeg = (px, py, ax, ay, bx, by) => {
   const dx = bx - ax, dy = by - ay, t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy)));
   return Math.hypot(px - ax - t * dx, py - ay - t * dy);
 };
+const meioD = (x, y, x0, y0, y1, r) => (x >= x0 && x <= 258 && y >= y0 && y <= y1) || (x > 258 && Math.hypot(x - 258, y - 256) <= r);
+function letraD(x, y) {
+  if (!meioD(x, y, 144, 116, 396, 140)) return false;
+  if (x < 200 && y > 340 && Math.hypot(x - 200, y - 340) > 56) return false; /* canto inferior arredondado */
+  if (meioD(x, y, 226, 192, 320, 64)) return false;                          /* miolo */
+  for (let i = 1; i < CORTE.length; i++) if (distSeg(x, y, ...CORTE[i - 1], ...CORTE[i]) < 17) return false;
+  return true;
+}
 function pixel(x, y) {
   const R = 112, cx = Math.max(R, Math.min(512 - R, x)), cy = Math.max(R, Math.min(512 - R, y));
   if (Math.hypot(x - cx, y - cy) > R) return NADA;
-  const check = Math.min(distSeg(x, y, 196, 238, 240, 282), distSeg(x, y, 240, 282, 322, 196)) < 16;
-  if (check) return TEAL;
-  return dentro(x, y) ? BRANCO : NAVY;
+  return letraD(x, y) ? CLARO : PRETO;
 }
 
 mkdirSync("public/icons", { recursive: true });

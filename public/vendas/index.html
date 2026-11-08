@@ -3,17 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0c2440">
+<meta name="theme-color" content="#151719">
 <title>DENTALCHECK — Simulação de sorriso com IA para dentistas</title>
 <meta name="description" content="Mostre ao paciente o novo sorriso em segundos: lentes, clareamento e implantes simulados com IA na foto dele, dente a dente, e uma apresentação com a sua marca pronta para enviar.">
 <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --navy:#0c2440; --navy2:#16365c; --teal:#0b9e96; --teal2:#087a74; --aqua:#4fd1c5; --mint:#dff5f2;
-  --sky:#f3f8fb; --ink:#10233a; --muted:#5d6f84; --line:rgba(12,36,64,.1); --line2:rgba(12,36,64,.2);
-  --r:22px; --sombra:0 24px 60px -30px rgba(12,36,64,.45);
+  /* identidade DENTALCHECK: preto, off-white, cinza claro e verde-limão como acento */
+  --preto:#151719; --preto2:#2a2d31; --offwhite:#f4f4f0; --cinza:#dcdfe0; --lima:#c3e86b; --lima2:#aed44f; --lima-claro:#eef6db;
+  --navy:var(--preto); --navy2:var(--preto2); --teal:var(--preto); --teal2:var(--preto); --aqua:var(--lima); --mint:var(--lima-claro);
+  --sky:var(--offwhite); --ink:var(--preto); --muted:#64686d; --line:rgba(21,23,25,.1); --line2:rgba(21,23,25,.2);
+  --display:"Montserrat","Plus Jakarta Sans",system-ui,sans-serif;
+  --r:22px; --sombra:0 24px 60px -30px rgba(21,23,25,.45);
   --ease:cubic-bezier(.2,.7,.2,1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -24,11 +27,12 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 a{color:inherit}
 .box{max-width:1160px;margin:0 auto;padding:0 20px}
 .kick{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--teal)}
-.kick::before{content:"";width:18px;height:2px;background:currentColor;border-radius:2px}
-h1{font-size:clamp(34px,5.4vw,60px);line-height:1.04;letter-spacing:-.02em;color:var(--navy)}
+.kick::before{content:"";width:8px;height:8px;background:var(--lima);border-radius:50%}
+h1,h2,h3{font-family:var(--display)}
+h1{font-size:clamp(34px,5.4vw,60px);line-height:1.06;letter-spacing:-.025em;color:var(--navy);font-weight:800}
 h2{font-size:clamp(28px,3.8vw,44px);line-height:1.1;letter-spacing:-.015em;color:var(--navy);margin:10px 0 14px}
 h3{font-size:19px;color:var(--navy)}
-.destaque{color:var(--teal)}
+.destaque{color:var(--preto);background:linear-gradient(transparent 60%,var(--lima) 60%,var(--lima) 92%,transparent 92%);padding:0 .08em}
 .sub{font-size:clamp(16px,1.6vw,19px);color:var(--muted);max-width:620px}
 .centro{text-align:center}.centro .sub{margin:0 auto}
 section{padding:96px 0}
@@ -36,8 +40,8 @@ section{padding:96px 0}
 /* botões */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:52px;padding:0 26px;border-radius:999px;font-weight:700;font-size:15px;text-decoration:none;transition:transform .2s var(--ease),box-shadow .2s,background .2s;white-space:nowrap}
 .btn:active{transform:scale(.97)}
-.btn.pri{background:var(--teal);color:#fff;box-shadow:0 14px 30px -14px rgba(11,158,150,.8)}
-.btn.pri:hover{background:var(--teal2);transform:translateY(-2px)}
+.btn.pri{background:var(--preto);color:#fff;box-shadow:0 14px 30px -14px rgba(21,23,25,.55)}
+.btn.pri:hover{background:var(--lima);color:var(--preto);transform:translateY(-2px)}
 .btn.sec{background:#fff;color:var(--navy);border:1px solid var(--line2)}
 .btn.sec:hover{background:var(--sky)}
 .btn.claro{background:#fff;color:var(--navy)}
@@ -47,9 +51,8 @@ section{padding:96px 0}
 .nav{position:fixed;top:0;left:0;right:0;z-index:50;transition:background .3s,box-shadow .3s}
 .nav.solida{background:rgba(255,255,255,.92);backdrop-filter:blur(12px);box-shadow:0 1px 0 var(--line)}
 .nav .box{display:flex;align-items:center;gap:22px;height:72px}
-.logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.02em;color:var(--navy);text-decoration:none;font-size:17px}
-.logo img{width:32px;height:32px}
-.logo b{color:var(--teal)}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;letter-spacing:.04em;color:var(--preto);text-decoration:none;font-size:17px}
+.logo img{width:auto;height:28px}
 .links{display:flex;gap:26px;margin-left:auto;font-size:14px;font-weight:600;color:var(--muted)}
 .links a{text-decoration:none}.links a:hover{color:var(--navy)}
 .menu-bt{display:none;width:44px;height:44px;border-radius:12px;border:1px solid var(--line2);margin-left:auto}
@@ -62,7 +65,7 @@ section{padding:96px 0}
 }
 
 /* hero */
-.hero{padding:132px 0 80px;background:radial-gradient(1100px 520px at 85% 0%,rgba(79,209,197,.18),transparent 60%),radial-gradient(800px 500px at 0% 30%,rgba(22,54,92,.08),transparent 60%)}
+.hero{padding:132px 0 80px;background:radial-gradient(1100px 520px at 85% 0%,rgba(195,232,107,.18),transparent 60%),radial-gradient(800px 500px at 0% 30%,rgba(22,54,92,.08),transparent 60%)}
 .hero .box{display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center}
 .hero p.sub{margin:22px 0 30px}
 .acoes{display:flex;gap:12px;flex-wrap:wrap}
@@ -73,19 +76,19 @@ section{padding:96px 0}
 
 /* comparador antes/depois */
 .comparador{position:relative}
-.comp{position:relative;border-radius:26px;overflow:hidden;box-shadow:var(--sombra);user-select:none;touch-action:none;cursor:ew-resize;background:#0b1520;aspect-ratio:4/3}
+.comp{position:relative;border-radius:26px;overflow:hidden;box-shadow:var(--sombra);user-select:none;touch-action:none;cursor:ew-resize;background:#151719;aspect-ratio:4/3}
 .comp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
 .comp .dep{clip-path:inset(0 0 0 50%)}
 .comp .linha{position:absolute;top:0;bottom:0;left:50%;width:3px;background:#fff;transform:translateX(-50%);box-shadow:0 0 14px rgba(0,0,0,.35)}
 .comp .pega{position:absolute;top:50%;left:50%;width:52px;height:52px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:20px;color:var(--navy)}
-.comp .tag{position:absolute;top:16px;padding:6px 14px;border-radius:99px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:rgba(12,36,64,.78)}
+.comp .tag{position:absolute;top:16px;padding:6px 14px;border-radius:99px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:rgba(21,23,25,.78)}
 .comp .tag.d{right:16px;background:var(--teal)}.comp .tag.a{left:16px}
 /* topo: o quadro muda de tamanho com transição suave ao trocar de exemplo (deitado ↔ rosto inteiro em pé) */
 #compHero{margin:0 auto;transition:width .65s var(--ease),height .65s var(--ease)}
 #compHero img{transition:opacity .28s ease}
 #compHero.trocando img{opacity:0}
 /* carrossel com os slides reais da apresentação */
-.carrossel{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;border:1px solid var(--line);box-shadow:0 18px 40px -24px rgba(12,36,64,.45);background:#fff}
+.carrossel{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;border:1px solid var(--line);box-shadow:0 18px 40px -24px rgba(21,23,25,.45);background:#fff}
 .carrossel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .6s ease}
 .carrossel img.on{opacity:1}
 .pontos{display:flex;gap:6px;justify-content:center;margin-top:12px}
@@ -143,7 +146,7 @@ section{padding:96px 0}
 .slides-mock div{aspect-ratio:16/9;border-radius:12px;overflow:hidden;position:relative;background:#fff;border:1px solid var(--line)}
 .slides-mock .capa{background:linear-gradient(135deg,var(--navy),#0d5f63);color:#fff;padding:14px;font-weight:800;font-size:14px}
 .slides-mock img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.slides-mock .rot{position:absolute;left:8px;bottom:8px;background:rgba(12,36,64,.8);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px}
+.slides-mock .rot{position:absolute;left:8px;bottom:8px;background:rgba(21,23,25,.8);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px}
 @media (max-width:900px){.passos{grid-template-columns:1fr}.tela{min-height:0}}
 
 /* procedimentos */
@@ -170,7 +173,7 @@ section{padding:96px 0}
 .tons button{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--muted)}
 .tons i{width:100%;aspect-ratio:3/4;border-radius:12px 12px 18px 18px;border:2px solid var(--line);box-shadow:inset 0 -10px 14px rgba(0,0,0,.06);transition:.2s}
 .tons button.on{color:var(--teal2)}
-.tons button.on i{border-color:var(--teal);box-shadow:0 0 0 3px rgba(11,158,150,.25);transform:translateY(-4px)}
+.tons button.on i{border-color:var(--teal);box-shadow:0 0 0 3px rgba(195,232,107,.7);transform:translateY(-4px)}
 .tom-info{display:flex;gap:16px;align-items:center;background:var(--sky);border-radius:18px;padding:16px}
 .tom-info .amostra{width:64px;height:84px;border-radius:14px 14px 22px 22px;flex:none;border:1px solid var(--line);transition:background .3s}
 .tom-info b{color:var(--navy);font-size:17px}
@@ -181,7 +184,7 @@ section{padding:96px 0}
 .demo-painel,.demo-saida{border-radius:28px;padding:26px}
 .demo-painel{background:#fff;border:1px solid var(--line);box-shadow:var(--sombra)}
 .demo-saida{background:var(--navy);color:#fff;position:relative;overflow:hidden}
-.demo-saida::after{content:"";position:absolute;width:340px;height:340px;right:-120px;bottom:-140px;background:radial-gradient(circle,rgba(79,209,197,.35),transparent 70%)}
+.demo-saida::after{content:"";position:absolute;width:340px;height:340px;right:-120px;bottom:-140px;background:radial-gradient(circle,rgba(195,232,107,.35),transparent 70%)}
 .demo h4{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:16px 0 8px}
 .demo h4:first-child{margin-top:0}
 .seg{display:flex;flex-wrap:wrap;gap:6px}
@@ -210,11 +213,11 @@ section{padding:96px 0}
 @media (max-width:520px){.grade4{grid-template-columns:1fr}}
 
 /* apresentação */
-.apres{background:linear-gradient(160deg,var(--navy),var(--navy2) 60%,#0d4f60);color:#fff;border-radius:36px;padding:56px;display:grid;grid-template-columns:1fr 1.1fr;gap:44px;align-items:center;overflow:hidden;position:relative}
+.apres{background:linear-gradient(160deg,var(--navy),var(--navy2) 60%,var(--preto));color:#fff;border-radius:36px;padding:56px;display:grid;grid-template-columns:1fr 1.1fr;gap:44px;align-items:center;overflow:hidden;position:relative}
 .apres h2{color:#fff}.apres .sub{color:rgba(255,255,255,.75)}
 .apres .kick{color:var(--aqua)}
 .apres .lista-check b{color:#fff}.apres .lista-check span{color:rgba(255,255,255,.7)}
-.apres .lista-check i{background:rgba(79,209,197,.2);color:var(--aqua)}
+.apres .lista-check i{background:var(--lima);color:var(--preto)}
 .slide-demo{border-radius:18px;overflow:hidden;box-shadow:0 30px 60px -20px rgba(0,0,0,.5);background:#fff;aspect-ratio:16/9;display:grid;grid-template-columns:.9fr 1fr 1fr;gap:8px;padding:16px;color:var(--ink)}
 .slide-demo .txt{display:flex;flex-direction:column;justify-content:center;gap:6px}
 .slide-demo .txt small{font-size:9px;font-weight:800;letter-spacing:.1em;color:var(--teal);text-transform:uppercase}
@@ -222,7 +225,7 @@ section{padding:96px 0}
 .slide-demo .txt span{font-size:9px;color:var(--muted)}
 .slide-demo figure{position:relative;border-radius:10px;overflow:hidden}
 .slide-demo img{width:100%;height:100%;object-fit:cover}
-.slide-demo figcaption{position:absolute;top:6px;left:6px;font-size:8px;font-weight:800;color:#fff;background:rgba(12,36,64,.8);padding:2px 7px;border-radius:99px}
+.slide-demo figcaption{position:absolute;top:6px;left:6px;font-size:8px;font-weight:800;color:#fff;background:rgba(21,23,25,.8);padding:2px 7px;border-radius:99px}
 .slide-demo figure.d figcaption{background:var(--teal)}
 .cores-marca{display:flex;gap:8px;margin-top:16px}
 .cores-marca button{width:30px;height:30px;border-radius:50%;border:3px solid rgba(255,255,255,.6)}
@@ -236,8 +239,8 @@ section{padding:96px 0}
 .alterna small{background:var(--mint);color:var(--teal2);font-size:11px;padding:2px 8px;border-radius:99px;margin-left:6px}
 .planos{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px;align-items:stretch}
 .plano{text-align:left;border:1px solid var(--line);border-radius:28px;padding:30px;display:flex;flex-direction:column;background:#fff;position:relative}
-.plano.dest{border:2px solid var(--teal);box-shadow:var(--sombra);transform:translateY(-10px)}
-.plano .selo{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--teal);color:#fff;font-size:12px;font-weight:800;padding:5px 14px;border-radius:99px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.plano.dest{border:2px solid var(--preto);box-shadow:var(--sombra);transform:translateY(-10px)}
+.plano .selo{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--lima);color:var(--preto);font-size:12px;font-weight:800;padding:5px 14px;border-radius:99px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
 .plano h3{font-size:22px}
 .plano .para{color:var(--muted);font-size:14px;margin-top:4px;min-height:42px}
 .preco{margin:22px 0 4px;display:flex;align-items:baseline;gap:6px;color:var(--navy)}
@@ -249,9 +252,9 @@ section{padding:96px 0}
 .plano li::before{content:"✓";color:var(--teal);font-weight:800}
 .plano .btn{width:100%}
 .extra{margin-top:26px;font-size:14px;color:var(--muted)}
-.garantia{display:flex;gap:22px;align-items:center;text-align:left;max-width:760px;margin:30px auto 0;padding:22px 26px;border-radius:24px;background:var(--mint);border:1px solid rgba(11,158,150,.3)}
+.garantia{display:flex;gap:22px;align-items:center;text-align:left;max-width:760px;margin:30px auto 0;padding:22px 26px;border-radius:24px;background:var(--mint);border:1px solid rgba(195,232,107,.9)}
 .garantia h3{font-size:19px}.garantia p{color:var(--muted);font-size:15px;margin-top:4px}
-.selo-g{flex:none;width:86px;height:86px;border-radius:50%;background:var(--teal);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 0 0 6px rgba(11,158,150,.18);line-height:1}
+.selo-g{flex:none;width:86px;height:86px;border-radius:50%;background:var(--preto);color:var(--lima);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 0 0 6px rgba(195,232,107,.6);line-height:1}
 .selo-g b{font-size:34px;font-weight:800}.selo-g span{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
 @media (max-width:560px){.garantia{flex-direction:column;text-align:center;padding:20px}}
 .extra b{color:var(--navy)}
@@ -272,7 +275,7 @@ section{padding:96px 0}
 .faq p b{color:var(--navy)}
 
 /* chamada final e rodapé */
-.final{text-align:center;padding:90px 20px;background:radial-gradient(700px 360px at 50% 0%,rgba(79,209,197,.22),transparent 70%)}
+.final{text-align:center;padding:90px 20px;background:radial-gradient(700px 360px at 50% 0%,rgba(195,232,107,.22),transparent 70%)}
 .final .sub{margin:14px auto 30px}
 footer{background:var(--navy);color:rgba(255,255,255,.7);padding:40px 0;font-size:13px}
 footer .box{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
@@ -291,7 +294,7 @@ footer p{max-width:560px}
 <!-- NAVEGAÇÃO -->
 <header class="nav" id="nav">
   <div class="box">
-    <a class="logo" href="#topo"><img src="/icons/icon.svg" alt=""><span>DENTAL<b>CHECK</b></span></a>
+    <a class="logo" href="#topo"><img src="/icons/marca.svg" alt=""><span>DENTALCHECK</span></a>
     <nav class="links" id="links">
       <a href="#como-funciona">Como funciona</a><a href="#procedimentos">Procedimentos</a><a href="#apresentacao">Apresentação</a><a href="#planos">Planos</a><a href="#duvidas">Dúvidas</a>
     </nav>
@@ -536,7 +539,7 @@ footer p{max-width:560px}
 
 <footer>
   <div class="box">
-    <a class="logo" href="#topo"><img src="/icons/icon.svg" alt=""><span>DENTAL<b style="color:var(--aqua)">CHECK</b></span></a>
+    <a class="logo" href="#topo"><img src="/icons/marca-branca.svg" alt=""><span>DENTALCHECK</span></a>
     <p>As simulações são ilustrativas e não substituem a avaliação clínica. As imagens desta página foram feitas com fotos de pessoas fictícias. © <span id="ano"></span> DENTALCHECK</p>
   </div>
 </footer>

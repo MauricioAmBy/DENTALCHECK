@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0c2440">
+<meta name="theme-color" content="#151719">
 <title>Simulador de sorriso com IA · DENTALCHECK</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/app.css">
 <script src="assets/licenca.js"></script>
 <script>Licenca.exigir()</script>
@@ -48,7 +48,7 @@
 .foto-box{position:sticky;top:80px}
 .palco{position:relative;border-radius:var(--r);overflow:hidden;background:#000;user-select:none;touch-action:none}
 .palco img{width:100%;display:block;pointer-events:none}
-.regiao{position:absolute;border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 9999px rgba(12,36,64,.45),0 0 0 2px var(--brand) inset;cursor:move}
+.regiao{position:absolute;border:2px solid #fff;border-radius:50%;box-shadow:0 0 0 9999px rgba(21,23,25,.45),0 0 0 2px var(--brand) inset;cursor:move}
 .regiao .alca{position:absolute;right:-9px;bottom:-9px;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--brand);cursor:nwse-resize}
 .regiao .rot{position:absolute;left:50%;top:-30px;transform:translateX(-50%);background:var(--brand);color:#fff;font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap}
 .dica-reg{font-size:13px;color:var(--muted);margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
@@ -86,18 +86,18 @@
 .resumo{background:var(--navy);color:#fff;border-radius:var(--r);padding:16px}
 .resumo p{font-size:14px;color:rgba(255,255,255,.8);margin:6px 0 14px}
 .previa{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:-4px 0 14px;font-size:13px}
-.previa span{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#4fd1c5;margin-bottom:4px}
+.previa span{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#c3e86b;margin-bottom:4px}
 .previa div:last-child span{color:rgba(255,255,255,.55)}
 .previa ul{list-style:none;display:grid;gap:3px;color:rgba(255,255,255,.88)}
-.previa li::before{content:"• ";color:#4fd1c5}
+.previa li::before{content:"• ";color:#c3e86b}
 .previa div:last-child li{color:rgba(255,255,255,.6)}
 .previa div:last-child li::before{color:rgba(255,255,255,.4)}
 .calibrar{display:flex;gap:8px;align-items:flex-start;font-size:13px;margin-bottom:14px;cursor:pointer}
 .calibrar small{display:block;color:rgba(255,255,255,.6)}
-.calibrar input{margin-top:3px;accent-color:#4fd1c5}
+.calibrar input{margin-top:3px;accent-color:#c3e86b}
 @media (max-width:600px){.previa{grid-template-columns:1fr}}
-.btn-ia{width:100%;height:52px;font-size:16px;background:linear-gradient(135deg,var(--teal),#4fd1c5);border:0;color:#fff}
-.btn-ia:hover{filter:brightness(1.05);background:linear-gradient(135deg,var(--teal),#4fd1c5)}
+.btn-ia{width:100%;height:52px;font-size:16px;background:var(--lima);border:0;color:var(--preto);font-weight:800}
+.btn-ia:hover{background:var(--lima2);color:var(--preto)}
 
 /* etapa 3: resultado */
 .res-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start}
@@ -106,23 +106,23 @@
 .comp .dep{position:absolute;inset:0;width:100%;height:100%;max-height:none;clip-path:inset(0 0 0 50%)}
 .comp .linha{position:absolute;top:0;bottom:0;left:50%;width:3px;background:#fff;transform:translateX(-50%);box-shadow:0 0 10px rgba(0,0,0,.4)}
 .comp .linha::after{content:"⇆";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:20px;color:var(--navy)}
-.comp .tag{position:absolute;top:12px;background:rgba(12,36,64,.8);color:#fff;font-size:13px;font-weight:600;padding:4px 12px;border-radius:99px}
+.comp .tag{position:absolute;top:12px;background:rgba(21,23,25,.8);color:#fff;font-size:13px;font-weight:600;padding:4px 12px;border-radius:99px}
 .lado{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .lado figure{position:relative;border-radius:var(--r);overflow:hidden;background:#000}
 .lado img{display:block;width:100%;max-height:72vh;object-fit:contain}
-.lado figcaption{position:absolute;top:10px;left:10px;background:rgba(12,36,64,.8);color:#fff;font-size:13px;font-weight:600;padding:4px 12px;border-radius:99px}
+.lado figcaption{position:absolute;top:10px;left:10px;background:rgba(21,23,25,.8);color:#fff;font-size:13px;font-weight:600;padding:4px 12px;border-radius:99px}
 .versoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .versoes button{width:86px;border-radius:10px;overflow:hidden;border:2px solid transparent;position:relative}
 .versoes button.on{border-color:var(--brand)}
 .versoes img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
-.versoes span{position:absolute;left:4px;top:4px;background:rgba(12,36,64,.8);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px}
+.versoes span{position:absolute;left:4px;top:4px;background:rgba(21,23,25,.8);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px}
 .acoes{display:grid;gap:8px}
 .acoes .btn{width:100%}
 .plano-txt{font-size:13px;color:var(--muted);white-space:pre-line}
 
 /* carregando */
-#gerando{position:fixed;inset:0;background:rgba(12,36,64,.86);z-index:300;display:grid;place-items:center;color:#fff;text-align:center;padding:20px}
-.spinner{width:64px;height:64px;border-radius:50%;border:5px solid rgba(255,255,255,.2);border-top-color:#4fd1c5;animation:gira 1s linear infinite;margin:0 auto 18px}
+#gerando{position:fixed;inset:0;background:rgba(21,23,25,.86);z-index:300;display:grid;place-items:center;color:#fff;text-align:center;padding:20px}
+.spinner{width:64px;height:64px;border-radius:50%;border:5px solid rgba(255,255,255,.2);border-top-color:#c3e86b;animation:gira 1s linear infinite;margin:0 auto 18px}
 @keyframes gira{to{transform:rotate(360deg)}}
 #gerando p{color:rgba(255,255,255,.7);margin-top:6px}
 
@@ -133,7 +133,7 @@
 .slot .img{position:relative;aspect-ratio:3/4;background:var(--sky);display:grid;place-items:center}
 .slot .img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .slot .img svg{width:58%;opacity:.55}
-.slot .img .proc{position:absolute;inset:0;background:rgba(12,36,64,.65);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700}
+.slot .img .proc{position:absolute;inset:0;background:rgba(21,23,25,.65);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700}
 .slot .img .x{position:absolute;right:8px;top:8px;width:28px;height:28px;border-radius:50%;background:#fff;color:var(--bad);font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.2)}
 .slot .info{padding:12px;display:flex;flex-direction:column;gap:8px;flex:1}
 .slot .info b{font-size:14px;color:var(--navy)}
@@ -150,12 +150,12 @@
 .guia.rosto{width:62vmin;height:82vmin;border-radius:50%}
 .guia.perfil,.guia.perfil-esq{width:56vmin;height:80vmin;border-radius:46% 54% 50% 50%}
 .guia.boca{width:84vmin;height:42vmin;border-radius:40%}
-.guia.ok{border-color:#4fd1c5;border-style:solid}
+.guia.ok{border-color:#c3e86b;border-style:solid}
 .cam-topo{position:absolute;left:0;right:0;top:0;padding:18px 18px 40px;background:linear-gradient(rgba(0,0,0,.75),transparent);text-align:center;display:grid;gap:4px}
 .cam-topo b{font-size:20px}
 .cam-topo span{font-size:14px;color:rgba(255,255,255,.85);max-width:520px;margin:0 auto}
-.cam-topo small{color:#4fd1c5;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.cam-aviso{position:absolute;left:50%;bottom:130px;transform:translateX(-50%);background:rgba(12,36,64,.85);padding:6px 14px;border-radius:99px;font-size:13px;white-space:nowrap}
+.cam-topo small{color:#c3e86b;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.cam-aviso{position:absolute;left:50%;bottom:130px;transform:translateX(-50%);background:rgba(21,23,25,.85);padding:6px 14px;border-radius:99px;font-size:13px;white-space:nowrap}
 .cam-base{position:absolute;left:0;right:0;bottom:0;padding:22px;display:flex;justify-content:space-around;align-items:center;background:linear-gradient(transparent,rgba(0,0,0,.75))}
 .obturador{width:76px;height:76px;border-radius:50%;background:#fff;border:6px solid rgba(255,255,255,.45);background-clip:padding-box}
 .obturador:active{transform:scale(.94)}
@@ -174,13 +174,13 @@
   .etapas{gap:2px}.etapas i{width:8px}
 }
 /* etapa 2: dentes identificados sobre a foto */
-.marca{position:absolute;transform:translate(-50%,-50%);min-width:26px;height:26px;padding:0 5px;border-radius:99px;background:rgba(255,255,255,.92);color:var(--navy);font-size:11px;font-weight:800;border:2px solid rgba(12,36,64,.25);display:grid;place-items:center;z-index:3;cursor:pointer}
+.marca{position:absolute;transform:translate(-50%,-50%);min-width:26px;height:26px;padding:0 5px;border-radius:99px;background:rgba(255,255,255,.92);color:var(--navy);font-size:11px;font-weight:800;border:2px solid rgba(21,23,25,.25);display:grid;place-items:center;z-index:3;cursor:pointer}
 .marca.on{background:var(--brand);color:#fff;border-color:#fff}
 .zoom-dentes{position:relative;margin-top:12px;border-radius:var(--r);overflow:hidden;background:#000;user-select:none}
 .zoom-dentes img{display:block;width:100%}
 .zoom-dentes .marca{min-width:32px;height:32px;font-size:13px}
-.zoom-rot{position:absolute;left:10px;top:10px;background:rgba(12,36,64,.8);color:#fff;font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px}
-.palco.selecionando .regiao{box-shadow:0 0 0 9999px rgba(12,36,64,.2),0 0 0 2px var(--brand) inset}
+.zoom-rot{position:absolute;left:10px;top:10px;background:rgba(21,23,25,.8);color:#fff;font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px}
+.palco.selecionando .regiao{box-shadow:0 0 0 9999px rgba(21,23,25,.2),0 0 0 2px var(--brand) inset}
 .status-dentes{font-size:13px;color:var(--muted);margin:-2px 0 10px}
 
 .pacientes-m{display:grid;gap:6px;max-height:300px;overflow:auto;margin:12px 0}
@@ -193,7 +193,7 @@
 </head>
 <body>
 <header class="top">
-  <a class="logo" href="/"><img src="icons/icon.svg" alt=""><span>DENTAL<b>CHECK</b></span></a>
+  <a class="logo" href="/"><img src="icons/marca.svg" alt=""><span>DENTALCHECK</span></a>
   <span class="muted">· Novo procedimento</span>
   <div class="sp"></div>
   <nav class="etapas" id="etapas">
@@ -426,10 +426,10 @@
     { id: "boca", nome: "Boca de frente", dica: "Aproxime a câmera: só os lábios e os dentes, de frente, com sorriso aberto.", guia: "boca", base: true }
   ];
   const ICONES = {
-    rosto: `<svg viewBox="0 0 100 120" fill="none" stroke="#0c2440" stroke-width="3"><ellipse cx="50" cy="58" rx="34" ry="46"/><path d="M34 76q16 14 32 0" /><circle cx="37" cy="50" r="3" fill="#0c2440"/><circle cx="63" cy="50" r="3" fill="#0c2440"/></svg>`,
-    "perfil-esq": `<svg viewBox="0 0 100 120" fill="none" stroke="#0c2440" stroke-width="3"><path d="M64 12c-26 0-40 20-40 42 0 6-8 14-8 18s6 4 8 6c0 8 0 16 8 20 10 4 22 2 30 6 6-14 14-30 14-52 0-24-6-40-12-40z"/><path d="M24 80q6 4 12 0"/></svg>`,
-    perfil: `<svg viewBox="0 0 100 120" fill="none" stroke="#0c2440" stroke-width="3"><path d="M36 12c26 0 40 20 40 42 0 6 8 14 8 18s-6 4-8 6c0 8 0 16-8 20-10 4-22 2-30 6-6-14-14-30-14-52 0-24 6-40 12-40z"/><path d="M76 80q-6 4-12 0"/></svg>`,
-    boca: `<svg viewBox="0 0 100 120" fill="none" stroke="#0c2440" stroke-width="3"><path d="M10 60q40-30 80 0q-40 36-80 0z"/><path d="M20 60q30-12 60 0l-4 8q-26-8-52 0z" fill="#0c2440" fill-opacity=".15"/><path d="M36 54v12M50 52v14M64 54v12"/></svg>`
+    rosto: `<svg viewBox="0 0 100 120" fill="none" stroke="#151719" stroke-width="3"><ellipse cx="50" cy="58" rx="34" ry="46"/><path d="M34 76q16 14 32 0" /><circle cx="37" cy="50" r="3" fill="#151719"/><circle cx="63" cy="50" r="3" fill="#151719"/></svg>`,
+    "perfil-esq": `<svg viewBox="0 0 100 120" fill="none" stroke="#151719" stroke-width="3"><path d="M64 12c-26 0-40 20-40 42 0 6-8 14-8 18s6 4 8 6c0 8 0 16 8 20 10 4 22 2 30 6 6-14 14-30 14-52 0-24-6-40-12-40z"/><path d="M24 80q6 4 12 0"/></svg>`,
+    perfil: `<svg viewBox="0 0 100 120" fill="none" stroke="#151719" stroke-width="3"><path d="M36 12c26 0 40 20 40 42 0 6 8 14 8 18s-6 4-8 6c0 8 0 16-8 20-10 4-22 2-30 6-6-14-14-30-14-52 0-24 6-40 12-40z"/><path d="M76 80q-6 4-12 0"/></svg>`,
+    boca: `<svg viewBox="0 0 100 120" fill="none" stroke="#151719" stroke-width="3"><path d="M10 60q40-30 80 0q-40 36-80 0z"/><path d="M20 60q30-12 60 0l-4 8q-26-8-52 0z" fill="#151719" fill-opacity=".15"/><path d="M36 54v12M50 52v14M64 54v12"/></svg>`
   };
   const fotos = {}, infoFotos = {};          // id → dataURL / { ia, boca, rosto, angulo }
   const processando = new Set();
@@ -1285,7 +1285,7 @@
     const gap = Math.round(a.width * 0.02), faixa = Math.round(a.width * 0.09);
     const c = document.createElement("canvas"); c.width = a.width * 2 + gap; c.height = a.height + faixa;
     const x = c.getContext("2d");
-    x.fillStyle = "#0c2440"; x.fillRect(0, 0, c.width, c.height);
+    x.fillStyle = "#151719"; x.fillRect(0, 0, c.width, c.height);
     x.drawImage(a, 0, faixa); x.drawImage(d, a.width + gap, faixa);
     x.fillStyle = "#fff"; x.font = `700 ${Math.round(faixa * 0.42)}px "Plus Jakarta Sans",sans-serif`; x.textAlign = "center"; x.textBaseline = "middle";
     x.fillText("ANTES", a.width / 2, faixa / 2); x.fillText("DEPOIS", a.width * 1.5 + gap, faixa / 2);
