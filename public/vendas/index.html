@@ -287,6 +287,27 @@ footer p{max-width:560px}
 .revela.visivel{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.revela{opacity:1;transform:none}.cartao-flut{animation:none}html{scroll-behavior:auto}}
 @media (max-width:600px){section{padding:68px 0}.btn{height:50px;padding:0 22px}}
+
+/* oferta de boas-vindas (pop-up para visitante novo) */
+.oferta{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:16px;background:rgba(21,23,25,.55);backdrop-filter:blur(4px);opacity:0;transition:opacity .35s var(--ease)}
+.oferta.on{opacity:1}
+.oferta-card{position:relative;width:min(440px,100%);background:#fff;border-radius:28px;padding:30px 28px 24px;box-shadow:0 40px 80px -30px rgba(0,0,0,.5);transform:translateY(18px) scale(.97);transition:transform .45s var(--ease);text-align:center;overflow:hidden}
+.oferta.on .oferta-card{transform:none}
+.oferta-card::before{content:"";position:absolute;width:260px;height:260px;border-radius:50%;right:-110px;top:-130px;background:radial-gradient(circle,rgba(195,232,107,.55),transparent 70%)}
+.oferta-x{position:absolute;right:14px;top:14px;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:20px;color:var(--muted);z-index:1}
+.oferta-x:hover{background:var(--sky);color:var(--preto)}
+.oferta-selo{position:relative;display:inline-block;background:var(--lima);color:var(--preto);font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;padding:6px 14px;border-radius:99px}
+.oferta h3{position:relative;font-size:clamp(22px,4.6vw,27px);line-height:1.15;margin:16px 0 8px;letter-spacing:-.015em}
+.oferta p{position:relative;color:var(--muted);font-size:15px}
+.oferta-preco{position:relative;display:flex;align-items:baseline;justify-content:center;gap:10px;margin:20px 0 4px;color:var(--preto)}
+.oferta-preco s{color:var(--muted);font-size:18px}
+.oferta-preco b{font-family:var(--display);font-size:52px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.oferta-preco span{font-size:15px;color:var(--muted)}
+.oferta-nota{position:relative;font-size:13px!important;margin-bottom:20px}
+.oferta .btn{position:relative;width:100%}
+.oferta-nao{display:block;margin:12px auto 0;font-size:13px;color:var(--muted);text-decoration:underline}
+@media (max-width:600px){.oferta{place-items:end center;padding:0}.oferta-card{border-radius:26px 26px 0 0;padding:28px 22px calc(22px + env(safe-area-inset-bottom));transform:translateY(100%)}}
+@media (prefers-reduced-motion:reduce){.oferta,.oferta-card{transition:none}}
 </style>
 </head>
 <body>
@@ -552,7 +573,9 @@ footer p{max-width:560px}
   const CONFIG = {
     contato: "",                       // ex.: "https://wa.me/5511999999999"
     descontoAnual: 20,                 // % de desconto no anual (mostrado no botão "Anual")
-    pacoteExtra: { qtd: 30, preco: 29, link: "https://pay.kiwify.com.br/QLr9A4h" },   // simulações avulsas para quem passar do limite
+    pacoteExtra: { qtd: 30, preco: 29, link: "https://pay.kiwify.com.br/QLr9A4h" },
+    /* pop-up de boas-vindas: só para visitante novo, depois de 60 s na página e de rolar ~40% dela */
+    ofertaNovo: { ativa: true, plano: "Essencial", preco: 47, precoNormal: 97, link: "https://pay.kiwify.com.br/Sx4MeED", segundos: 60, rolagem: 0.4 },   // simulações avulsas para quem passar do limite
     planos: [
       { nome: "Essencial", para: "Para quem está começando a simular na consulta.", mensal: 97, anual: 77.60, links: { mensal: "https://pay.kiwify.com.br/lC2Eunb", anual: "https://pay.kiwify.com.br/bXu02Gk" },
         itens: ["<b>40 simulações</b> com IA por mês", "Lentes, clareamento e implantes", "Fotos guiadas e organizadas pela IA", "Planejamento dente a dente", "Apresentação e PDF", "1 identidade visual", "1 profissional · 2 aparelhos", "Suporte por e-mail"] },
@@ -735,6 +758,44 @@ footer p{max-width:560px}
   /* entrada suave das seções ao rolar */
   const obs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("visivel"); obs.unobserve(e.target); } }), { threshold: 0.12 });
   document.querySelectorAll(".revela:not(.visivel)").forEach(el => obs.observe(el));
+  /* oferta de boas-vindas: aparece uma única vez, só para quem nunca viu a oferta nem clicou para assinar */
+  (function () {
+    const o = CONFIG.ofertaNovo; if (!o || !o.ativa || !o.link) return;
+    const ler = k => { try { return localStorage.getItem(k); } catch { return "1"; } };   // sem armazenamento: não mostra
+    const gravar = k => { try { localStorage.setItem(k, String(Date.now())); } catch {} };
+    let tempoOk = false, rolouOk = false, mostrou = false;
+    const previa = new URLSearchParams(location.search).get("oferta") === "ver";   // /vendas/?oferta=ver mostra na hora, sem registrar
+    if (previa) { setTimeout(() => mostrar(true), 400); return; }
+    if (ler("dc-oferta-vista") || ler("dc-clicou-assinar")) return;
+    document.addEventListener("click", e => { const a = e.target.closest("a[href*='pay.kiwify']"); if (a) gravar("dc-clicou-assinar"); });
+    const rolou = () => { const h = document.documentElement; return (h.scrollTop + innerHeight) / h.scrollHeight >= o.rolagem; };
+    const tentar = () => { if (tempoOk && rolouOk && !mostrou && !ler("dc-clicou-assinar")) mostrar(); };
+    const aoRolar = () => { if (!rolouOk && rolou()) { rolouOk = true; removeEventListener("scroll", aoRolar); tentar(); } };
+    addEventListener("scroll", aoRolar, { passive: true });
+    setTimeout(() => { tempoOk = true; tentar(); }, o.segundos * 1000);
+    function mostrar(soPrevia) {
+      mostrou = true; if (!soPrevia) gravar("dc-oferta-vista");
+      const desc = Math.round((1 - o.preco / o.precoNormal) * 100);
+      const el = document.createElement("div");
+      el.className = "oferta"; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-labelledby", "ofertaTit");
+      el.innerHTML = `<div class="oferta-card">
+        <button class="oferta-x" aria-label="Fechar">×</button>
+        <span class="oferta-selo">−${desc}% no 1º mês</span>
+        <h3 id="ofertaTit">Experimente o DENTALCHECK por menos da metade</h3>
+        <p>Oferta de boas-vindas para começar a simular sorrisos na sua consulta com o plano ${o.plano}.</p>
+        <div class="oferta-preco"><s>R$ ${reais(o.precoNormal)}</s><b>R$ ${reais(o.preco)}</b><span>no 1º mês</span></div>
+        <p class="oferta-nota">Depois, R$ ${reais(o.precoNormal)}/mês. Sem fidelidade · garantia de 7 dias.</p>
+        <a class="btn pri" href="${o.link}" target="_blank" rel="noopener">Quero por R$ ${reais(o.preco)}</a>
+        <button class="oferta-nao">Agora não</button></div>`;
+      document.body.appendChild(el);
+      el.offsetWidth; setTimeout(() => el.classList.add("on"), 30);
+      const fechar = () => { el.classList.remove("on"); removeEventListener("keydown", esc); setTimeout(() => el.remove(), 400); };
+      const esc = e => { if (e.key === "Escape") fechar(); };
+      addEventListener("keydown", esc);
+      el.addEventListener("click", e => { if (e.target === el || e.target.closest(".oferta-x,.oferta-nao")) fechar(); });
+      el.querySelector(".oferta .btn").focus({ preventScroll: true });
+    }
+  })();
 })();
 </script>
 </body>
