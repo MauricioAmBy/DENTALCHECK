@@ -1,0 +1,58 @@
+<template>
+  <style>
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans.ttf") format("truetype"); font-weight: 200 800; }
+    #root { position: absolute; inset: 0; background: #0b9e96; font-family: "Plus Jakarta Sans", sans-serif; overflow: hidden; }
+    #r-titulo { position: absolute; left: 80px; right: 80px; top: 250px; font-weight: 800; font-size: 160px; line-height: 0.98;
+      letter-spacing: -0.04em; color: #fff; }
+    #r-titulo span { display: inline-block; }
+    #r-titulo .ac { color: #0c2440; }
+    #r-app { position: absolute; left: 60px; top: 760px; width: 960px; height: 400px; border-radius: 40px; background: #f3f8fb;
+      box-shadow: 0 40px 80px -40px rgba(12, 36, 64, 0.7); transform-origin: 480px 200px; }
+    #r-conteudo { position: absolute; inset: 0; padding: 40px 44px; }
+    #r-topo { display: flex; align-items: center; gap: 18px; padding-bottom: 30px; border-bottom: 2px solid rgba(12, 36, 64, 0.1); }
+    #r-topo img { width: 72px; height: 72px; }
+    #r-marca { font-weight: 800; font-size: 44px; letter-spacing: 0.02em; color: #0c2440; }
+    #r-marca b { color: #0b9e96; }
+    #r-novo { margin-left: auto; font-size: 30px; font-weight: 600; color: #5d6f84; }
+    #r-etapas { display: flex; justify-content: space-between; margin-top: 40px; }
+    .r-et { width: 214px; text-align: center; font-size: 28px; font-weight: 700; color: #5d6f84; }
+    .r-et i { display: grid; place-items: center; width: 68px; height: 68px; margin: 0 auto 14px; border-radius: 50%; font-style: normal;
+      font-size: 32px; font-weight: 800; background: #fff; border: 2px solid rgba(12, 36, 64, 0.2); color: #0c2440; }
+    .r-et.on { color: #0c2440; }
+    .r-et.on i { background: #0b9e96; border-color: #0b9e96; color: #fff; }
+  </style>
+  <div id="root" data-composition-id="revela" data-width="1080" data-height="1920">
+    <div id="r-titulo"><span id="r-w1">Antes</span><br /><span id="r-w2">do</span> <span id="r-w3" class="ac">sim.</span></div>
+    <div id="r-app">
+      <div id="r-conteudo">
+        <div id="r-topo">
+          <img src="assets/img/logo.svg" alt="" />
+          <div id="r-marca">DENTAL<b>CHECK</b></div>
+          <div id="r-novo">Novo procedimento</div>
+        </div>
+        <div id="r-etapas">
+          <div class="r-et on" id="r-e1"><i>1</i>Foto</div>
+          <div class="r-et" id="r-e2"><i>2</i>Planejamento</div>
+          <div class="r-et" id="r-e3"><i>3</i>Simulação</div>
+          <div class="r-et" id="r-e4"><i>4</i>Apresentação</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // o app sobe quando a narração diz o nome
+    tl.fromTo("#r-app", { y: 900 }, { y: 0, duration: 0.7, ease: "expo.out" }, 0.4);
+    ["#r-e1", "#r-e2", "#r-e3", "#r-e4"].forEach((e, i) =>
+      tl.fromTo(e, { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power2.out" }, 0.85 + i * 0.08));
+    // "antes de dizer sim"
+    tl.fromTo("#r-w1", { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 2.6);
+    tl.fromTo("#r-w2", { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 3.0);
+    tl.fromTo("#r-w3", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.6)" }, 3.22);
+    // o cartão do app cresce e vira o próprio app (próxima cena)
+    tl.to("#r-conteudo", { opacity: 0, duration: 0.18, ease: "power2.in" }, 3.68);
+    tl.to("#r-titulo", { opacity: 0, filter: "blur(14px)", duration: 0.25, ease: "power2.in" }, 3.66);
+    tl.to("#r-app", { scale: 5.4, borderRadius: 0, duration: 0.5, ease: "power3.in" }, 3.7);
+    window.__timelines["revela"] = tl;
+  </script>
+</template>

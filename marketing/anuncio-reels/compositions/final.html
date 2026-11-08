@@ -1,0 +1,40 @@
+<template>
+  <style>
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans.ttf") format("truetype"); font-weight: 200 800; }
+    #root { position: absolute; inset: 0; font-family: "Plus Jakarta Sans", sans-serif; overflow: hidden;
+      background: linear-gradient(160deg, #0c2440, #16365c 60%, #0d4f60); }
+    #e-selo { position: absolute; left: 410px; top: 450px; width: 260px; height: 260px; overflow: visible; }
+    #e-marca { position: absolute; left: 0; right: 0; top: 790px; text-align: center; font-weight: 800; font-size: 116px; letter-spacing: 0.01em;
+      color: #fff; line-height: 1; clip-path: inset(0 100% 0 0); }
+    #e-marca b { color: #4fd1c5; }
+    #e-sub { position: absolute; left: 0; right: 0; top: 940px; text-align: center; font-weight: 600; font-size: 42px; color: rgba(255, 255, 255, 0.75); }
+    #e-garantia { position: absolute; left: 50%; top: 1040px; white-space: nowrap; padding: 16px 34px; border-radius: 99px; border: 3px solid #4fd1c5;
+      color: #4fd1c5; font-weight: 800; font-size: 40px; }
+    #e-cta { position: absolute; left: 220px; top: 1170px; width: 640px; height: 130px; border-radius: 99px; background: #fff; color: #0c2440;
+      display: grid; place-items: center; font-weight: 800; font-size: 56px; box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.6); }
+  </style>
+  <div id="root" data-composition-id="final" data-width="1080" data-height="1920">
+    <svg id="e-selo" viewBox="0 0 512 512">
+      <rect id="e-fundo" x="4" y="4" width="504" height="504" rx="110" fill="#0c2440" stroke="rgba(255,255,255,0.22)" stroke-width="8" />
+      <path id="e-dente" d="M256 128c-28-24-70-30-100-12-40 24-44 78-30 124 10 34 16 70 22 108 6 36 18 60 38 60 22 0 26-30 32-62 6-30 18-44 38-44s32 14 38 44c6 32 10 62 32 62 20 0 32-24 38-60 6-38 12-74 22-108 14-46 10-100-30-124-30-18-72-12-100 12z" fill="#fff" />
+      <path id="e-check" d="M196 252l42 42 82-88" fill="none" stroke="#0b9e96" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" pathLength="100" />
+    </svg>
+    <div id="e-marca">DENTAL<b>CHECK</b></div>
+    <div id="e-sub">Simulação de sorriso com IA</div>
+    <div id="e-garantia">✓ Garantia de 7 dias</div>
+    <div id="e-cta">Teste agora →</div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // o selo pousa, o dente aparece e o check se desenha
+    tl.fromTo("#e-selo", { scale: 0.4, opacity: 0, transformOrigin: "50% 50%" }, { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.5)" }, 0.0);
+    tl.fromTo("#e-dente", { scale: 0.6, opacity: 0, transformOrigin: "50% 50%" }, { scale: 1, opacity: 1, duration: 0.35, ease: "back.out(1.6)" }, 0.15);
+    tl.fromTo("#e-check", { strokeDasharray: 100, strokeDashoffset: 100 }, { strokeDashoffset: 0, duration: 0.35, ease: "power2.out" }, 0.4);
+    // o nome abre junto com a narração
+    tl.fromTo("#e-marca", { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.45, ease: "power3.out" }, 0.95);
+    tl.fromTo("#e-sub", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 1.45);
+    tl.fromTo("#e-garantia", { opacity: 0, scale: 0.6, xPercent: -50 }, { opacity: 1, scale: 1, xPercent: -50, duration: 0.35, ease: "back.out(1.7)" }, 2.18);
+    tl.fromTo("#e-cta", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.6)" }, 2.78);
+    window.__timelines["final"] = tl;
+  </script>
+</template>

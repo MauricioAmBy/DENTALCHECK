@@ -1,0 +1,62 @@
+<template>
+  <style>
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans.ttf") format("truetype"); font-weight: 200 800; }
+    #root { position: absolute; inset: 0; background: #f3f8fb; font-family: "Plus Jakarta Sans", sans-serif; overflow: hidden; }
+    #g-palco { position: absolute; inset: 0; }
+    #g-foto { position: absolute; left: 60px; top: 200px; width: 960px; height: 900px; border-radius: 40px; overflow: hidden;
+      box-shadow: 0 30px 70px -30px rgba(12, 36, 64, 0.55); }
+    #g-zoom { position: absolute; inset: 0; transform-origin: 553px 508px; }
+    #g-zoom img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; }
+    #g-pb { opacity: 0; }
+    /* balão de fala do paciente */
+    #g-balao { position: absolute; left: 520px; top: 585px; padding: 24px 36px; background: #fff; border-radius: 40px;
+      font-weight: 800; font-size: 64px; letter-spacing: -0.02em; color: #0c2440; white-space: nowrap;
+      box-shadow: 0 24px 60px -24px rgba(12, 36, 64, 0.55); transform-origin: 30px 150px; }
+    #g-balao::after { content: ""; position: absolute; left: 34px; bottom: -26px; width: 52px; height: 52px; background: #fff;
+      border-radius: 0 0 0 14px; transform: skewX(-28deg) rotate(8deg); }
+    /* retorno que não acontece */
+    #g-retorno { position: absolute; left: 100px; top: 900px; width: 880px; height: 170px; background: #fff; border-radius: 28px;
+      display: flex; align-items: center; gap: 28px; padding: 0 34px; box-shadow: 0 24px 60px -30px rgba(12, 36, 64, 0.5); }
+    #g-cal { width: 96px; height: 96px; border-radius: 22px; background: #dff5f2; color: #0b9e96; display: grid; place-items: center;
+      font-weight: 800; font-size: 28px; line-height: 1.05; text-align: center; flex: none; }
+    #g-cal b { display: block; font-size: 40px; }
+    #g-txt { flex: 1; }
+    #g-txt b { display: block; font-size: 40px; color: #0c2440; font-weight: 800; }
+    #g-txt span { font-size: 32px; color: #5d6f84; font-weight: 600; }
+    #g-risco { position: absolute; left: 150px; right: 210px; top: 84px; height: 6px; border-radius: 3px; background: #d64545; transform-origin: left center; }
+    #g-selo { flex: none; padding: 12px 22px; border-radius: 99px; background: #fdecec; color: #b42323; font-weight: 800; font-size: 28px; }
+  </style>
+  <div id="root" data-composition-id="gancho" data-width="1080" data-height="1920">
+    <div id="g-palco">
+      <div id="g-foto">
+        <div id="g-zoom">
+          <img id="g-cor" src="assets/img/rosto-antes.jpg" alt="" />
+          <img id="g-pb" src="assets/img/rosto-antes-pb.jpg" alt="" />
+        </div>
+      </div>
+      <div id="g-balao">“Vou pensar.”</div>
+      <div id="g-retorno">
+        <div id="g-cal"><span>QUI<b>14</b></span></div>
+        <div id="g-txt"><b>Retorno · Maria Souza</b><span>Plano de tratamento</span></div>
+        <div id="g-selo">Não voltou</div>
+        <div id="g-risco"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // aproximação lenta no rosto enquanto o doutor explica
+    tl.fromTo("#g-zoom", { scale: 1.14 }, { scale: 1.0, duration: 4.2, ease: "power2.out" }, 0);
+    // "Vou pensar." (fala em ~4.3 s)
+    tl.fromTo("#g-balao", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(1.6)" }, 4.25);
+    // "E não volta.": o retorno entra, é riscado e a foto perde a cor
+    tl.fromTo("#g-retorno", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.45, ease: "expo.out" }, 5.05);
+    tl.fromTo("#g-risco", { scaleX: 0 }, { scaleX: 1, duration: 0.25, ease: "power3.inOut" }, 5.72);
+    tl.fromTo("#g-selo", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(1.6)" }, 5.8);
+    tl.fromTo("#g-pb", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power2.inOut" }, 5.75);
+    tl.to("#g-balao", { opacity: 0.35, duration: 0.6, ease: "power2.inOut" }, 5.75);
+    // saída em chicote para a esquerda (encontra a cena seguinte vindo da direita)
+    tl.to("#g-palco", { x: -420, filter: "blur(18px)", opacity: 0, duration: 0.26, ease: "power3.in" }, 6.34);
+    window.__timelines["gancho"] = tl;
+  </script>
+</template>

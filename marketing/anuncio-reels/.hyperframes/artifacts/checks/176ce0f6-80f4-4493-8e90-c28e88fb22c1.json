@@ -1,0 +1,882 @@
+{
+  "ok": false,
+  "strict": false,
+  "browserSkipped": false,
+  "lint": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "filesScanned": 12
+  },
+  "runtime": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": []
+  },
+  "layout": {
+    "ok": false,
+    "errorCount": 1,
+    "warningCount": 0,
+    "infoCount": 9,
+    "findings": [
+      {
+        "code": "content_overlap",
+        "severity": "error",
+        "time": 22.75,
+        "selector": "#p-proc > div:nth-of-type(1)",
+        "message": "Two text blocks overlap and may render unreadable.",
+        "rect": {
+          "left": 117.59,
+          "top": 943,
+          "right": 330.41,
+          "bottom": 981,
+          "width": 212.82,
+          "height": 38
+        },
+        "containerSelector": "#p-lentes-on",
+        "text": "Lentes dentais",
+        "fixHint": "Give each block its own zone, or put data-layout-allow-overlap on the text or on a container inside the scene. A marker on the scene root does not apply.",
+        "dataAttributes": {},
+        "sourceFile": "compositions/plano.html",
+        "bbox": {
+          "x": 117.59,
+          "y": 943,
+          "width": 212.82,
+          "height": 38
+        },
+        "firstSeen": 21.352,
+        "lastSeen": 23.385,
+        "occurrences": 10,
+        "heldMs": 2033.0000000000014,
+        "times": [
+          21.352,
+          21.606,
+          21.86,
+          22.115,
+          22.369,
+          22.623,
+          22.75,
+          22.877,
+          23.131,
+          23.385
+        ]
+      },
+      {
+        "code": "container_overflow",
+        "severity": "info",
+        "time": 2.528,
+        "selector": "#g-zoom",
+        "message": "Element extends outside a clipping layout container.",
+        "rect": {
+          "left": 54.86,
+          "top": 195.28,
+          "right": 1023.79,
+          "bottom": 1103.65,
+          "width": 968.93,
+          "height": 908.37
+        },
+        "containerSelector": "#g-foto",
+        "fixHint": "Resize/reposition the child or container, or mark intentional overflow with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 60,
+          "top": 200,
+          "right": 1020,
+          "bottom": 1100,
+          "width": 960,
+          "height": 900
+        },
+        "overflow": {
+          "left": 5.14,
+          "right": 3.79,
+          "top": 4.72,
+          "bottom": 3.65
+        },
+        "dataAttributes": {},
+        "sourceFile": "compositions/gancho.html",
+        "bbox": {
+          "x": 54.86,
+          "y": 195.28,
+          "width": 968.93,
+          "height": 908.37
+        },
+        "firstSeen": 2.528,
+        "lastSeen": 2.528,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          2.528
+        ]
+      },
+      {
+        "code": "content_overlap",
+        "severity": "info",
+        "time": 11.693,
+        "selector": "#r-marca",
+        "message": "Two text blocks overlap and may render unreadable.",
+        "rect": {
+          "left": 194,
+          "top": 1275.82,
+          "right": 368.73,
+          "bottom": 1331.82,
+          "width": 174.73,
+          "height": 56
+        },
+        "containerSelector": "#leg5 > span:nth-of-type(1)",
+        "text": "DENTALCHECK",
+        "fixHint": "Give each block its own zone, or put data-layout-allow-overlap on the text or on a container inside the scene. A marker on the scene root does not apply.",
+        "dataAttributes": {},
+        "sourceFile": "compositions/revela.html",
+        "bbox": {
+          "x": 194,
+          "y": 1275.82,
+          "width": 174.73,
+          "height": 56
+        },
+        "firstSeen": 11.693,
+        "lastSeen": 11.693,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          11.693
+        ]
+      },
+      {
+        "code": "content_overlap",
+        "severity": "info",
+        "time": 11.693,
+        "selector": "#r-marca > b:nth-of-type(1)",
+        "message": "Two text blocks overlap and may render unreadable.",
+        "rect": {
+          "left": 368.73,
+          "top": 1275.82,
+          "right": 529.44,
+          "bottom": 1331.82,
+          "width": 160.71,
+          "height": 56
+        },
+        "containerSelector": "#leg5 > span:nth-of-type(1)",
+        "text": "CHECK",
+        "fixHint": "Give each block its own zone, or put data-layout-allow-overlap on the text or on a container inside the scene. A marker on the scene root does not apply.",
+        "dataAttributes": {},
+        "sourceFile": "compositions/revela.html",
+        "bbox": {
+          "x": 368.73,
+          "y": 1275.82,
+          "width": 160.71,
+          "height": 56
+        },
+        "firstSeen": 11.693,
+        "lastSeen": 11.693,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          11.693
+        ]
+      },
+      {
+        "code": "container_overflow",
+        "severity": "info",
+        "time": 17.694,
+        "selector": "#f-cam > img:nth-of-type(1)",
+        "message": "Element extends outside a clipping layout container.",
+        "rect": {
+          "left": 60,
+          "top": 324.74,
+          "right": 553.34,
+          "bottom": 980.6,
+          "width": 493.34,
+          "height": 655.86
+        },
+        "containerSelector": "#f-cam",
+        "fixHint": "Resize/reposition the child or container, or mark intentional overflow with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 60,
+          "top": 440,
+          "right": 553.34,
+          "bottom": 791.9,
+          "width": 493.34,
+          "height": 351.9
+        },
+        "overflow": {
+          "top": 115.26,
+          "bottom": 188.7
+        },
+        "dataAttributes": {
+          "data-hf-render-id": "hf-media-9",
+          "data-hf-authored-opacity": ""
+        },
+        "sourceFile": "compositions/fotos.html",
+        "bbox": {
+          "x": 60,
+          "y": 324.74,
+          "width": 493.34,
+          "height": 655.86
+        },
+        "firstSeen": 17.694,
+        "lastSeen": 17.694,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          17.694
+        ]
+      },
+      {
+        "code": "text_occluded",
+        "severity": "info",
+        "time": 22.75,
+        "selector": "#p-proc > div:nth-of-type(1)",
+        "message": "Text is hidden beneath an opaque element.",
+        "rect": {
+          "left": 117.59,
+          "top": 943,
+          "right": 330.41,
+          "bottom": 981,
+          "width": 212.81,
+          "height": 38
+        },
+        "containerSelector": "#p-lentes-on",
+        "text": "Lentes dentais",
+        "fixHint": "Give the text its own zone, raise its stacking order above the covering element, or mark intentional layering with data-layout-allow-occlusion.",
+        "coveredFraction": 1,
+        "dataAttributes": {},
+        "sourceFile": "compositions/plano.html",
+        "bbox": {
+          "x": 117.59,
+          "y": 943,
+          "width": 212.81,
+          "height": 38
+        },
+        "firstSeen": 22.75,
+        "lastSeen": 22.75,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          22.75
+        ]
+      },
+      {
+        "code": "container_overflow",
+        "severity": "info",
+        "time": 22.75,
+        "selector": "#p-foto > img:nth-of-type(1)",
+        "message": "Element extends outside a clipping layout container.",
+        "rect": {
+          "left": -238,
+          "top": 304,
+          "right": 1362,
+          "bottom": 1104,
+          "width": 1600,
+          "height": 800
+        },
+        "containerSelector": "#p-foto",
+        "fixHint": "Resize/reposition the child or container, or mark intentional overflow with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 40,
+          "top": 420,
+          "right": 1040,
+          "bottom": 880,
+          "width": 1000,
+          "height": 460
+        },
+        "overflow": {
+          "left": 278,
+          "right": 322,
+          "top": 116,
+          "bottom": 224
+        },
+        "dataAttributes": {
+          "data-hf-render-id": "hf-media-11",
+          "data-hf-authored-opacity": ""
+        },
+        "sourceFile": "compositions/plano.html",
+        "bbox": {
+          "x": -238,
+          "y": 304,
+          "width": 1600,
+          "height": 800
+        },
+        "firstSeen": 22.75,
+        "lastSeen": 22.75,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          22.75
+        ]
+      },
+      {
+        "code": "content_overlap",
+        "severity": "info",
+        "time": 24.148,
+        "selector": "#x-botao",
+        "message": "Two text blocks overlap and may render unreadable.",
+        "rect": {
+          "left": 264.08,
+          "top": 964.74,
+          "right": 815.91,
+          "bottom": 1025.26,
+          "width": 551.83,
+          "height": 60.52
+        },
+        "containerSelector": "#x-prog > b:nth-of-type(1)",
+        "text": "✨ Gerar simulação com IA",
+        "fixHint": "Give each block its own zone, or put data-layout-allow-overlap on the text or on a container inside the scene. A marker on the scene root does not apply.",
+        "dataAttributes": {},
+        "sourceFile": "compositions/gera.html",
+        "bbox": {
+          "x": 264.08,
+          "y": 964.74,
+          "width": 551.83,
+          "height": 60.52
+        },
+        "firstSeen": 24.148,
+        "lastSeen": 24.148,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          24.148
+        ]
+      },
+      {
+        "code": "container_overflow",
+        "severity": "info",
+        "time": 32.861,
+        "selector": "#a-dedo",
+        "message": "Element extends outside a clipping layout container.",
+        "rect": {
+          "left": 1100,
+          "top": 1300,
+          "right": 1184,
+          "bottom": 1384,
+          "width": 84,
+          "height": 84
+        },
+        "containerSelector": "#apresentacao > div:nth-of-type(1)",
+        "fixHint": "Resize/reposition the child or container, or mark intentional overflow with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1080,
+          "bottom": 1920,
+          "width": 1080,
+          "height": 1920
+        },
+        "overflow": {
+          "right": 104
+        },
+        "dataAttributes": {},
+        "sourceFile": "compositions/apresentacao.html",
+        "bbox": {
+          "x": 1100,
+          "y": 1300,
+          "width": 84,
+          "height": 84
+        },
+        "firstSeen": 32.861,
+        "lastSeen": 32.861,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          32.861
+        ]
+      },
+      {
+        "code": "container_overflow",
+        "severity": "info",
+        "time": 37.917,
+        "selector": "#m-cortina",
+        "message": "Element extends outside a clipping layout container.",
+        "rect": {
+          "left": 0,
+          "top": 1920,
+          "right": 1080,
+          "bottom": 3840,
+          "width": 1080,
+          "height": 1920
+        },
+        "containerSelector": "#promessa > div:nth-of-type(1)",
+        "fixHint": "Resize/reposition the child or container, or mark intentional overflow with data-layout-allow-overflow.",
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1080,
+          "bottom": 1920,
+          "width": 1080,
+          "height": 1920
+        },
+        "overflow": {
+          "bottom": 1920
+        },
+        "dataAttributes": {},
+        "sourceFile": "compositions/promessa.html",
+        "bbox": {
+          "x": 0,
+          "y": 1920,
+          "width": 1080,
+          "height": 1920
+        },
+        "firstSeen": 37.917,
+        "lastSeen": 37.917,
+        "occurrences": 1,
+        "heldMs": 0,
+        "times": [
+          37.917
+        ]
+      }
+    ],
+    "duration": 45.5,
+    "samples": [
+      2.528,
+      7.583,
+      12.639,
+      17.694,
+      22.75,
+      27.806,
+      32.861,
+      37.917,
+      42.972
+    ],
+    "transitionSamples": [],
+    "transitionSamplesDropped": 0,
+    "tolerance": 2,
+    "totalIssueCount": 10,
+    "truncated": false
+  },
+  "motion": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": false,
+    "samples": 0
+  },
+  "contrast": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 1,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "contrast_aa_failure",
+        "severity": "warning",
+        "message": "Contrast is 1.56:1; WCAG AA requires 3:1.",
+        "text": "Lentes dentais",
+        "fg": "rgb(93,111,132)",
+        "bg": "rgb(11,158,150)",
+        "ratio": 1.56,
+        "requiredRatio": 3,
+        "suggestedColor": "rgb(57,67,80)",
+        "large": true,
+        "selector": "div > div:nth-of-type(6) > div > div:nth-of-type(4) > div:nth-of-type(1) > div:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/plano.html",
+        "bbox": {
+          "x": 66,
+          "y": 926,
+          "width": 316,
+          "height": 72
+        },
+        "time": 22.75,
+        "times": [
+          22.75
+        ]
+      }
+    ],
+    "enabled": true,
+    "samples": [
+      2.528,
+      12.639,
+      22.75,
+      32.861,
+      42.972
+    ],
+    "checked": 41,
+    "passed": 40
+  },
+  "craft": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 10,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "line_unread",
+        "severity": "warning",
+        "message": "\"Fechar o plano de tratamento\" (5 words) is on screen 1.16 s (±0.01 s), under its 1.50 s floor: hold it about 0.5 s + 0.3 s a word (2.00 s here) before it leaves or changes; see references/motion.md.",
+        "text": "Fechar o plano de tratamento",
+        "selector": "#g-txt",
+        "dataAttributes": {},
+        "sourceFile": "compositions/gancho.html",
+        "bbox": {
+          "x": 258,
+          "y": 996.22,
+          "width": 453.1600000000001,
+          "height": 40
+        },
+        "time": 5.406,
+        "words": 5,
+        "seconds": 1.164,
+        "floorSeconds": 1.5
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and \"QUI\" renders at 26 px for 1.13 s: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "QUI",
+        "selector": "#g-cal > span:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/gancho.html",
+        "bbox": {
+          "x": 157.44,
+          "y": 953.07,
+          "width": 49.12,
+          "height": 33
+        },
+        "time": 5.5,
+        "times": [
+          5.5
+        ],
+        "fontPx": 26,
+        "floorPx": 28,
+        "seconds": 1.125,
+        "elements": [
+          {
+            "selector": "#g-cal > span:nth-of-type(1)",
+            "text": "QUI",
+            "fontPx": 26,
+            "time": 5.5,
+            "seconds": 1.125
+          }
+        ]
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 4 text elements stay under it for 0.5 s or more, the smallest \"Foto\" at 27 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "Foto",
+        "selector": "#r-e1",
+        "dataAttributes": {},
+        "sourceFile": "compositions/revela.html",
+        "bbox": {
+          "x": 178.27,
+          "y": 1028.17,
+          "width": 61.45,
+          "height": 34
+        },
+        "time": 12.125,
+        "times": [
+          12.125,
+          12.25,
+          12.375,
+          12.375
+        ],
+        "fontPx": 27,
+        "floorPx": 28,
+        "seconds": 3,
+        "elements": [
+          {
+            "selector": "#r-e1",
+            "text": "Foto",
+            "fontPx": 27,
+            "time": 12.125,
+            "seconds": 3
+          },
+          {
+            "selector": "#r-e2",
+            "text": "Planejamento",
+            "fontPx": 27,
+            "time": 12.25,
+            "seconds": 2.875
+          },
+          {
+            "selector": "#r-e3",
+            "text": "Simulação",
+            "fontPx": 27,
+            "time": 12.375,
+            "seconds": 2.75
+          },
+          {
+            "selector": "#r-e4",
+            "text": "Apresentação",
+            "fontPx": 27,
+            "time": 12.375,
+            "seconds": 2.75
+          }
+        ]
+      },
+      {
+        "code": "line_unread",
+        "severity": "warning",
+        "message": "\"✓ Boa luz — encaixe no contorno e capture\" (7 words) is on screen 0.86 s (±0.01 s), under its 1.95 s floor: hold it about 0.5 s + 0.3 s a word (2.60 s here) before it leaves or changes; see references/motion.md.",
+        "text": "✓ Boa luz — encaixe no contorno e capture",
+        "selector": "#f-aviso",
+        "dataAttributes": {},
+        "sourceFile": "compositions/fotos.html",
+        "bbox": {
+          "x": 247.26,
+          "y": 482.59,
+          "width": 585.48,
+          "height": 35.81999999999999
+        },
+        "time": 16.641,
+        "words": 7,
+        "seconds": 0.859,
+        "floorSeconds": 1.95
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 4 text elements stay under it for 0.5 s or more, the smallest \"Boca de frente\" at 25 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "Boca de frente",
+        "selector": "#f-c3 > div:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "compositions/fotos.html",
+        "bbox": {
+          "x": 599.4,
+          "y": 1185.45,
+          "width": 177.47,
+          "height": 31.4
+        },
+        "time": 18.125,
+        "times": [
+          17.75,
+          17.875,
+          18,
+          18.125
+        ],
+        "fontPx": 24.75,
+        "floorPx": 28,
+        "seconds": 1.125,
+        "elements": [
+          {
+            "selector": "#f-c3 > div:nth-of-type(1)",
+            "text": "Boca de frente",
+            "fontPx": 24.75,
+            "time": 18.125,
+            "seconds": 1.125
+          },
+          {
+            "selector": "#f-c1 > div:nth-of-type(1)",
+            "text": "Lateral esquerda",
+            "fontPx": 25.29,
+            "time": 17.75,
+            "seconds": 1.5
+          },
+          {
+            "selector": "#f-rot0",
+            "text": "Rosto de frente, sorrindo",
+            "fontPx": 25.84,
+            "time": 17.875,
+            "seconds": 1.375
+          },
+          {
+            "selector": "#f-c2 > div:nth-of-type(1)",
+            "text": "Lateral direita",
+            "fontPx": 25.84,
+            "time": 18,
+            "seconds": 1.25
+          }
+        ]
+      },
+      {
+        "code": "line_unread",
+        "severity": "warning",
+        "message": "\"✓ Organizadas pela IA\" (3 words) is on screen 0.67 s (±0.01 s), under its 1.05 s floor: hold it about 0.5 s + 0.3 s a word (1.40 s here) before it leaves or changes; see references/motion.md.",
+        "text": "✓ Organizadas pela IA",
+        "selector": "#f-ok",
+        "dataAttributes": {},
+        "sourceFile": "compositions/fotos.html",
+        "bbox": {
+          "x": 717.8,
+          "y": 355.07,
+          "width": 262.62,
+          "height": 30.860000000000014
+        },
+        "time": 18.5,
+        "words": 3,
+        "seconds": 0.672,
+        "floorSeconds": 1.05
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 6 text elements stay under it for 0.5 s or more, the smallest \"13\" at 19 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "13",
+        "selector": "#p-n13",
+        "dataAttributes": {},
+        "sourceFile": "compositions/plano.html",
+        "bbox": {
+          "x": 337.13,
+          "y": 657.78,
+          "width": 19.74,
+          "height": 24.44
+        },
+        "time": 19.75,
+        "times": [
+          19.75,
+          19.75,
+          19.75,
+          19.75,
+          20.125,
+          20.125
+        ],
+        "fontPx": 19.26,
+        "floorPx": 28,
+        "seconds": 3.875,
+        "elements": [
+          {
+            "selector": "#p-n13",
+            "text": "13",
+            "fontPx": 19.26,
+            "time": 19.75,
+            "seconds": 3.875
+          },
+          {
+            "selector": "#p-n23",
+            "text": "23",
+            "fontPx": 19.26,
+            "time": 19.75,
+            "seconds": 3.875
+          },
+          {
+            "selector": "#p-n12",
+            "text": "12",
+            "fontPx": 23.89,
+            "time": 19.75,
+            "seconds": 3.875
+          },
+          {
+            "selector": "#p-n22",
+            "text": "22",
+            "fontPx": 23.89,
+            "time": 19.75,
+            "seconds": 3.875
+          },
+          {
+            "selector": "#p-n11",
+            "text": "11",
+            "fontPx": 26,
+            "time": 20.125,
+            "seconds": 3.5
+          },
+          {
+            "selector": "#p-n21",
+            "text": "21",
+            "fontPx": 26,
+            "time": 20.125,
+            "seconds": 3.5
+          }
+        ]
+      },
+      {
+        "code": "line_unread",
+        "severity": "warning",
+        "message": "\"✨ Gerar simulação com IA\" (4 words) is on screen 0.53 s (±0.01 s), under its 1.27 s floor: hold it about 0.5 s + 0.3 s a word (1.70 s here) before it leaves or changes; see references/motion.md.",
+        "text": "✨ Gerar simulação com IA",
+        "selector": "#x-botao",
+        "dataAttributes": {},
+        "sourceFile": "compositions/gera.html",
+        "bbox": {
+          "x": 252.58,
+          "y": 967.68,
+          "width": 574.83,
+          "height": 56
+        },
+        "time": 23.641,
+        "words": 4,
+        "seconds": 0.531,
+        "floorSeconds": 1.275
+      },
+      {
+        "code": "line_unread",
+        "severity": "warning",
+        "message": "\"Logo e cores da sua clínica\" (6 words) is on screen 0.63 s (±0.01 s), under its 1.72 s floor: hold it about 0.5 s + 0.3 s a word (2.30 s here) before it leaves or changes; see references/motion.md.",
+        "text": "Logo e cores da sua clínica",
+        "selector": "#a-marca",
+        "dataAttributes": {},
+        "sourceFile": "compositions/apresentacao.html",
+        "bbox": {
+          "x": 139.67,
+          "y": 917.52,
+          "width": 474.14,
+          "height": 45.960000000000036
+        },
+        "time": 33.273,
+        "words": 6,
+        "seconds": 0.633,
+        "floorSeconds": 1.725
+      },
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 3 text elements stay under it for 0.5 s or more, the smallest \"PDF\" at 24 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "PDF",
+        "selector": "#a-pdf",
+        "dataAttributes": {},
+        "sourceFile": "compositions/apresentacao.html",
+        "bbox": {
+          "x": 298.33,
+          "y": 935.8,
+          "width": 47.12,
+          "height": 29.82
+        },
+        "time": 35,
+        "times": [
+          35,
+          35,
+          35
+        ],
+        "fontPx": 23.85,
+        "floorPx": 28,
+        "seconds": 1.25,
+        "elements": [
+          {
+            "selector": "#a-pdf",
+            "text": "PDF",
+            "fontPx": 23.85,
+            "time": 35,
+            "seconds": 1.25
+          },
+          {
+            "selector": "#a-hora",
+            "text": "14:32",
+            "fontPx": 25.84,
+            "time": 35,
+            "seconds": 1.25
+          },
+          {
+            "selector": "#a-arq > div:nth-of-type(2) > span:nth-of-type(1)",
+            "text": "8 páginas",
+            "fontPx": 26.84,
+            "time": 35,
+            "seconds": 1.25
+          }
+        ]
+      }
+    ],
+    "enabled": true,
+    "step": 0.125,
+    "samples": 364
+  },
+  "audio": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": []
+  },
+  "hdr": {
+    "autoPromotion": null,
+    "inspection": "available"
+  },
+  "snapshots": {
+    "enabled": false,
+    "files": [],
+    "times": [],
+    "findingFiles": []
+  }
+}

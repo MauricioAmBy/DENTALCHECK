@@ -1,0 +1,60 @@
+<template>
+  <style>
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans.ttf") format("truetype"); font-weight: 200 800; }
+    #root { position: absolute; inset: 0; background: #f3f8fb; font-family: "Plus Jakarta Sans", sans-serif; overflow: hidden; }
+    #x-barra { position: absolute; left: 0; right: 0; top: 168px; height: 120px; background: #fff; display: flex; align-items: center;
+      gap: 16px; padding: 0 60px; border-bottom: 2px solid rgba(12, 36, 64, 0.08); }
+    #x-barra img { width: 60px; height: 60px; }
+    .x-marca { font-weight: 800; font-size: 38px; letter-spacing: 0.02em; color: #0c2440; }
+    .x-marca b { color: #0b9e96; }
+    #x-etapa { margin-left: auto; font-size: 28px; font-weight: 700; color: #5d6f84; }
+    #x-titulo { position: absolute; left: 60px; top: 330px; font-weight: 800; font-size: 60px; letter-spacing: -0.03em; color: #0c2440; }
+    #x-foto { position: absolute; left: 40px; top: 420px; width: 1000px; height: 460px; border-radius: 36px; overflow: hidden;
+      box-shadow: 0 30px 70px -34px rgba(12, 36, 64, 0.5); }
+    #x-foto > img { position: absolute; left: -278px; top: -116px; width: 1600px; height: 800px; }
+    .x-m { position: absolute; border-radius: 16px; border: 4px solid #4fd1c5; background: rgba(79, 209, 197, 0.32); }
+    #x-scan { position: absolute; left: 0; right: 0; top: 0; height: 120px; margin-top: -120px;
+      background: linear-gradient(to bottom, rgba(79, 209, 197, 0), rgba(79, 209, 197, 0.35)); border-bottom: 5px solid #4fd1c5; }
+    #x-botao { position: absolute; left: 40px; top: 930px; width: 1000px; height: 130px; border-radius: 99px; background: #0b9e96; color: #fff;
+      display: grid; place-items: center; font-weight: 800; font-size: 44px; box-shadow: 0 24px 50px -24px rgba(11, 158, 150, 0.9); }
+    #x-prog { position: absolute; left: 40px; top: 930px; width: 1000px; height: 170px; border-radius: 32px; background: #fff; padding: 30px 36px;
+      box-shadow: 0 24px 60px -30px rgba(12, 36, 64, 0.45); opacity: 0; }
+    #x-prog b { display: block; font-size: 40px; font-weight: 800; color: #0c2440; }
+    #x-barra-prog { margin-top: 24px; height: 18px; border-radius: 99px; background: #dff5f2; overflow: hidden; }
+    #x-enche { height: 100%; width: 100%; background: #0b9e96; border-radius: 99px; transform-origin: left center; }
+    #x-dedo { position: absolute; left: 0; top: 0; width: 84px; height: 84px; border-radius: 50%; background: rgba(12, 36, 64, 0.35);
+      border: 5px solid #fff; box-shadow: 0 8px 24px rgba(12, 36, 64, 0.35); }
+  </style>
+  <div id="root" data-composition-id="gera" data-width="1080" data-height="1920">
+    <div id="x-barra"><img src="assets/img/logo.svg" alt="" /><div class="x-marca">DENTAL<b>CHECK</b></div><div id="x-etapa">Etapa 2 de 3</div></div>
+    <div id="x-titulo">Planejamento do sorriso</div>
+    <div id="x-foto">
+      <img src="assets/img/mulher-boca-antes.jpg" alt="" />
+      <div class="x-m" style="left: 422px; top: 175px; width: 104px; height: 141px"></div>
+      <div class="x-m" style="left: 556px; top: 175px; width: 109px; height: 138px"></div>
+      <div class="x-m" style="left: 342px; top: 184px; width: 77px; height: 107px"></div>
+      <div class="x-m" style="left: 665px; top: 182px; width: 75px; height: 107px"></div>
+      <div id="x-scan"></div>
+    </div>
+    <div id="x-botao">✨ Gerar simulação com IA</div>
+    <div id="x-prog"><b>Analisando o sorriso…</b><div id="x-barra-prog"><div id="x-enche"></div></div></div>
+    <div id="x-dedo"></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+        // toque em "Gerar simulação com IA"
+    tl.fromTo("#x-dedo", { x: 1100, y: 1300 }, { x: 498, y: 953, duration: 0.28, ease: "power3.out" }, 0.04);
+    tl.to("#x-dedo", { scale: 0.8, duration: 0.05 }, 0.31);
+    tl.to("#x-botao", { scale: 0.96, duration: 0.05 }, 0.31);
+    tl.to("#x-dedo", { scale: 1, duration: 0.1 }, 0.37);
+    tl.to("#x-dedo", { x: 1100, y: 1500, duration: 0.3, ease: "power3.in" }, 0.5);
+    // o botão vira o cartão de progresso
+    tl.to("#x-botao", { opacity: 0, scaleY: 1.3, duration: 0.16, ease: "power2.in" }, 0.42);
+    tl.fromTo("#x-prog", { opacity: 0, scaleY: 0.76 }, { opacity: 1, scaleY: 1, duration: 0.25, ease: "power3.out" }, 0.48);
+    tl.fromTo("#x-enche", { scaleX: 0 }, { scaleX: 1, duration: 1.8, ease: "power1.inOut" }, 0.55);
+    // a leitura passa duas vezes sobre o sorriso
+    tl.fromTo("#x-scan", { y: 0 }, { y: 580, duration: 0.8, ease: "power1.inOut" }, 0.6);
+    tl.fromTo("#x-scan", { y: 0 }, { y: 580, duration: 0.8, ease: "power1.inOut", immediateRender: false }, 1.5);
+    window.__timelines["gera"] = tl;
+  </script>
+</template>

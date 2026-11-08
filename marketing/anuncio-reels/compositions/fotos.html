@@ -1,0 +1,85 @@
+<template>
+  <style>
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans.ttf") format("truetype"); font-weight: 200 800; }
+    #root { position: absolute; inset: 0; background: #f3f8fb; font-family: "Plus Jakarta Sans", sans-serif; overflow: hidden; }
+    /* barra do app (igual nas cenas do app) */
+    #f-barra { position: absolute; left: 0; right: 0; top: 168px; height: 120px; background: #fff; display: flex; align-items: center;
+      gap: 16px; padding: 0 60px; border-bottom: 2px solid rgba(12, 36, 64, 0.08); }
+    #f-barra img { width: 60px; height: 60px; }
+    .f-marca { font-weight: 800; font-size: 38px; letter-spacing: 0.02em; color: #0c2440; }
+    .f-marca b { color: #0b9e96; }
+    #f-etapa { margin-left: auto; font-size: 28px; font-weight: 700; color: #5d6f84; }
+    #f-titulo { position: absolute; left: 60px; top: 330px; font-weight: 800; font-size: 64px; letter-spacing: -0.03em; color: #0c2440; }
+    #f-ok { position: absolute; right: 60px; top: 340px; padding: 12px 22px; border-radius: 99px; background: #e8f7ef; color: #1f7a45;
+      font-weight: 800; font-size: 28px; }
+    /* câmera guiada */
+    #f-cam { position: absolute; left: 60px; top: 440px; width: 960px; height: 690px; border-radius: 36px; overflow: hidden;
+      background: #0c2440; transform-origin: 0 0; }
+    #f-cam img { position: absolute; left: 0; top: -226px; width: 960px; height: 1286px; }
+    #f-guia { position: absolute; inset: 0; }
+    #f-aviso { position: absolute; left: 50%; top: 28px; white-space: nowrap; padding: 14px 26px; border-radius: 99px;
+      background: rgba(12, 36, 64, 0.82); color: #fff; font-weight: 700; font-size: 28px; }
+    #f-disparo { position: absolute; left: 425px; top: 570px; width: 110px; height: 110px; border-radius: 50%; background: #fff;
+      box-shadow: 0 0 0 10px rgba(255, 255, 255, 0.35); }
+    #f-flash { position: absolute; inset: 0; background: #fff; opacity: 0; }
+    .f-rot { position: absolute; left: 22px; bottom: 22px; padding: 10px 18px; border-radius: 99px; background: rgba(255, 255, 255, 0.94);
+      color: #0c2440; font-weight: 700; font-size: 28px; white-space: nowrap; }
+    #f-rot0 { font-size: 58px; left: 45px; bottom: 45px; padding: 20px 36px; opacity: 0; } /* compensa a câmera reduzida a 0,49 */
+    .f-cel { position: absolute; width: 470px; height: 335px; border-radius: 28px; overflow: hidden; background: #0c2440; }
+    .f-cel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+    #f-c1 { left: 550px; top: 440px; }
+    #f-c2 { left: 60px; top: 795px; }
+    #f-c3 { left: 550px; top: 795px; }
+    #f-c3 img { object-position: 50% 62%; }
+    /* dedo do dentista */
+    #f-dedo { position: absolute; left: 0; top: 0; width: 84px; height: 84px; border-radius: 50%; background: rgba(12, 36, 64, 0.35);
+      border: 5px solid #fff; box-shadow: 0 8px 24px rgba(12, 36, 64, 0.35); }
+  </style>
+  <div id="root" data-composition-id="fotos" data-width="1080" data-height="1920">
+    <div id="f-barra"><img src="assets/img/logo.svg" alt="" /><div class="f-marca">DENTAL<b>CHECK</b></div><div id="f-etapa">Etapa 1 de 3</div></div>
+    <div id="f-titulo">Paciente e fotos</div>
+    <div id="f-ok">✓ Organizadas pela IA</div>
+    <div id="f-c1" class="f-cel"><img src="assets/img/mulher-lateral-esq.jpg" alt="" /><div class="f-rot">Lateral esquerda</div></div>
+    <div id="f-c2" class="f-cel"><img src="assets/img/mulher-lateral-dir.jpg" alt="" /><div class="f-rot">Lateral direita</div></div>
+    <div id="f-c3" class="f-cel"><img src="assets/img/mulher-boca.jpg" alt="" /><div class="f-rot">Boca de frente</div></div>
+    <div id="f-cam">
+      <img src="assets/img/rosto-antes.jpg" alt="" />
+      <svg id="f-guia" viewBox="0 0 960 690">
+        <ellipse id="f-oval" cx="493" cy="300" rx="205" ry="262" fill="none" stroke="#4fd1c5" stroke-width="7" stroke-dasharray="18 14" pathLength="1000" />
+      </svg>
+      <div id="f-aviso">✓ Boa luz</div>
+      <div id="f-disparo"></div>
+      <div id="f-flash"></div>
+      <div id="f-rot0" class="f-rot">Rosto de frente, sorrindo</div>
+    </div>
+    <div id="f-dedo"></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // o app abre na etapa de fotos
+    tl.fromTo("#f-titulo", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 0.05);
+    tl.fromTo("#f-cam", { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.55, ease: "expo.out" }, 0.12);
+    // o contorno se desenha em volta do rosto e o aviso de luz confirma
+    tl.fromTo("#f-oval", { strokeDashoffset: 1000, opacity: 1 }, { strokeDashoffset: 0, duration: 0.6, ease: "power2.inOut" }, 0.5);
+    tl.fromTo("#f-aviso", { opacity: 0, scale: 0.7, xPercent: -50 }, { opacity: 1, scale: 1, xPercent: -50, duration: 0.3, ease: "back.out(1.6)" }, 0.95);
+    // o dedo entra e toca no disparador
+    tl.fromTo("#f-dedo", { x: 1100, y: 1500, opacity: 1 }, { x: 498, y: 1015, duration: 0.5, ease: "power3.out" }, 1.25);
+    tl.to("#f-dedo", { scale: 0.82, duration: 0.07, ease: "power2.in" }, 1.75);
+    tl.to("#f-dedo", { scale: 1, duration: 0.12, ease: "power2.out" }, 1.82);
+    tl.to("#f-disparo", { scale: 0.86, duration: 0.07 }, 1.75);
+    tl.to("#f-disparo", { scale: 1, duration: 0.12 }, 1.82);
+    tl.fromTo("#f-flash", { opacity: 0 }, { opacity: 0.9, duration: 0.05 }, 1.83);
+    tl.to("#f-flash", { opacity: 0, duration: 0.22 }, 1.88);
+    tl.to("#f-dedo", { x: 1100, y: 1600, duration: 0.35, ease: "power3.in" }, 1.95);
+    // a foto vira a primeira célula e as outras três chegam organizadas
+    tl.to(["#f-oval", "#f-aviso", "#f-disparo"], { opacity: 0, duration: 0.12 }, 2.05);
+    tl.to("#f-cam", { scaleX: 0.4896, scaleY: 0.4855, borderRadius: 57, duration: 0.3, ease: "power3.inOut" }, 2.05);
+    tl.fromTo("#f-rot0", { opacity: 0 }, { opacity: 1, duration: 0.15 }, 2.32);
+    ["#f-c1", "#f-c2", "#f-c3"].forEach((c, i) =>
+      tl.fromTo(c, { opacity: 0, y: 260, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: "power3.out" }, 2.25 + i * 0.2));
+    tl.fromTo("#f-ok", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(1.6)" }, 2.5);
+    // troca suave para a etapa 2 (a barra continua no lugar)
+    tl.to(["#f-titulo", "#f-ok", "#f-cam", "#f-c1", "#f-c2", "#f-c3"], { opacity: 0, filter: "blur(10px)", duration: 0.18, ease: "power2.in" }, 3.6);
+    window.__timelines["fotos"] = tl;
+  </script>
+</template>

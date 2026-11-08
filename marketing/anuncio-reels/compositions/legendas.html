@@ -1,0 +1,36 @@
+<template>
+  <style>
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans.ttf") format("truetype"); font-weight: 200 800; }
+    #root { position: absolute; inset: 0; pointer-events: none; font-family: "Plus Jakarta Sans", sans-serif; }
+    /* a frase falada, na base da área segura (acima da interface do Reels) */
+    .leg { position: absolute; left: 70px; right: 70px; bottom: 600px; display: flex; justify-content: center; }
+    .leg span { display: inline-block; max-width: 940px; text-align: center; font-weight: 700; font-size: 46px; line-height: 1.25;
+      color: #fff; letter-spacing: -0.01em; background: rgba(12, 36, 64, 0.9); padding: 18px 30px; border-radius: 28px; }
+    .leg em { font-style: normal; color: #4fd1c5; }
+  </style>
+  <div id="root" data-composition-id="legendas" data-width="1080" data-height="1920">
+    <div id="leg1" class="leg clip" data-start="0" data-duration="2.3"><span>Você explica o tratamento com todo o <em>cuidado</em>…</span></div>
+    <div id="leg2" class="leg clip" data-start="2.3" data-duration="1.85"><span>…e o paciente responde:</span></div>
+    <div id="leg3" class="leg clip" data-start="5.5" data-duration="1.1"><span>E não <em>volta</em>.</span></div>
+    <div id="leg4" class="leg clip" data-start="6.95" data-duration="3.95"><span>Muitas vezes, o que falta é ele conseguir <em>imaginar</em> o resultado.</span></div>
+    <div id="leg5" class="leg clip" data-start="11.35" data-duration="3.85"><span>Com o DENTALCHECK, ele vê o novo sorriso antes de dizer <em>sim</em>!</span></div>
+    <div id="leg6" class="leg clip" data-start="15.75" data-duration="2.5"><span>Tire as fotos com a <em>câmera guiada</em>.</span></div>
+    <div id="leg7" class="leg clip" data-start="19.35" data-duration="3.1"><span>Marque os dentes, escolha o procedimento e a <em>cor</em>.</span></div>
+    <div id="leg8" class="leg clip" data-start="23.75" data-duration="2.35"><span>Em cerca de <em>dez segundos</em>,</span></div>
+    <div id="leg9" class="leg clip" data-start="26.1" data-duration="2.3"><span>a IA mostra o resultado na foto do próprio paciente.</span></div>
+    <div id="leg10" class="leg clip" data-start="28.75" data-duration="2.2"><span>Só nos <em>dentes que você marcou</em>.</span></div>
+    <div id="leg11" class="leg clip" data-start="31.85" data-duration="3.95"><span>E a apresentação com a sua marca já fica pronta para enviar pelo <em>WhatsApp</em>.</span></div>
+    <div id="leg12" class="leg clip" data-start="36.5" data-duration="2.9"><span>Mostre hoje o sorriso que o seu paciente vai ter.</span></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // cada legenda entra com um leve desfoque (sem deslizar) e sai rápido; a primeira já está na capa
+    document.querySelectorAll("#root .leg").forEach(leg => {
+      const ini = parseFloat(leg.dataset.start), dur = parseFloat(leg.dataset.duration);
+      const span = leg.querySelector("span");
+      if (ini > 0) tl.fromTo(span, { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.16, ease: "power2.out" }, ini);
+      tl.to(span, { opacity: 0, duration: 0.1, ease: "power1.in" }, ini + dur - 0.1);
+    });
+    window.__timelines["legendas"] = tl;
+  </script>
+</template>

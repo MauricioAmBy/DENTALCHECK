@@ -1,0 +1,101 @@
+<template>
+  <style>
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans.ttf") format("truetype"); font-weight: 200 800; }
+    #root { position: absolute; inset: 0; background: #f3f8fb; font-family: "Plus Jakarta Sans", sans-serif; overflow: hidden; }
+    #p-barra { position: absolute; left: 0; right: 0; top: 168px; height: 120px; background: #fff; display: flex; align-items: center;
+      gap: 16px; padding: 0 60px; border-bottom: 2px solid rgba(12, 36, 64, 0.08); }
+    #p-barra img { width: 60px; height: 60px; }
+    .p-marca { font-weight: 800; font-size: 38px; letter-spacing: 0.02em; color: #0c2440; }
+    .p-marca b { color: #0b9e96; }
+    #p-etapa { margin-left: auto; font-size: 28px; font-weight: 700; color: #5d6f84; }
+    #p-titulo { position: absolute; left: 60px; top: 330px; font-weight: 800; font-size: 60px; letter-spacing: -0.03em; color: #0c2440; }
+    /* foto da boca ampliada, com a numeração FDI sobre os dentes */
+    #p-foto { position: absolute; left: 40px; top: 420px; width: 1000px; height: 460px; border-radius: 36px; overflow: hidden;
+      box-shadow: 0 30px 70px -34px rgba(12, 36, 64, 0.5); }
+    #p-foto img { position: absolute; left: -278px; top: -116px; width: 1600px; height: 800px; }
+    .p-marca-dente { position: absolute; border-radius: 16px; border: 4px solid #4fd1c5; background: rgba(79, 209, 197, 0.32); opacity: 0; }
+    #p-m11 { left: 422px; top: 175px; width: 104px; height: 141px; }
+    #p-m21 { left: 556px; top: 175px; width: 109px; height: 138px; }
+    #p-m12 { left: 342px; top: 184px; width: 77px; height: 107px; }
+    #p-m22 { left: 665px; top: 182px; width: 75px; height: 107px; }
+    .p-num { position: absolute; width: 64px; height: 64px; margin: -32px 0 0 -32px; top: 250px; border-radius: 50%; background: #fff;
+      color: #0c2440; font-weight: 800; font-size: 30px; display: grid; place-items: center; box-shadow: 0 6px 16px rgba(12, 36, 64, 0.3); }
+    .p-num.on { background: #0b9e96; color: #fff; }
+    /* painel do planejamento */
+    #p-painel { position: absolute; left: 40px; top: 900px; width: 1000px; height: 224px; padding: 24px; border-radius: 32px; background: #fff;
+      box-shadow: 0 24px 60px -30px rgba(12, 36, 64, 0.45); }
+    #p-proc { display: flex; gap: 0; height: 76px; border-radius: 99px; background: #f3f8fb; border: 2px solid rgba(12, 36, 64, 0.1); }
+    #p-proc div { flex: 1; display: grid; place-items: center; border-radius: 99px; font-weight: 700; font-size: 30px; color: #5d6f84; }
+    #p-botao { position: absolute; left: 40px; top: 930px; width: 1000px; height: 130px; border-radius: 99px; background: #0b9e96; color: #fff;
+      display: grid; place-items: center; font-weight: 800; font-size: 44px; box-shadow: 0 24px 50px -24px rgba(11, 158, 150, 0.9); opacity: 0; }
+    #p-cores { display: flex; align-items: center; gap: 16px; margin-top: 24px; }
+    #p-cores > b { width: 84px; font-size: 30px; font-weight: 800; color: #0c2440; }
+    .p-cor { width: 150px; height: 64px; border-radius: 99px; display: grid; place-items: center; font-weight: 800; font-size: 28px; color: #0c2440;
+      border: 2px solid rgba(12, 36, 64, 0.15); }
+    #p-bl2 { position: relative; }
+    #p-bl2 i { position: absolute; inset: -8px; border-radius: 99px; border: 5px solid #0b9e96; opacity: 0; }
+    #p-dedo { position: absolute; left: 0; top: 0; width: 84px; height: 84px; border-radius: 50%; background: rgba(12, 36, 64, 0.35);
+      border: 5px solid #fff; box-shadow: 0 8px 24px rgba(12, 36, 64, 0.35); }
+  </style>
+  <div id="root" data-composition-id="plano" data-width="1080" data-height="1920">
+    <div id="p-barra"><img src="assets/img/logo.svg" alt="" /><div class="p-marca">DENTAL<b>CHECK</b></div><div id="p-etapa">Etapa 2 de 3</div></div>
+    <div id="p-titulo">Planejamento do sorriso</div>
+    <div id="p-foto">
+      <img src="assets/img/mulher-boca-antes.jpg" alt="" />
+      <div id="p-m11" class="p-marca-dente"></div><div id="p-m21" class="p-marca-dente"></div>
+      <div id="p-m12" class="p-marca-dente"></div><div id="p-m22" class="p-marca-dente"></div>
+      <div id="p-n13" class="p-num" style="left: 307px">13</div>
+      <div id="p-n12" class="p-num" style="left: 380px">12</div>
+      <div id="p-n11" class="p-num" style="left: 474px">11</div>
+      <div id="p-n21" class="p-num" style="left: 611px">21</div>
+      <div id="p-n22" class="p-num" style="left: 702px">22</div>
+      <div id="p-n23" class="p-num" style="left: 771px">23</div>
+    </div>
+    <div id="p-painel">
+      <div id="p-proc"><div id="p-lentes">Lentes dentais</div><div>Clareamento</div><div>Implantes</div></div>
+      <div id="p-cores">
+        <b>Cor</b>
+        <div class="p-cor" style="background: #f8f7f2">BL1</div>
+        <div class="p-cor" id="p-bl2" style="background: #f4f1e6">BL2<i></i></div>
+        <div class="p-cor" style="background: #efe9d8">BL3</div>
+        <div class="p-cor" style="background: #ebe0c4">A1</div>
+        <div class="p-cor" style="background: #e5d3ae">A2</div>
+      </div>
+    </div>
+    <div id="p-botao">✨ Gerar simulação com IA</div>
+    <div id="p-dedo"></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#p-titulo", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power2.out" }, 0);
+    tl.fromTo("#p-foto", { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 0.04);
+    // a IA numera os dentes (pares de fora para dentro)
+    [["#p-n13", "#p-n23"], ["#p-n12", "#p-n22"], ["#p-n11", "#p-n21"]].forEach((par, i) =>
+      tl.fromTo(par, { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(1.8)" }, 0.25 + i * 0.2));
+    // o dedo marca 11, 21, 12 e 22
+    tl.fromTo("#p-dedo", { x: 1100, y: 1200 }, { x: 472, y: 628, duration: 0.35, ease: "power3.out" }, 0.5);
+    const toques = [["11", 472, 0.85], ["21", 609, 1.1], ["12", 378, 1.35], ["22", 700, 1.6]];
+    toques.forEach(([n, x, t], i) => {
+      if (i > 0) tl.to("#p-dedo", { x, y: 628, duration: 0.17, ease: "power2.inOut" }, t - 0.19);
+      tl.to("#p-dedo", { scale: 0.8, duration: 0.05 }, t - 0.03);
+      tl.to("#p-dedo", { scale: 1, duration: 0.1 }, t + 0.03);
+      tl.fromTo("#p-n" + n, { backgroundColor: "#ffffff", color: "#0c2440" }, { backgroundColor: "#0b9e96", color: "#ffffff", duration: 0.1 }, t);
+      tl.fromTo("#p-m" + n, { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.2, ease: "back.out(1.6)" }, t);
+    });
+    // o painel sobe: procedimento e cor
+    tl.fromTo("#p-painel", { y: 420, opacity: 0 }, { y: 0, opacity: 1, duration: 0.42, ease: "expo.out" }, 1.55);
+    tl.to("#p-dedo", { x: 180, y: 920, duration: 0.3, ease: "power2.inOut" }, 1.72);
+    tl.to("#p-dedo", { scale: 0.8, duration: 0.05 }, 2.02);
+    tl.to("#p-dedo", { scale: 1, duration: 0.1 }, 2.08);
+    tl.fromTo("#p-lentes", { backgroundColor: "rgba(11,158,150,0)", color: "#5d6f84" }, { backgroundColor: "rgba(11,158,150,1)", color: "#ffffff", duration: 0.15 }, 2.05);
+    tl.to("#p-dedo", { x: 363, y: 1010, duration: 0.35, ease: "power2.inOut" }, 2.42);
+    tl.to("#p-dedo", { scale: 0.8, duration: 0.05 }, 2.77);
+    tl.to("#p-dedo", { scale: 1, duration: 0.1 }, 2.83);
+    tl.fromTo("#p-bl2 i", { opacity: 0, scale: 1.2 }, { opacity: 1, scale: 1, duration: 0.2, ease: "back.out(1.6)" }, 2.8);
+    tl.to("#p-dedo", { x: 1100, y: 1400, duration: 0.4, ease: "power3.in" }, 3.2);
+    // o painel dá lugar ao botão de gerar (continua na próxima cena)
+    tl.to("#p-painel", { opacity: 0, y: 40, filter: "blur(8px)", duration: 0.2, ease: "power2.in" }, 3.3);
+    tl.fromTo("#p-botao", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.3, ease: "expo.out" }, 3.4);
+    window.__timelines["plano"] = tl;
+  </script>
+</template>

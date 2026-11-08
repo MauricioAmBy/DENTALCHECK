@@ -1,0 +1,39 @@
+<template>
+  <style>
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans.ttf") format("truetype"); font-weight: 200 800; }
+    #root { position: absolute; inset: 0; background: #dff5f2; font-family: "Plus Jakarta Sans", sans-serif; overflow: hidden; }
+    #d-titulo { position: absolute; left: 80px; right: 80px; top: 240px; font-weight: 800; font-size: 128px; line-height: 1.02;
+      letter-spacing: -0.035em; color: #0c2440; }
+    #d-titulo span { display: inline-block; }
+    #d-titulo .ac { color: #0b9e96; }
+    #d-card { position: absolute; left: 60px; top: 560px; width: 960px; height: 480px; border-radius: 40px; overflow: hidden;
+      box-shadow: 0 30px 70px -30px rgba(12, 36, 64, 0.5); }
+    #d-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    #d-nitido { clip-path: circle(0px at 491px 220px); }
+    #d-anel { position: absolute; left: 341px; top: 70px; width: 300px; height: 300px; border-radius: 50%; border: 6px solid #fff; opacity: 0; }
+    #d-iris { position: absolute; inset: 0; background: #0b9e96; clip-path: circle(0px at 551px 780px); }
+  </style>
+  <div id="root" data-composition-id="duvida" data-width="1080" data-height="1920">
+    <div id="d-titulo"><span id="d-w1">Como</span> <span id="d-w2">vai</span><br /><span id="d-w3" class="ac">ficar?</span></div>
+    <div id="d-card">
+      <img src="assets/img/mulher-boca-fosca.jpg" alt="" />
+      <img id="d-nitido" src="assets/img/mulher-boca-depois.jpg" alt="" />
+      <div id="d-anel"></div>
+    </div>
+    <div id="d-iris"></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // chega em chicote da direita, encontrando a saída do gancho
+    tl.fromTo("#d-card", { x: 420, filter: "blur(16px)", opacity: 0 }, { x: 0, filter: "blur(0px)", opacity: 1, duration: 0.38, ease: "power3.out" }, 0);
+    // a dúvida do paciente, palavra por palavra
+    ["#d-w1", "#d-w2", "#d-w3"].forEach((w, i) =>
+      tl.fromTo(w, { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.16, ease: "power2.out" }, 0.45 + i * 0.09));
+    // em "resultado": uma janela nítida se abre no sorriso e mostra o depois
+    tl.fromTo("#d-nitido", { clipPath: "circle(0px at 491px 220px)" }, { clipPath: "circle(150px at 491px 220px)", duration: 0.5, ease: "back.out(1.4)" }, 3.2);
+    tl.fromTo("#d-anel", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.4)" }, 3.2);
+    // a janela vira o mundo teal da próxima cena
+    tl.fromTo("#d-iris", { clipPath: "circle(0px at 551px 780px)" }, { clipPath: "circle(2300px at 551px 780px)", duration: 0.42, ease: "power3.in" }, 4.18);
+    window.__timelines["duvida"] = tl;
+  </script>
+</template>

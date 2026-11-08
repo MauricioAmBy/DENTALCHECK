@@ -8,5 +8,5 @@
     "start": "node server/servidor.mjs",
     "icones": "node scripts/gerar-icones.mjs"
   },
-  "engines": { "node": ">=18" }
+  "engines": { "node": "24.x" }
 }

@@ -1,0 +1,27 @@
+<template>
+  <style>
+    @font-face { font-family: "Plus Jakarta Sans"; src: url("assets/fonts/PlusJakartaSans.ttf") format("truetype"); font-weight: 200 800; }
+    #root { position: absolute; inset: 0; background: #f3f8fb; font-family: "Plus Jakarta Sans", sans-serif; overflow: hidden; }
+    #m-titulo { position: absolute; left: 70px; top: 220px; font-weight: 800; font-size: 172px; line-height: 0.96; letter-spacing: -0.045em; color: #0c2440; }
+    #m-titulo span { display: inline-block; }
+    #m-titulo .ac { color: #0b9e96; }
+    #m-foto { position: absolute; left: 0; right: 0; top: 600px; bottom: 0; overflow: hidden; clip-path: inset(100% 0 0 0); }
+    #m-foto img { position: absolute; left: -189px; top: -580px; width: 1420px; height: 1902px; } /* sorriso em y 1000, acima da legenda */
+    #m-cortina { position: absolute; inset: 0; background: #0c2440; }
+  </style>
+  <div id="root" data-composition-id="promessa" data-width="1080" data-height="1920">
+    <div id="m-titulo"><span id="m-w1">Mostre</span><br /><span id="m-w2" class="ac">hoje.</span></div>
+    <div id="m-foto"><img src="assets/img/rosto-depois.jpg" alt="" /></div>
+    <div id="m-cortina"></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    // o sorriso novo sobe e ocupa a tela
+    tl.fromTo("#m-foto", { clipPath: "inset(100% 0 0 0)" }, { clipPath: "inset(0% 0 0 0)", duration: 0.5, ease: "power3.out" }, 0);
+    tl.fromTo("#m-w1", { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power2.out" }, 0.55);
+    tl.fromTo("#m-w2", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.6)" }, 0.92);
+    // o azul da marca sobe e vira o cartão final
+    tl.fromTo("#m-cortina", { y: 1920 }, { y: 0, duration: 0.32, ease: "power2.inOut" }, 3.08);
+    window.__timelines["promessa"] = tl;
+  </script>
+</template>
