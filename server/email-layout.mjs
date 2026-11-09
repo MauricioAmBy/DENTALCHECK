@@ -11,7 +11,7 @@ export const COR = {
 };
 const FONTE = "-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
 
-export const appUrl = () => (process.env.APP_URL || "https://dentalcheck.vercel.app").replace(/\/$/, "");
+export const appUrl = () => (process.env.APP_URL || "https://www.dentalcheck.com.br").replace(/\/$/, "");
 export const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 /* botão "pílula" preto; funciona no Outlook porque o fundo fica na célula da tabela */

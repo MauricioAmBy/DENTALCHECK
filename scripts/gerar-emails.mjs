@@ -11,7 +11,7 @@ console.log("Modelos do Supabase atualizados em supabase/templates/:");
 for (const m of MODELOS_SUPABASE) console.log(`  ${m.arquivo.padEnd(22)} → painel "${m.painel}" · assunto: ${m.assunto}`);
 
 if (process.argv.includes("--previa")) {
-  const exemplo = { "{{ .Email }}": "dra.ana@clinica.com", "{{ .ConfirmationURL }}": "https://dentalcheck.vercel.app/#exemplo" };
+  const exemplo = { "{{ .Email }}": "dra.ana@clinica.com", "{{ .ConfirmationURL }}": "https://www.dentalcheck.com.br/#exemplo" };
   const logoLocal = html => html.replace(/https?:\/\/[^"]+\/icons\/email-logo\.png/g, "../public/icons/email-logo.png");   // o logo só existe no site depois do deploy
   const preencher = html => logoLocal(Object.entries(exemplo).reduce((h, [k, v]) => h.split(k).join(v), html));
   const lista = [

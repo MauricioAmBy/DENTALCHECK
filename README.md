@@ -83,7 +83,7 @@ Recibos e cobranças da compra são enviados pela própria Kiwify.
    - `RESEND_API_KEY`: a chave do Resend.
    - `EMAIL_REMETENTE`: por exemplo `DENTALCHECK <ola@seudominio.com.br>`. Precisa ser do domínio verificado.
    - `EMAIL_RESPOSTA` (opcional): para onde vão as respostas, por exemplo o e-mail de suporte.
-   - `APP_URL` (opcional): o endereço do app, se for diferente de `https://dentalcheck.vercel.app`. Os links e o logo dos e-mails usam esse endereço.
+   - `APP_URL` (opcional): o endereço do app, se for diferente de `https://www.dentalcheck.com.br`. Os links e o logo dos e-mails usam esse endereço.
 3. **Supabase** → Authentication → Emails:
    - **Templates:** em "Confirm signup" e "Reset password", cole o HTML do arquivo correspondente e use o assunto que o `npm run emails` mostra.
    - **SMTP Settings:** ative o SMTP próprio com o Resend (host `smtp.resend.com`, porta `465`, usuário `resend`, senha = a chave do Resend, remetente igual ao `EMAIL_REMETENTE`). Sem isso, o Supabase envia de um remetente genérico e só poucos e-mails por hora.
