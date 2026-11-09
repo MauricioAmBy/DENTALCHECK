@@ -5,3 +5,4 @@ server/servidor.log
 
 .vercel
 .env*
+previa-emails/

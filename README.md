@@ -49,7 +49,7 @@ A edição de imagem do Gemini **não tem cota gratuita**, então o faturamento 
 ## Contas, planos e pagamento
 
 - **Supabase:** login por e-mail e senha, assinaturas, aparelhos, equipe e contador de simulações. A estrutura do banco está em `supabase/migrations/`.
-- **E-mail de boas-vindas:** enviado pelo app na primeira ativação (`server/email.mjs`, Resend). Variáveis: `RESEND_API_KEY`, `EMAIL_REMETENTE` e, opcional, `EMAIL_RESPOSTA`.
+- **E-mails:** veja a seção "E-mails" abaixo.
 - **Kiwify:** cada compra, renovação, atraso, cancelamento ou reembolso chega em `POST /api/kiwify` e atualiza a assinatura pelo e-mail do comprador.
 - **Limites por plano:** ficam em `server/conta.mjs` (`PLANOS`) e são conferidos no servidor.
 
@@ -59,6 +59,34 @@ Variáveis de ambiente (Vercel → Settings → Environment Variables):
 - `KIWIFY_PRODUTOS` (opcional): JSON que liga o id de cada produto ao plano, por exemplo `{"123":"profissional:anual","456":"extra"}`.
 
 Sem as variáveis do Supabase, o app continua no modo de teste com a senha única (`ACESSO_SENHA`).
+
+## E-mails
+
+Todos os e-mails usam o mesmo layout, com a identidade da marca, em `server/email-layout.mjs`. Para mudar o visual, mude só esse arquivo.
+
+| E-mail | Quando sai | Quem envia | Modelo |
+|---|---|---|---|
+| Boas-vindas | Primeira compra aprovada (aviso da Kiwify) | Servidor, pelo Resend | `modeloBoasVindas` em `server/email.mjs` |
+| Confirmar conta | Dentista cria a conta no app | Supabase | `MODELOS_SUPABASE` → `supabase/templates/confirmar-conta.html` |
+| Nova senha | "Esqueci minha senha" | Supabase | `MODELOS_SUPABASE` → `supabase/templates/redefinir-senha.html` |
+
+Recibos e cobranças da compra são enviados pela própria Kiwify.
+
+**Para alterar ou criar um e-mail:**
+1. Edite o texto em `server/email.mjs`. Um e-mail novo do servidor ganha uma função `modeloX` e uma `emailX`, como as de boas-vindas.
+2. Rode `npm run emails -- --previa` e abra `previa-emails/index.html` para conferir todos os e-mails com dados de exemplo.
+3. Se mudou um modelo do Supabase, cole o HTML de `supabase/templates/` no painel (passo 3 abaixo).
+
+**Configuração (uma vez):**
+1. **Resend:** crie a conta, adicione e verifique o domínio de envio (registros DNS) e gere uma chave de API.
+2. **Vercel** → Settings → Environment Variables:
+   - `RESEND_API_KEY`: a chave do Resend.
+   - `EMAIL_REMETENTE`: por exemplo `DENTALCHECK <ola@seudominio.com.br>`. Precisa ser do domínio verificado.
+   - `EMAIL_RESPOSTA` (opcional): para onde vão as respostas, por exemplo o e-mail de suporte.
+   - `APP_URL` (opcional): o endereço do app, se for diferente de `https://dentalcheck.vercel.app`. Os links e o logo dos e-mails usam esse endereço.
+3. **Supabase** → Authentication → Emails:
+   - **Templates:** em "Confirm signup" e "Reset password", cole o HTML do arquivo correspondente e use o assunto que o `npm run emails` mostra.
+   - **SMTP Settings:** ative o SMTP próprio com o Resend (host `smtp.resend.com`, porta `465`, usuário `resend`, senha = a chave do Resend, remetente igual ao `EMAIL_REMETENTE`). Sem isso, o Supabase envia de um remetente genérico e só poucos e-mails por hora.
 
 ## Estrutura
 
