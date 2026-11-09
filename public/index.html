@@ -350,7 +350,7 @@
   const SUPORTE = {
     email: "suporte.dentalcheck@gmail.com",         // provisório (o mesmo cadastrado nos produtos da Kiwify)
     whatsapp: "5511926743571",                      // com DDI e DDD, só números
-    kiwify: ""                                      // PENDENTE: link confirmado da área do comprador da Kiwify; vazio = cartão e cancelamento pelo suporte
+    kiwify: ""                                      // opcional: link da área do comprador da Kiwify; vazio = suporte + passo a passo pelo e-mail "Pagamento de assinatura aprovado"
   };
   /* checkout de cada plano (mesmos links da página de vendas) */
   const PLANOS_CHECKOUT = [
@@ -408,6 +408,15 @@
         <div class="mc-add"><a class="btn sm" href="${PACOTE_EXTRA}" target="_blank" rel="noopener">+30 simulações · R$ 29</a></div>
         <h4>Pagamento e cancelamento</h4>
         <div class="mc-add" style="flex-wrap:wrap">${cartao}<a class="btn sm ghost" href="${sup}"${alvo(sup)}>Falar com o suporte</a></div>
+        <details style="margin-top:10px"><summary style="cursor:pointer;font-weight:600">Como trocar o cartão ou cancelar sozinho, pela Kiwify</summary>
+          <ol style="margin:8px 0 0 20px;display:grid;gap:6px;font-size:14px">
+            <li>Procure na caixa de entrada de <b>${c.email}</b> o e-mail da Kiwify com o título <b>“Pagamento de assinatura aprovado”</b>. Ele chega depois da compra e em cada renovação. Se não achar, olhe também em Spam e Promoções.</li>
+            <li>Clique no botão <b>Gerenciar assinatura</b> desse e-mail.</li>
+            <li>Na página que abrir, escolha <b>trocar o cartão de crédito</b> ou <b>cancelar a assinatura</b>.</li>
+            <li>Não encontrou o e-mail ou deu algum problema? Fale com o suporte pelo botão acima e resolvemos para você.</li>
+          </ol>
+          <p style="font-size:13px">Cancelar só interrompe as próximas cobranças. Para pedir o reembolso dentro dos 7 dias de garantia, fale com o suporte.</p>
+        </details>
         <p>Você pode cancelar quando quiser; o acesso continua até o fim do período já pago.</p></div>`;
     }
     /* pagamento atrasado: faixa no topo com o caminho para regularizar (o servidor mantém o acesso por alguns dias) */
