@@ -60,6 +60,12 @@
 .sim.fora .cmp,.sim.fora .info b,.sim.fora .info p{opacity:.45}
 .sim.fora .incluir{color:var(--muted)}
 .sel-resumo{font-size:13px;color:var(--muted);margin:-6px 0 14px}
+/* termo de autorização de uso de imagem */
+.termo{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.termo p{font-size:14px;color:var(--muted);margin-top:4px;max-width:620px}
+.termo .st{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:99px;background:#fff7e6;color:#8a5a00}
+.termo .st.ok{background:var(--lima-claro,#eef6db);color:var(--preto,#151719)}
+.termo .bts{display:flex;gap:8px;flex-wrap:wrap}
 .sel-resumo b{color:var(--navy)}
 .item.fora .par{opacity:.45}
 .item .incluir{border:0;padding:0 0 10px;background:none}
@@ -254,6 +260,7 @@
   <div class="lista-top">
     <input class="in" id="busca" placeholder="Buscar paciente…" type="search">
     <button class="btn pri" id="btnNovo">+ Novo procedimento</button>
+    <a class="btn" href="/#backup" title="Baixar ou restaurar o backup dos pacientes">⤓ Backup</a>
   </div>
   <div class="pacientes" id="pacientes"></div>
 </main>
@@ -274,6 +281,13 @@
     <div class="caso-sec-topo"><h2>Simulações <small id="casoQtd"></small></h2><a class="btn sm pri" id="casoNova" href="/simulador">+ Nova simulação</a></div>
     <p class="sel-resumo hidden" id="casoSel"></p>
     <div class="sims" id="casoSims"></div>
+  </div>
+  <div class="caso-sec">
+    <div class="termo">
+      <div><h2>Autorização de uso de imagem <span class="st" id="termoSt">Pendente</span></h2>
+        <p id="termoTxt">Imprima o termo, peça a assinatura do paciente e guarde com o prontuário. Ele autoriza as fotos e a simulação e deixa o paciente escolher se a imagem pode ir para a divulgação da clínica.</p></div>
+      <div class="bts"><button class="btn sm pri" id="termoImprimir">Imprimir termo</button><button class="btn sm" id="termoMarcar">Marcar como assinado</button></div>
+    </div>
   </div>
   <div class="caso-sec" id="casoFotosBox">
     <div class="caso-sec-topo"><h2>Fotos do paciente</h2><button class="btn sm" id="casoFotosEditar">Organizar fotos</button></div>
@@ -461,10 +475,66 @@
     }).join("") : `<div class="caso-vazio" style="grid-column:1/-1"><p>Nenhuma simulação ainda.</p><a class="btn pri" style="margin-top:12px" href="/simulador?paciente=${pac.id}">Fazer a primeira simulação</a></div>`;
     $("casoSims").querySelectorAll(".cmp").forEach(ligarComparador);
     resumoSelecao(sims);
+    renderTermo();
     const fotos = ANGULOS.filter(([id]) => pac.fotos[id]);
     $("casoFotosBox").classList.toggle("hidden", !fotos.length);
     $("casoFotos").innerHTML = fotos.map(([id, nome]) => `<figure><img src="${pac.fotos[id]}" alt=""><figcaption>${nome}</figcaption></figure>`).join("");
   }
+  /* ---------- termo de autorização de uso de imagem (LGPD) ---------- */
+  const VERSAO_TERMO = 1;   // suba quando o texto do termo mudar (fica gravado no consentimento do paciente)
+  function renderTermo() {
+    const c = pac.consentimento;   // { data, versao } no cadastro; + { assinado, divulgacao } quando o termo em papel é assinado
+    const st = c && c.assinado ? "Assinado" : c ? "Autorizado no cadastro" : "Pendente";
+    $("termoSt").textContent = st;
+    $("termoSt").classList.toggle("ok", !!(c && c.assinado));
+    $("termoTxt").textContent = c && c.assinado
+      ? `Termo assinado em ${dataBR(c.assinado)}${c.divulgacao === false ? " · sem autorização para divulgação" : c.divulgacao ? " · com autorização para divulgação" : ""}. Guarde a via assinada com o prontuário.`
+      : (c ? `Autorização registrada no cadastro em ${dataBR(c.data)}. ` : "") + "Imprima o termo, peça a assinatura do paciente e guarde com o prontuário. Ele autoriza as fotos e a simulação e deixa o paciente escolher se a imagem pode ir para a divulgação da clínica.";
+    $("termoMarcar").textContent = c && c.assinado ? "Desmarcar assinatura" : "Marcar como assinado";
+  }
+  $("termoMarcar").onclick = async () => {
+    const c = pac.consentimento || {};
+    if (c.assinado) { if (!confirm("Desmarcar o termo como assinado?")) return; delete c.assinado; delete c.divulgacao; }
+    else {
+      const div = confirm("O paciente AUTORIZOU o uso da imagem para divulgação da clínica (redes sociais, site, materiais)?" + "\n\n" + "OK = autorizou · Cancelar = não autorizou");
+      const hoje = new Date().toISOString().slice(0, 10);
+      Object.assign(c, { data: c.data || hoje, versao: VERSAO_TERMO, assinado: hoje, divulgacao: div });
+    }
+    pac.consentimento = c; await DB.salvar(pac); renderTermo();
+  };
+  $("termoImprimir").onclick = () => {
+    const I = identidade(), hoje = new Date().toLocaleDateString("pt-BR", { day: "numeric", month: "long", year: "numeric" });
+    const clinica = esc(I.clinica || "a clínica"), prof = (I.profissionais || []).filter(p => p.nome);
+    const linha = (w = "100%") => `<span style="display:inline-block;width:${w};border-bottom:1px solid #000;height:1.1em;vertical-align:bottom"></span>`;
+    const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Termo de autorização de uso de imagem - ${esc(pac.nome || "paciente")}</title>
+      <style>@page{size:A4;margin:22mm 20mm}body{font:12pt/1.55 Georgia,"Times New Roman",serif;color:#111;max-width:170mm;margin:0 auto;padding:16px}
+      h1{font:700 15pt Arial,sans-serif;text-align:center;margin:0 0 4px;text-transform:uppercase;letter-spacing:.04em}.sub{text-align:center;font:10pt Arial,sans-serif;color:#555;margin-bottom:22px}
+      p{margin:0 0 10px;text-align:justify}ol{margin:0 0 12px 18px;padding:0}li{margin-bottom:6px}.op{margin:14px 0;padding:12px 14px;border:1px solid #999;border-radius:6px}
+      .op div{margin:6px 0}.cx{display:inline-block;width:13px;height:13px;border:1.5px solid #000;margin-right:8px;vertical-align:-2px}
+      .ass{margin-top:46px;display:grid;grid-template-columns:1fr 1fr;gap:40px;font:10pt Arial,sans-serif;text-align:center}.ass div{border-top:1px solid #000;padding-top:6px}
+      .rod{margin-top:30px;font:9pt Arial,sans-serif;color:#666;text-align:center}.bt{display:block;margin:0 auto 18px;padding:10px 22px;font:700 11pt Arial;border:0;border-radius:99px;background:#151719;color:#fff;cursor:pointer}
+      @media print{.bt{display:none}}</style></head><body>
+      <button class="bt" onclick="print()">Imprimir</button>
+      <h1>Termo de autorização de uso de imagem</h1><div class="sub">${clinica}${I.endereco ? " · " + esc(I.endereco) : ""}</div>
+      <p>Eu, <b>${pac.nome ? esc(pac.nome) : linha("60%")}</b>, portador(a) do CPF ${linha("32%")}, autorizo ${clinica}${prof.length ? `, por meio de ${prof.map(p => esc(p.nome) + (p.registro ? " (" + esc(p.registro) + ")" : "")).join(", ")},` : ""} a:</p>
+      <ol>
+        <li>fotografar o meu rosto e o meu sorriso para avaliação, planejamento e registro do tratamento odontológico;</li>
+        <li>usar essas fotos para criar <b>simulações ilustrativas</b> do resultado do tratamento, geradas com o auxílio de inteligência artificial, e para montar a apresentação do meu planejamento.</li>
+      </ol>
+      <p>Declaro estar ciente de que as simulações são apenas <b>ilustrativas</b>, não representam promessa ou garantia de resultado, e que o resultado real depende da avaliação clínica, do tratamento e da resposta do meu organismo. Fui informado(a) de que as fotos são tratadas de acordo com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018), guardadas com segurança e usadas somente para as finalidades autorizadas aqui, e de que posso revogar esta autorização a qualquer momento, por escrito, sem prejuízo do meu atendimento.</p>
+      <div class="op"><b>Uso em divulgação</b> (opcional; marque uma opção):
+        <div><span class="cx"></span><b>AUTORIZO</b> o uso das minhas fotos e simulações em materiais de divulgação da clínica (redes sociais, site e materiais impressos), de forma gratuita, sem limite de tempo e respeitando o Código de Ética Odontológica.</div>
+        <div><span class="cx"></span><b>NÃO AUTORIZO</b> o uso das minhas imagens para divulgação. Elas serão usadas apenas no meu atendimento.</div>
+      </div>
+      <p>${I.endereco ? esc(I.endereco.split(",").slice(-1)[0].trim()) : linha("30%")}, ${hoje}.</p>
+      <div class="ass"><div>Paciente (ou responsável legal)<br>${pac.nome ? esc(pac.nome) : ""}</div><div>Profissional responsável<br>${prof[0] ? esc(prof[0].nome) + (prof[0].registro ? " · " + esc(prof[0].registro) : "") : ""}</div></div>
+      <div class="rod">Termo de autorização de uso de imagem · versão ${VERSAO_TERMO} · gerado pelo DENTALCHECK. Guarde a via assinada com o prontuário do paciente.</div>
+      <script>setTimeout(() => print(), 400)<\/script></body></html>`;
+    const w = window.open("", "_blank");
+    if (!w) return toast("Permita pop-ups para imprimir o termo.");
+    w.document.open(); w.document.write(html); w.document.close();
+  };
+
   /* quantas simulações vão para a apresentação/PDF (todas entram até o dentista desmarcar) */
   function resumoSelecao(sims) {
     const el = $("casoSel"), n = sims.filter(b => !b.fora).length;
@@ -818,7 +888,12 @@
     const a = t.closest("[data-a]")?.dataset.a;
     /* plano Essencial: 1 identidade visual */
     const limIdent = (() => { try { return JSON.parse(localStorage.getItem("dc_plano") || "null")?.limites?.identidades; } catch (e) { return null; } })();
-    if ((a === "nova" || a === "duplicar") && limIdent && rascunho.lista.length >= limIdent) { toast(`Seu plano permite ${limIdent} identidade visual. Mude de plano para ter várias.`); return; }
+    if ((a === "nova" || a === "duplicar") && limIdent && rascunho.lista.length >= limIdent) {
+      if (confirm(`Seu plano permite ${limIdent} identidade visual. O plano Profissional libera identidades ilimitadas (uma para cada unidade ou marca).
+
+Quer conhecer o plano Profissional?`)) window.open("https://pay.kiwify.com.br/M8FHLNa", "_blank");
+      return;
+    }
     if (a === "nova") { const n = { ...IDENT_PADRAO, id: DB.uid(), nome: "Nova identidade", profissionais: [] }; rascunho.lista.push(n); rascunho.sel = n.id; }
     if (a === "duplicar") { const n = { ...JSON.parse(JSON.stringify(I)), id: DB.uid(), nome: (I.nome || "Identidade") + " (cópia)" }; rascunho.lista.push(n); rascunho.sel = n.id; }
     if (a === "excluir" && confirm(`Excluir a identidade “${I.nome}”? Apresentações que usam ela passam a usar outra.`)) { rascunho.lista = rascunho.lista.filter(x => x.id !== I.id); rascunho.sel = rascunho.lista[0].id; }

@@ -288,6 +288,10 @@ footer p{max-width:560px}
 @media (prefers-reduced-motion:reduce){.revela{opacity:1;transform:none}.cartao-flut{animation:none}html{scroll-behavior:auto}}
 @media (max-width:600px){section{padding:68px 0}.btn{height:50px;padding:0 22px}}
 
+/* aviso de cookies (só aparece com Pixel/GA configurados) */
+.cookies{position:fixed;left:16px;right:16px;bottom:16px;z-index:150;max-width:640px;margin:0 auto;background:var(--preto);color:#fff;border-radius:18px;padding:16px 18px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;box-shadow:0 20px 50px -20px rgba(0,0,0,.5);font-size:14px}
+.cookies p{flex:1 1 280px;color:rgba(255,255,255,.85)}.cookies a{color:var(--lima)}
+.cookies div{display:flex;gap:8px}.cookies .btn.sm{height:38px}.cookies .btn.pri{background:var(--lima);color:var(--preto)}
 /* oferta de boas-vindas (pop-up para visitante novo) */
 .oferta{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:16px;background:rgba(21,23,25,.55);backdrop-filter:blur(4px);opacity:0;transition:opacity .35s var(--ease)}
 .oferta.on{opacity:1}
@@ -561,7 +565,7 @@ footer p{max-width:560px}
 <footer>
   <div class="box">
     <a class="logo" href="#topo"><img src="/icons/marca-branca.svg" alt=""><span>DENTALCHECK</span></a>
-    <p>As simulações são ilustrativas e não substituem a avaliação clínica. As imagens desta página foram feitas com fotos de pessoas fictícias. © <span id="ano"></span> DENTALCHECK</p>
+    <p>As simulações são ilustrativas e não substituem a avaliação clínica. As imagens desta página foram feitas com fotos de pessoas fictícias. © <span id="ano"></span> DENTALCHECK · <a href="/privacidade" style="color:inherit">Privacidade</a> · <a href="/termos" style="color:inherit">Termos de uso</a></p>
   </div>
 </footer>
 
@@ -571,7 +575,11 @@ footer p{max-width:560px}
      Preencha os valores e links de pagamento quando os planos estiverem definidos.
      preco: número por mês (ou null para mostrar "Em breve"); link: checkout (Kiwify, Stripe…). */
   const CONFIG = {
-    contato: "",                       // ex.: "https://wa.me/5511999999999"
+    contato: "mailto:suporte.dentalcheck@gmail.com?subject=DENTALCHECK%3A%20quero%20saber%20mais",   // troque pelo WhatsApp quando tiver: "https://wa.me/5511999999999"
+    /* medição de vendas: preencha os IDs para ativar (vazio = nada é carregado).
+       metaPixel: Gerenciador de Eventos da Meta → Fontes de dados → ID do pixel (só números).
+       ga4: Google Analytics → Administrador → Fluxos de dados → ID da métrica ("G-XXXXXXX"). */
+    rastreio: { metaPixel: "", ga4: "" },
     descontoAnual: 20,                 // % de desconto no anual (mostrado no botão "Anual")
     pacoteExtra: { qtd: 30, preco: 29, link: "https://pay.kiwify.com.br/QLr9A4h" },
     /* pop-up de boas-vindas: só para visitante novo, depois de 60 s na página e de rolar ~40% dela */
@@ -752,6 +760,59 @@ footer p{max-width:560px}
   const px = CONFIG.pacoteExtra;
   if (px) $("planosLista").insertAdjacentHTML("afterend", `<p class="extra">Passou do limite do mês? Pacote avulso de <b>+${px.qtd} simulações por R$ ${reais(px.preco)}</b>, sem trocar de plano${px.link ? ` · <a href="${px.link}" target="_blank" rel="noopener">Comprar pacote</a>` : ""}. · Uma simulação = uma imagem gerada pela IA.</p>`);
 
+  /* ---------- medição (Pixel da Meta e Google Analytics) ----------
+     Eventos: visita (PageView), chegou aos planos (ViewContent), viu a oferta de boas-vindas (oferta_vista)
+     e clicou para pagar (InitiateCheckout, com plano e valor). A compra em si (Purchase) é registrada pela
+     Kiwify: cadastre o mesmo Pixel nas configurações do produto lá. */
+  const R = CONFIG.rastreio || {};
+  function carregarMedicao() {
+    if (R.metaPixel && !window.fbq) {
+      !function (f, b, e, v, n, t, s) { if (f.fbq) return; n = f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); }; if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = "2.0"; n.queue = []; t = b.createElement(e); t.async = !0; t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s); }(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+      fbq("init", R.metaPixel); fbq("track", "PageView");
+    }
+    if (R.ga4 && !window.gtag) {
+      const g = document.createElement("script"); g.async = true; g.src = "https://www.googletagmanager.com/gtag/js?id=" + R.ga4; document.head.appendChild(g);
+      window.dataLayer = window.dataLayer || []; window.gtag = function () { dataLayer.push(arguments); }; gtag("js", new Date()); gtag("config", R.ga4);
+    }
+  }
+  /* consentimento de cookies (LGPD): a medição só carrega depois do "Aceitar". Sem IDs configurados, o aviso nem aparece. */
+  if (R.metaPixel || R.ga4) {
+    let escolha = null; try { escolha = localStorage.getItem("dc-cookies"); } catch (e) {}
+    if (escolha === "sim") carregarMedicao();
+    else if (escolha !== "nao") {
+      const b = document.createElement("div");
+      b.className = "cookies"; b.setAttribute("role", "region"); b.setAttribute("aria-label", "Aviso de cookies");
+      b.innerHTML = `<p>Usamos cookies para medir o desempenho desta página e dos nossos anúncios. Saiba mais na <a href="/privacidade">Política de Privacidade</a>.</p><div><button class="btn sm sec" data-c="nao">Recusar</button><button class="btn sm pri" data-c="sim">Aceitar</button></div>`;
+      b.onclick = e => { const c = e.target.closest("[data-c]"); if (!c) return; try { localStorage.setItem("dc-cookies", c.dataset.c); } catch (er) {} if (c.dataset.c === "sim") carregarMedicao(); b.remove(); };
+      document.body.appendChild(b);
+    }
+  }
+  /* UTMs do anúncio (utm_source, utm_campaign…) seguem para o checkout da Kiwify, para saber qual anúncio vendeu */
+  const utms = [...new URLSearchParams(location.search)].filter(([k]) => /^utm_|^src$|^sck$/.test(k));
+  if (utms.length) document.addEventListener("click", e => {
+    const a = e.target.closest("a[href*='pay.kiwify']"); if (!a || a.dataset.utm) return;
+    const u = new URL(a.href); utms.forEach(([k, v]) => u.searchParams.set(k, v)); a.href = u.toString(); a.dataset.utm = "1";
+  }, true);
+  /* nomes padrão de cada ferramenta; dados: { plano, valor } */
+  window.rastrear = function (evento, dados = {}) {
+    const meta = { ver_planos: "ViewContent", oferta_vista: "Lead", iniciar_compra: "InitiateCheckout" }[evento];
+    const ga = { ver_planos: "view_item", oferta_vista: "generate_lead", iniciar_compra: "begin_checkout" }[evento] || evento;
+    const valor = dados.valor ? { value: dados.valor, currency: "BRL" } : {};
+    try { if (window.fbq) meta ? fbq("track", meta, { content_name: dados.plano, ...valor }) : fbq("trackCustom", evento, dados); } catch (e) {}
+    try { if (window.gtag) gtag("event", ga, { item_name: dados.plano, ...valor }); } catch (e) {}
+  };
+  const secPlanos = document.getElementById("planos");
+  if (secPlanos) new IntersectionObserver((es, o) => { if (es[0].isIntersecting) { rastrear("ver_planos"); o.disconnect(); } }, { threshold: 0.25 }).observe(secPlanos);
+  /* clique em qualquer link de pagamento: descobre plano e valor pelo link */
+  document.addEventListener("click", e => {
+    const a = e.target.closest("a[href*='pay.kiwify']"); if (!a) return;
+    const o = CONFIG.ofertaNovo, href = a.getAttribute("href").split("?")[0];
+    if (o && href === o.link) return rastrear("iniciar_compra", { plano: o.plano + " (oferta 1º mês)", valor: o.preco });
+    for (const p of CONFIG.planos) for (const per of ["mensal", "anual"])
+      if (p.links && p.links[per] === href) return rastrear("iniciar_compra", { plano: `${p.nome} ${per}`, valor: per === "anual" ? Math.round(p.anual * 12 * 100) / 100 : p.mensal });
+    if (CONFIG.pacoteExtra && href === CONFIG.pacoteExtra.link) rastrear("iniciar_compra", { plano: "Pacote extra", valor: CONFIG.pacoteExtra.preco });
+  });
+
   /* contato */
   if (CONFIG.contato) $("ctaContato").href = CONFIG.contato; else $("ctaContato").href = "#duvidas";
 
@@ -774,7 +835,7 @@ footer p{max-width:560px}
     addEventListener("scroll", aoRolar, { passive: true });
     setTimeout(() => { tempoOk = true; tentar(); }, o.segundos * 1000);
     function mostrar(soPrevia) {
-      mostrou = true; if (!soPrevia) gravar("dc-oferta-vista");
+      mostrou = true; if (!soPrevia) { gravar("dc-oferta-vista"); rastrear("oferta_vista", { plano: o.plano, valor: o.preco }); }
       const desc = Math.round((1 - o.preco / o.precoNormal) * 100);
       const el = document.createElement("div");
       el.className = "oferta"; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-labelledby", "ofertaTit");

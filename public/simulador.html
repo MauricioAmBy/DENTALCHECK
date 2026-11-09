@@ -189,6 +189,10 @@
 
 @media (max-width:980px){.plano-grid,.res-grid,.foto-grid{grid-template-columns:1fr}.foto-box{position:static}}
 @media (max-width:600px){.etapas .txt{display:none}.etapas span{padding:4px}.cores{grid-template-columns:repeat(4,1fr)}.opcoes{grid-template-columns:1fr}.lado{grid-template-columns:1fr}}
+.consent{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:14px;color:var(--muted);cursor:pointer;line-height:1.45}
+.consent input{width:18px;height:18px;margin-top:1px;accent-color:var(--preto,#151719);flex:none}
+.consent b{color:var(--navy)}
+.consent.erro{color:var(--bad)}.consent.erro b{color:var(--bad)}
 </style>
 </head>
 <body>
@@ -211,6 +215,7 @@
   <p class="muted" style="margin:6px 0 20px">Capture as fotos com o guia passo a passo ou envie as que você já tem. A IA endireita e identifica cada foto sozinha.</p>
   <div class="card" style="margin-bottom:16px">
     <div class="f" style="margin:0"><label for="nomePac">Nome do paciente</label><input class="in" id="nomePac" placeholder="Ex.: Maria Souza" autocomplete="off"></div>
+    <label class="consent" id="consentBox"><input type="checkbox" id="consentPac"><span><b>O paciente autorizou o uso da imagem</b> para avaliação e simulação do sorriso. O termo para ele assinar fica na ficha do paciente, em Apresentações.</span></label>
   </div>
   <div class="fotos-topo">
     <button class="btn pri" id="btnCapturar">📷 Capturar com guia passo a passo</button>
@@ -585,10 +590,15 @@
   /* continua: cria (ou atualiza) o paciente com as fotos e abre a foto de base no planejamento */
   $("irPlano").onclick = async () => {
     if (!base) return;
+    if (!$("consentPac").checked) {                   // LGPD: só segue com a autorização de uso da imagem registrada
+      $("consentBox").classList.add("erro"); $("consentBox").scrollIntoView({ behavior: "smooth", block: "center" });
+      return toast("Confirme que o paciente autorizou o uso da imagem.");
+    }
     const nome = $("nomePac").value.trim() || "Paciente sem nome";
     let p = pacienteId ? await DB.obter(pacienteId) : null;
     if (!p) p = DB.novoPaciente(nome);
     p.nome = nome; p.fotosInfo = p.fotosInfo || {};
+    if (!p.consentimento) p.consentimento = { data: new Date().toISOString().slice(0, 10), versao: 1 };   // versão do texto do termo
     for (const [id, img] of Object.entries(fotos)) { p.fotos[id] = img; p.fotosInfo[id] = infoFotos[id] || { ia: false }; }
     await DB.salvar(p);
     pacienteId = p.id;
@@ -597,6 +607,7 @@
     irEtapa(2);
   };
   $("trocarFoto").onclick = () => irEtapa(1);
+  $("consentPac").onchange = () => $("consentBox").classList.remove("erro");
 
   function carregarFoto(src, tipo) {
     const img = new Image();
@@ -619,6 +630,7 @@
   if (pacienteId) DB.obter(pacienteId).then(p => {
     if (!p) return (pacienteId = null);
     $("nomePac").value = p.nome || "";
+    if (p.consentimento) $("consentPac").checked = true;
     for (const passo of PASSOS) if (p.fotos[passo.id]) { fotos[passo.id] = p.fotos[passo.id]; infoFotos[passo.id] = (p.fotosInfo || {})[passo.id] || { ia: false }; }
     desenharSlots();
   });

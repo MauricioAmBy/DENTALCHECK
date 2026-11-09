@@ -1,4 +1,5 @@
-/* DENTALCHECK — banco local (IndexedDB). Os dados do paciente nunca saem do aparelho. */
+/* DENTALCHECK — banco local (IndexedDB). Os dados do paciente ficam no aparelho; o backup (exportar/importar)
+   gera um arquivo que o próprio dentista guarda. */
 (function () {
   const NOME = "dentalcheck", VERSAO = 1;
   let conexao;
@@ -55,7 +56,41 @@
     salvar: p => { p.atualizado = Date.now(); return tx("pacientes", "readwrite", s => s.put(p)).then(() => p); },
     excluir: id => tx("pacientes", "readwrite", s => s.delete(id)),
     config: () => tx("config", "readonly", s => s.get("clinica")).then(c => Object.assign({}, CONFIG_PADRAO, c || {})),
-    salvarConfig: c => tx("config", "readwrite", s => s.put(c, "clinica"))
+    salvarConfig: c => tx("config", "readwrite", s => s.put(c, "clinica")),
+
+    /* backup: um arquivo .json com todos os pacientes (fotos e simulações incluídas) e as identidades visuais.
+       Serve para guardar uma cópia fora do navegador e para levar os pacientes para outro aparelho. */
+    exportar: async () => {
+      const [pacientes, config] = await Promise.all([
+        tx("pacientes", "readonly", s => s.getAll()),
+        tx("config", "readonly", s => s.get("clinica"))
+      ]);
+      return { app: "DENTALCHECK", formato: 1, criado: new Date().toISOString(), pacientes: pacientes || [], config: config || null };
+    },
+    /* restaura sem apagar nada: paciente que não existe entra; paciente que já existe só é trocado se a
+       cópia do backup for mais recente. As identidades visuais do backup são somadas às deste aparelho. */
+    importar: async dados => {
+      if (!dados || dados.app !== "DENTALCHECK" || !Array.isArray(dados.pacientes)) throw new Error("Este arquivo não é um backup do DENTALCHECK.");
+      const atuais = new Map(((await tx("pacientes", "readonly", s => s.getAll())) || []).map(p => [p.id, p]));
+      let novos = 0, atualizados = 0;
+      for (const p of dados.pacientes) {
+        if (!p || !p.id) continue;
+        const atual = atuais.get(p.id);
+        if (atual && (atual.atualizado || 0) >= (p.atualizado || 0)) continue;
+        await tx("pacientes", "readwrite", s => s.put(p));
+        atual ? atualizados++ : novos++;
+      }
+      if (dados.config) {
+        const local = (await tx("config", "readonly", s => s.get("clinica"))) || null;
+        if (!local) await tx("config", "readwrite", s => s.put(dados.config, "clinica"));
+        else if (Array.isArray(dados.config.identidades)) {
+          const ids = new Set((local.identidades || []).map(i => i.id));
+          const extras = dados.config.identidades.filter(i => !ids.has(i.id));
+          if (extras.length) { local.identidades = [...(local.identidades || []), ...extras]; await tx("config", "readwrite", s => s.put(local, "clinica")); }
+        }
+      }
+      return { novos, atualizados, total: dados.pacientes.length };
+    }
   };
 
   /* Reduz a foto antes de guardar: mantém qualidade de apresentação sem lotar o aparelho */

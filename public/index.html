@@ -58,6 +58,10 @@
 .mc-det li{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px;background:var(--sky);border-radius:10px;padding:8px 12px}
 .mc-det li small{color:var(--muted)}
 .mc-add{display:flex;gap:8px;margin-top:10px}
+.mc-atraso{background:#fdecec;border:1px solid #f3c5c5;color:#9b1c1c;border-radius:var(--r);padding:14px 18px;margin-bottom:16px;font-size:14px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.mc-atraso.hidden{display:none}
+.mc-ass p{font-size:14px;color:var(--muted);margin-top:10px}
+.mc-ass h4{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:16px 0 6px}
 
 /* hub */
 .hub-ola{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin:10px 0 24px}
@@ -75,6 +79,10 @@
 .a1{background:linear-gradient(150deg,#151719,#2a2d31)}
 .a2{background:linear-gradient(150deg,#c3e86b,#aed44f)}
 .a3{background:linear-gradient(150deg,#f4f4f0,#dcdfe0)}
+.backup{margin-top:22px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:18px 20px;border-radius:var(--r);background:#fff;border:1px solid var(--line)}
+.backup.alerta{border-color:var(--lima);box-shadow:0 0 0 3px rgba(195,232,107,.45)}
+.backup h3{font-size:16px}.backup p{font-size:14px;color:var(--muted);margin-top:4px;max-width:560px}
+.backup .bts{display:flex;gap:8px;flex-wrap:wrap}
 .dica{margin-top:22px;display:flex;gap:12px;align-items:center;padding:14px 18px;border-radius:var(--r);background:var(--mint);font-size:14px}
 @media (max-width:860px){#ativacao{grid-template-columns:1fr}.at-lado{padding:32px 22px}.at-lado ul{display:none}.sistemas{grid-template-columns:1fr}}
 </style>
@@ -112,6 +120,7 @@
       <button type="button" class="btn ghost hidden" id="btnEsqueci" style="width:100%;margin-top:6px">Esqueci minha senha</button>
       <button type="button" class="btn ghost hidden" id="btnVoltarLogin" style="width:100%;margin-top:6px">← Voltar para entrar</button>
       <button type="button" class="btn ghost hidden" id="btnTeste" style="width:100%;margin-top:8px">Entrar em modo de teste (só no computador local)</button>
+      <p class="ajuda" style="margin-top:10px">Ao entrar ou criar a conta, você concorda com os <a href="/termos" target="_blank">Termos de Uso</a> e a <a href="/privacidade" target="_blank">Política de Privacidade</a>.</p>
       <p class="ajuda" id="fAjuda">Ainda não assina? <a href="/vendas/#planos">Conheça os planos</a>.</p>
     </form>
   </div>
@@ -133,6 +142,7 @@
         <h1>O que vamos fazer hoje?</h1>
       </div>
     </div>
+    <div class="mc-atraso hidden" id="mcAtraso"></div>
     <div class="minha-conta hidden" id="minhaConta">
       <div class="mc-topo">
         <div><div class="kick">Minha conta</div><h2 id="mcPlano">Plano</h2><p class="muted" id="mcInfo"></p></div>
@@ -140,6 +150,7 @@
       </div>
       <div class="mc-uso"><div class="mc-barra"><i id="mcBarra"></i></div><span id="mcUso"></span></div>
       <div class="mc-alerta hidden" id="mcAlerta"></div>
+      <details class="mc-det hidden" id="mcAssinaturaBox"><summary>Pagamento e assinatura</summary><div id="mcAssinatura"></div></details>
       <details class="mc-det"><summary>Aparelhos conectados <span id="mcQtdAp"></span></summary><ul id="mcAparelhos"></ul></details>
       <details class="mc-det hidden" id="mcEquipeBox"><summary>Equipe <span id="mcQtdEq"></span></summary>
         <ul id="mcEquipe"></ul>
@@ -168,7 +179,14 @@
       <div class="meus-topo"><h2>Seus pacientes</h2><a class="btn sm" href="/apresentacao">Ver todos →</a></div>
       <div class="meus-grade" id="meusGrade"></div>
     </section>
+    <div class="mc-atraso hidden" id="avisoEndereco" style="background:#fff7e6;border-color:#f1d9a6;color:#8a5a00"></div>
+    <div class="backup" id="backupBox">
+      <div><h3>Backup dos pacientes</h3><p id="backupInfo">Os pacientes ficam guardados neste aparelho. Baixe uma cópia de segurança de vez em quando e use “Restaurar” para levar os pacientes a outro aparelho.</p></div>
+      <div class="bts"><button class="btn sm pri" id="btnBackup">⤓ Baixar backup</button><button class="btn sm" id="btnRestaurar">Restaurar backup</button></div>
+      <input type="file" id="arqBackup" accept=".json,application/json" class="hidden">
+    </div>
     <div class="dica"><b>Dica:</b> instale o DENTALCHECK na tela inicial para abrir como aplicativo, mesmo sem internet.</div>
+    <p class="muted" style="font-size:13px;margin-top:18px;text-align:center"><a href="/termos" style="color:inherit">Termos de Uso</a> · <a href="/privacidade" style="color:inherit">Política de Privacidade</a> · <a id="hubSuporte" href="mailto:suporte.dentalcheck@gmail.com" style="color:inherit">Suporte</a></p>
   </main>
 </section>
 
@@ -262,8 +280,58 @@
     if (!lic) return definirModo(tokenRecuperacao ? "nova" : !pub.contas ? "senha" : modo !== "senha" ? modo : veioDaCompra ? "criar" : "entrar");
     $("ola").textContent = lic.email ? "Olá, " + lic.email.split("@")[0] + "!" : "Olá!";
     if (lic.tipo === "conta") { carregarConta(); verificarAdmin(); }
-    mostrarPacientes();
+    mostrarPacientes(); mostrarBackup();
+    $("hubSuporte").href = linkSuporte("Preciso de ajuda.");
+    if (location.hash === "#backup") setTimeout(() => $("backupBox").scrollIntoView({ behavior: "smooth", block: "center" }), 300);
+    /* endereço antigo: os pacientes ficam guardados por endereço; quem usa o .vercel.app precisa levar o backup para o domínio novo */
+    if (location.hostname === "dentalcheck.vercel.app") {
+      mostra("avisoEndereco", true);
+      $("avisoEndereco").innerHTML = `<span><b>O DENTALCHECK mudou de endereço:</b> agora é <b>www.dentalcheck.com.br</b>. Seus pacientes estão guardados neste endereço antigo. Baixe o backup aqui e use “Restaurar backup” no endereço novo.</span><a class="btn sm pri" href="https://www.dentalcheck.com.br/#backup">Ir para o endereço novo</a>`;
+    }
   }
+
+  /* ---------- backup dos pacientes ---------- */
+  const ULT_BACKUP = "dc_ultimo_backup";
+  async function mostrarBackup() {
+    const n = (await DB.listar().catch(() => [])).length;
+    let ult = null; try { ult = Number(localStorage.getItem(ULT_BACKUP)) || null; } catch (e) {}
+    const dias = ult ? Math.floor((Date.now() - ult) / 864e5) : null;
+    const atrasado = n > 0 && (dias === null || dias >= 7);
+    $("backupBox").classList.toggle("alerta", atrasado);
+    $("backupInfo").textContent = !n ? "Quando você tiver pacientes, baixe aqui uma cópia de segurança. Use “Restaurar” para trazer pacientes de outro aparelho."
+      : `${n} ${n === 1 ? "paciente guardado" : "pacientes guardados"} só neste aparelho. ` +
+        (ult ? `Último backup ${dias === 0 ? "hoje" : dias === 1 ? "ontem" : `há ${dias} dias`}.` : "Você ainda não fez nenhum backup.") +
+        (atrasado ? " Baixe uma cópia agora: se o navegador for limpo, os pacientes se perdem." : "");
+  }
+  $("btnBackup").onclick = async () => {
+    try {
+      toast("Preparando o backup…");
+      const dados = await DB.exportar();
+      const blob = new Blob([JSON.stringify(dados)], { type: "application/json" });
+      const nome = `dentalcheck-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      const arq = new File([blob], nome, { type: "application/json" });
+      /* no celular, compartilhar permite salvar direto no Drive, iCloud ou WhatsApp */
+      if (navigator.canShare && navigator.canShare({ files: [arq] }) && /Android|iPhone|iPad/.test(navigator.userAgent)) {
+        await navigator.share({ files: [arq], title: "Backup DENTALCHECK" }).catch(e => { if (e.name !== "AbortError") throw e; });
+      } else {
+        const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = nome; a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      }
+      try { localStorage.setItem(ULT_BACKUP, String(Date.now())); } catch (e) {}
+      toast(`Backup pronto: ${dados.pacientes.length} ${dados.pacientes.length === 1 ? "paciente" : "pacientes"}.`);
+      mostrarBackup();
+    } catch (e) { console.error(e); toast("Não foi possível gerar o backup."); }
+  };
+  $("btnRestaurar").onclick = () => $("arqBackup").click();
+  $("arqBackup").onchange = async e => {
+    const f = e.target.files[0]; e.target.value = "";
+    if (!f) return;
+    try {
+      const r = await DB.importar(JSON.parse(await f.text()));
+      toast(r.novos || r.atualizados ? `Backup restaurado: ${r.novos} novos, ${r.atualizados} atualizados.` : "Tudo já estava neste aparelho. Nada mudou.");
+      mostrarPacientes(); mostrarBackup();
+    } catch (err) { console.error(err); toast(err instanceof SyntaxError ? "Este arquivo não é um backup do DENTALCHECK." : err.message || "Não foi possível restaurar."); }
+  };
 
   /* ---------- seus pacientes (salvos neste aparelho) ---------- */
   async function mostrarPacientes() {
@@ -277,6 +345,23 @@
       return `<a class="mp" href="/apresentacao?paciente=${p.id}"><div class="img" style="${capa ? `background-image:url(${capa})` : ""}">${capa ? "" : esc((p.nome || "?")[0].toUpperCase())}${n ? `<span class="tag">${n} ${n === 1 ? "simulação" : "simulações"}</span>` : ""}</div><div class="txt"><b>${esc(p.nome || "Sem nome")}</b><small>${dataBR(p.data)}</small></div></a>`;
     }).join("");
   }
+
+  /* ---------- suporte e assinatura (um lugar só para trocar contatos e links) ---------- */
+  const SUPORTE = {
+    email: "suporte.dentalcheck@gmail.com",         // provisório (o mesmo cadastrado nos produtos da Kiwify)
+    whatsapp: "",                                   // PENDENTE: ex.: "5511999999999" (com DDI e DDD, só números)
+    kiwify: ""                                      // PENDENTE: link confirmado da área do comprador da Kiwify; vazio = cartão e cancelamento pelo suporte
+  };
+  /* checkout de cada plano (mesmos links da página de vendas) */
+  const PLANOS_CHECKOUT = [
+    ["essencial", "Essencial", "R$ 97/mês", "https://pay.kiwify.com.br/lC2Eunb"],
+    ["profissional", "Profissional", "R$ 167/mês", "https://pay.kiwify.com.br/M8FHLNa"],
+    ["clinica", "Clínica", "R$ 267/mês", "https://pay.kiwify.com.br/tU9oVTh"]
+  ];
+  const PACOTE_EXTRA = "https://pay.kiwify.com.br/QLr9A4h";
+  const linkSuporte = assunto => SUPORTE.whatsapp
+    ? `https://wa.me/${SUPORTE.whatsapp}?text=${encodeURIComponent("Olá! Sou assinante do DENTALCHECK. " + assunto)}`
+    : `mailto:${SUPORTE.email}?subject=${encodeURIComponent("DENTALCHECK: " + assunto)}`;
 
   /* ---------- minha conta ---------- */
   const dataBR = d => d ? new Date(d).toLocaleDateString("pt-BR") : "";
@@ -306,6 +391,31 @@
     mostra("mcEquipeBox", c.titular && c.limites.profissionais > 1);
     $("mcQtdEq").textContent = `(${c.membros.length + 1} de ${c.limites.profissionais})`;
     $("mcEquipe").innerHTML = `<li><span>${c.email} <small>· titular</small></span></li>` + c.membros.map(m => `<li><span>${m}</span><button class="btn sm danger" data-membro="${m}">Remover</button></li>`).join("");
+    /* pagamento e assinatura: quem paga é o titular; equipe e cortesia não têm cobrança */
+    const pagante = c.titular && !c.cortesia, alvo = u => /^https?:/.test(u) ? ' target="_blank" rel="noopener"' : "";
+    mostra("mcAssinaturaBox", pagante);
+    if (pagante) {
+      const sup = linkSuporte(`Preciso de ajuda com a minha assinatura (${c.email}).`);
+      const cartao = SUPORTE.kiwify
+        ? `<a class="btn sm" href="${SUPORTE.kiwify}" target="_blank" rel="noopener">Atualizar cartão, faturas ou cancelar</a>`
+        : `<a class="btn sm" href="${linkSuporte(`Quero atualizar o cartão ou cancelar a assinatura (${c.email}).`)}"${alvo(SUPORTE.whatsapp ? "https:" : "")}>Atualizar cartão ou cancelar</a>`;
+      $("mcAssinatura").innerHTML = `<div class="mc-ass">
+        <p>Plano <b>${c.planoNome}</b> · ${c.periodo === "anual" ? "anual" : "mensal"} · ${c.status === "ativa" && c.validoAte ? "próxima cobrança em " + dataBR(c.validoAte) : "assinatura " + (STATUS[c.status] || c.status)}. Cobrança feita pela Kiwify no e-mail ${c.email}.</p>
+        <h4>Trocar de plano</h4>
+        <div class="mc-add" style="flex-wrap:wrap">${PLANOS_CHECKOUT.filter(([id]) => id !== c.plano).map(([, nome, preco, link]) => `<a class="btn sm" href="${link}" target="_blank" rel="noopener">${nome} · ${preco}</a>`).join("")}<a class="btn sm" href="/vendas#planos" target="_blank">Comparar planos</a></div>
+        <p>Ao trocar de plano, a Kiwify cria uma assinatura nova. Depois da compra, <b>cancele a assinatura anterior</b> para não ser cobrado duas vezes. O app passa a usar o plano novo sozinho.</p>
+        <h4>Mais simulações</h4>
+        <div class="mc-add"><a class="btn sm" href="${PACOTE_EXTRA}" target="_blank" rel="noopener">+30 simulações · R$ 29</a></div>
+        <h4>Pagamento e cancelamento</h4>
+        <div class="mc-add" style="flex-wrap:wrap">${cartao}<a class="btn sm ghost" href="${sup}"${alvo(sup)}>Falar com o suporte</a></div>
+        <p>Você pode cancelar quando quiser; o acesso continua até o fim do período já pago.</p></div>`;
+    }
+    /* pagamento atrasado: faixa no topo com o caminho para regularizar (o servidor mantém o acesso por alguns dias) */
+    mostra("mcAtraso", pagante && c.status === "atrasada");
+    if (pagante && c.status === "atrasada") {
+      const pagar = SUPORTE.kiwify || linkSuporte(`Meu pagamento está pendente e quero regularizar (${c.email}).`);
+      $("mcAtraso").innerHTML = `<span><b>Pagamento pendente.</b> A cobrança da sua assinatura não foi aprovada. Atualize o pagamento para não perder o acesso.</span><a class="btn sm pri" href="${pagar}"${alvo(pagar)}>Regularizar pagamento</a>`;
+    }
     try { localStorage.setItem("dc_plano", JSON.stringify({ plano: c.plano, limites: c.limites })); } catch (e) {}
   }
   /* botão "Administração" só para os e-mails de administrador (o servidor decide) */

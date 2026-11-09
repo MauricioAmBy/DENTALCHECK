@@ -18,7 +18,9 @@ App web para dentistas que simula o novo sorriso do paciente com IA e gera a apr
    - **Conteúdo:** as fotos e a simulação já entram no paciente, junto com exames, odontograma e propostas.
    - **Saída:** modo apresentação, PDF e identidade da clínica.
 
-Os dados dos pacientes ficam guardados no navegador do computador (IndexedDB).
+Os dados dos pacientes ficam guardados no navegador do aparelho (IndexedDB), separados por endereço. Na tela inicial, **Baixar backup** gera um arquivo `.json` com todos os pacientes (fotos incluídas) e as identidades visuais, e **Restaurar backup** traz esse arquivo para outro aparelho ou endereço sem apagar nada. O app lembra o dentista quando o último backup tem mais de 7 dias.
+
+**Privacidade e consentimento:** `public/privacidade.html` e `public/termos.html` são **modelos** que precisam ser revisados por um advogado e completados com os dados da empresa. O cadastro do paciente no simulador exige marcar que o paciente autorizou o uso da imagem (`consentimento: { data, versao }`), e a ficha do paciente imprime o termo de autorização para assinatura e registra a assinatura (`assinado`, `divulgacao`).
 
 ## Como rodar
 
@@ -70,7 +72,7 @@ Todos os e-mails usam o mesmo layout, com a identidade da marca, em `server/emai
 | Confirmar conta | Dentista cria a conta no app | Supabase | `MODELOS_SUPABASE` → `supabase/templates/confirmar-conta.html` |
 | Nova senha | "Esqueci minha senha" | Supabase | `MODELOS_SUPABASE` → `supabase/templates/redefinir-senha.html` |
 
-Recibos e cobranças da compra são enviados pela própria Kiwify.
+Recibos e cobranças da compra são enviados pela própria Kiwify. O rodapé de todos os e-mails tem links para a Política de Privacidade e os Termos de Uso. Ao mudar o layout, cole de novo os dois modelos no Supabase.
 
 **Para alterar ou criar um e-mail:**
 1. Edite o texto em `server/email.mjs`. Um e-mail novo do servidor ganha uma função `modeloX` e uma `emailX`, como as de boas-vindas.

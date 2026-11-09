@@ -21,7 +21,7 @@
       ]
     },
     {
-      "source": "/((?!vendas).*)",
+      "source": "/((?!vendas|privacidade|termos).*)",
       "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
     },
     {

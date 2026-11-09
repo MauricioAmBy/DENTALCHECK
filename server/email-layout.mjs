@@ -55,7 +55,8 @@ export function layoutEmail({ resumo = "", etiqueta = "", titulo, corpo, rodape,
         ${corpo}
       </td></tr>
       <tr><td style="padding:18px 30px;background:${COR.fundo};border-top:1px solid ${COR.cinza};font-family:${FONTE};font-size:12px;line-height:1.6;color:${COR.fraco}">
-        ${rodape ? rodape + "<br>" : ""}DENTALCHECK · Simulação de sorriso com IA para dentistas · <a href="${base}" style="color:${COR.fraco}">${base.replace(/^https?:\/\//, "")}</a>
+        ${rodape ? rodape + "<br>" : ""}DENTALCHECK · Simulação de sorriso com IA para dentistas · <a href="${base}" style="color:${COR.fraco}">${base.replace(/^https?:\/\//, "")}</a><br>
+        <a href="${base}/privacidade" style="color:${COR.fraco}">Política de Privacidade</a> · <a href="${base}/termos" style="color:${COR.fraco}">Termos de Uso</a>
       </td></tr>
     </table>
   </td></tr></table>
