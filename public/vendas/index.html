@@ -575,7 +575,7 @@ footer p{max-width:560px}
      Preencha os valores e links de pagamento quando os planos estiverem definidos.
      preco: número por mês (ou null para mostrar "Em breve"); link: checkout (Kiwify, Stripe…). */
   const CONFIG = {
-    contato: "mailto:suporte.dentalcheck@gmail.com?subject=DENTALCHECK%3A%20quero%20saber%20mais",   // troque pelo WhatsApp quando tiver: "https://wa.me/5511999999999"
+    contato: "https://wa.me/5511926743571?text=" + encodeURIComponent("Olá! Quero saber mais sobre o DENTALCHECK."),   // WhatsApp do suporte
     /* medição de vendas: preencha os IDs para ativar (vazio = nada é carregado).
        metaPixel: Gerenciador de Eventos da Meta → Fontes de dados → ID do pixel (só números).
        ga4: Google Analytics → Administrador → Fluxos de dados → ID da métrica ("G-XXXXXXX"). */
@@ -814,7 +814,7 @@ footer p{max-width:560px}
   });
 
   /* contato */
-  if (CONFIG.contato) $("ctaContato").href = CONFIG.contato; else $("ctaContato").href = "#duvidas";
+  if (CONFIG.contato) { $("ctaContato").href = CONFIG.contato; if (/^https?:/.test(CONFIG.contato)) { $("ctaContato").target = "_blank"; $("ctaContato").rel = "noopener"; } } else $("ctaContato").href = "#duvidas";
 
   /* entrada suave das seções ao rolar */
   const obs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("visivel"); obs.unobserve(e.target); } }), { threshold: 0.12 });
