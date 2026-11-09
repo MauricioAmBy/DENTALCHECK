@@ -3,7 +3,7 @@
    npm run emails -- --previa → também grava previa-emails/ com todos os e-mails preenchidos com dados
                                de exemplo e um índice para abrir no navegador (pasta fora do Git). */
 import { writeFileSync, mkdirSync } from "node:fs";
-import { MODELOS_SUPABASE, modeloBoasVindas } from "../server/email.mjs";
+import { MODELOS_SUPABASE, modeloBoasVindas, modeloAvisoAdmin } from "../server/email.mjs";
 
 mkdirSync("supabase/templates", { recursive: true });
 for (const m of MODELOS_SUPABASE) writeFileSync(`supabase/templates/${m.arquivo}`, m.html());
@@ -16,6 +16,7 @@ if (process.argv.includes("--previa")) {
   const preencher = html => logoLocal(Object.entries(exemplo).reduce((h, [k, v]) => h.split(k).join(v), html));
   const lista = [
     ["boas-vindas.html", "Boas-vindas após a compra (servidor)", modeloBoasVindas({ email: "dra.ana@clinica.com", nome: "Ana Souza", plano: "profissional" })],
+    ["aviso-admin.html", "Aviso ao administrador (servidor)", modeloAvisoAdmin({ titulo: "Falhas seguidas da IA em uma conta", resumo: "A conta abaixo teve 3 falhas seguidas da IA. Vale chamar o cliente antes que ele reclame.", linhas: [["Conta", "dra.ana@clinica.com"], ["Rota", "simular"], ["Último motivo", "bloqueio de segurança"], ["Falhas hoje", "3 de 10"]] })],
     ...MODELOS_SUPABASE.map(m => [m.arquivo, `${m.painel} (Supabase)`, { assunto: m.assunto, html: preencher(m.html()) }])
   ];
   mkdirSync("previa-emails", { recursive: true });

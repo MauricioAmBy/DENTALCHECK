@@ -41,7 +41,9 @@ GEMINI_API_KEY=sua-chave-do-google-ai-studio
 
 Opcionais:
 - `GEMINI_MODELO`: modelos em ordem de preferência. Padrão: `gemini-3.1-flash-image,gemini-2.5-flash-image`
-- `LIMITE_IA_DIA`: máximo de simulações por dia (padrão 200), para controlar o custo
+- `LIMITE_IA_DIA`: freio diário do sistema todo para simulações (padrão 200). Com contas, fica no banco e vale para todas as instâncias da Vercel
+- `LIMITE_IA_AUX_DIA`: freio diário do sistema todo para as análises auxiliares (padrão 3000)
+- `CUSTO_IA_JSON`: preço da IA em US$ por 1 milhão de tokens e cotação do dólar, se mudar a tabela do Google. Exemplo: `{"dolar":5.6,"modelos":{"gemini-3.1-flash-image":{"entrada":0.5,"saida":3,"imagem":60}}}`. Sem ela valem os preços de `server/margem.mjs`
 - `PORTA`: porta do servidor (padrão 5173)
 
 Sem a chave, o simulador mostra um resultado ilustrativo (só clareia a região) para dar para testar as telas.
@@ -61,6 +63,18 @@ Variáveis de ambiente (Vercel → Settings → Environment Variables):
 - `KIWIFY_PRODUTOS` (opcional): JSON que liga o id de cada produto ao plano, por exemplo `{"123":"profissional:anual","456":"extra"}`.
 
 Sem as variáveis do Supabase, o app continua no modo de teste com a senha única (`ACESSO_SENHA`).
+
+## Margem (custo da IA)
+
+Regra: nenhuma conta pode custar mais do que paga. Isso é garantido pelos limites no servidor (`server/margem.mjs`), não por acompanhamento depois:
+- **Simulações do mês:** cota do plano + extras (`consumir_simulacao`). Falha da IA devolve a simulação.
+- **Análises auxiliares** (`localizar`, `analisar-foto`, `dentes`): limite por conta e por dia, `auxiliaresDia` em `PLANOS`. Ao acabar, o app segue com a marcação manual.
+- **Teto de falhas:** no máximo 10 falhas da IA por conta por dia; depois as tentativas ficam pausadas até o dia seguinte.
+- **Freio do sistema:** `LIMITE_IA_DIA` e `LIMITE_IA_AUX_DIA`, contados no banco.
+- **Medição:** cada chamada ao Gemini grava modelo e tokens em `chamadas_ia` (sem foto e sem dado de paciente). O painel `/admin` → "Custo da IA e margem" mostra o custo médio por simulação e a conta do pior caso de cada plano contra a receita líquida (teto de 70%).
+- **Avisos ao administrador** (e-mail para `ADMIN_EMAILS`, no máximo 1 por hora por assunto): 3 falhas seguidas numa conta, conta pausada pelo teto de falhas, taxa de falha geral acima de 20% na hora, freio diário atingido.
+
+Tabelas e funções: `supabase/migrations/20261109120000_margem_ia.sql` (rode no SQL Editor do Supabase antes de publicar o código).
 
 ## E-mails
 
@@ -97,6 +111,10 @@ INICIAR-DENTALCHECK.bat   abre o app com dois cliques (Windows)
 server/
   servidor.mjs            servidor local: entrega as páginas e chama a IA (/api/simular, /api/localizar,
                           /api/analisar-foto, /api/dentes)
+  ia.mjs                  rotas da API e chamadas ao Gemini
+  conta.mjs               contas, planos e limites (Supabase)
+  margem.mjs              limites de custo da IA, registro das chamadas, avisos e conta da margem
+  admin.mjs               painel /admin
   prompt-sorriso.mjs      transforma o planejamento do doutor nas instruções para a IA
 public/                   o app (HTML, CSS e JS)
   index.html              tela inicial: novo procedimento e pacientes

@@ -55,6 +55,28 @@ export async function emailBoasVindas(dados) {
   return enviar(dados.email, assunto, html, texto, "boas-vindas");
 }
 
+/* ---------- aviso ao administrador (falhas da IA, freio diário) ----------
+   Vai para ADMIN_EMAILS. Nunca leva foto nem dado de paciente: só a conta (e-mail do dentista), a rota e o motivo. */
+export function modeloAvisoAdmin({ titulo, resumo, linhas }) {
+  const assunto = `[DENTALCHECK] ${titulo}`;
+  const html = layoutEmail({
+    resumo, etiqueta: "Aviso do sistema", titulo: esc(titulo),
+    corpo: paragrafo(esc(resumo)) + linhas.map(([t, d]) => paragrafo(`${destaque(esc(t))}: ${esc(d)}`)).join("")
+      + botao("Abrir o painel de administração", `${appUrl()}/admin`)
+      + nota("Este aviso sai no máximo uma vez por hora para o mesmo assunto."),
+    rodape: "Você recebeu este aviso porque o seu e-mail está em ADMIN_EMAILS."
+  });
+  const texto = `${titulo}\n\n${resumo}\n\n` + linhas.map(([t, d]) => `- ${t}: ${d}`).join("\n") + `\n\nPainel: ${appUrl()}/admin\n`;
+  return { assunto, html, texto };
+}
+export async function emailAvisoAdmin(dados) {
+  const para = String(process.env.ADMIN_EMAILS || "").split(",").map(e => e.trim()).filter(Boolean);
+  if (!para.length) { console.log("[email] sem ADMIN_EMAILS — aviso não enviado"); return false; }
+  const { assunto, html, texto } = modeloAvisoAdmin(dados);
+  const envios = await Promise.all(para.map(p => enviar(p, assunto, html, texto, "aviso-admin")));
+  return envios.some(Boolean);
+}
+
 /* ---------- modelos do Supabase ----------
    Ficam com as variáveis do Supabase ({{ .Email }}, {{ .ConfirmationURL }}), que ele troca na hora do envio.
    arquivo: nome em supabase/templates/ · painel: onde colar (Authentication → Emails → Templates). */

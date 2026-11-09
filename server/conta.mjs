@@ -2,10 +2,12 @@
    O servidor usa a chave service_role (só nas variáveis de ambiente) e fala com o Supabase pela API REST,
    sem dependências. O navegador só faz login (chave anon) e manda o token em cada chamada /api/. */
 
+/* auxiliaresDia: chamadas de análise de foto (localizar, analisar-foto, dentes) por dia — [DECISÃO] valores.
+   Ao mudar qualquer limite, confira a margem no painel admin e reflita a mudança na página de vendas. */
 export const PLANOS = {
-  essencial:    { nome: "Essencial",    simulacoes: 40,  aparelhos: 2,  profissionais: 1, identidades: 1,    versoes: false },
-  profissional: { nome: "Profissional", simulacoes: 150, aparelhos: 3,  profissionais: 1, identidades: null, versoes: true },
-  clinica:      { nome: "Clínica",      simulacoes: 350, aparelhos: 10, profissionais: 5, identidades: null, versoes: true }
+  essencial:    { nome: "Essencial",    simulacoes: 40,  aparelhos: 2,  profissionais: 1, identidades: 1,    versoes: false, auxiliaresDia: 30 },
+  profissional: { nome: "Profissional", simulacoes: 150, aparelhos: 3,  profissionais: 1, identidades: null, versoes: true,  auxiliaresDia: 60 },
+  clinica:      { nome: "Clínica",      simulacoes: 350, aparelhos: 10, profissionais: 5, identidades: null, versoes: true,  auxiliaresDia: 120 }
 };
 const CARENCIA_DIAS = 3;                               // pagamento atrasado: acesso mantido por alguns dias
 

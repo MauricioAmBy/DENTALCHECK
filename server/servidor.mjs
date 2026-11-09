@@ -32,7 +32,7 @@ const { atender } = await import("./ia.mjs");
 const { webhookKiwify } = await import("./kiwify.mjs");
 
 /* cabeçalhos que identificam quem chama: senha antiga, token de login e aparelho */
-export const cabecalhos = h => ({ senha: h["x-acesso"], token: String(h.authorization || "").replace(/^Bearers+/i, ""), aparelho: h["x-aparelho"], descricao: h["x-aparelho-nome"] });
+export const cabecalhos = h => ({ senha: h["x-acesso"], token: String(h.authorization || "").replace(/^Bearer\s+/i, ""), aparelho: h["x-aparelho"], descricao: h["x-aparelho-nome"] });
 
 const PORTA = Number(process.env.PORTA || 5173);
 const TIPOS = {

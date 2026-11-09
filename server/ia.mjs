@@ -3,6 +3,7 @@
 import { montarPrompt } from "./prompt-sorriso.mjs";
 import { contasConfiguradas, configPublica, exigirConta, consumirSimulacao, devolverSimulacao, resumoConta, acaoConta, ErroConta } from "./conta.mjs";
 import { atenderAdmin } from "./admin.mjs";
+import { liberarChamadaIA, registrarChamadasIA } from "./margem.mjs";
 
 const lista = (v, padrao) => (v || padrao).split(",").map(s => s.trim()).filter(Boolean);
 const MODELOS = () => lista(process.env.GEMINI_MODELO, "gemini-3.1-flash-image,gemini-2.5-flash-image");
@@ -16,8 +17,8 @@ export function acessoLiberado(senhaEnviada) {
   return !senha || senhaEnviada === senha;
 }
 
-/* limite diário de simulações (controle de custo), em memória: no servidor local vale por dia;
-   na Vercel cada instância conta separado, então serve só como freio contra excesso */
+/* Sem contas (computador local, testes): freio diário em memória. Com contas, o freio fica no banco
+   (server/margem.mjs), junto com os limites por conta, e vale para todas as instâncias da Vercel. */
 let usoDia = { dia: "", n: 0 };
 function contarUso() {
   const hoje = new Date().toISOString().slice(0, 10);
@@ -27,39 +28,57 @@ function contarUso() {
   return true;
 }
 
+/* Registro de cada chamada ao Gemini (tokens, modelo, sucesso), para medir o custo real.
+   reg.chamadas é gravado depois em chamadas_ia. Nunca guarda foto nem dado de paciente. */
+function tokensDe(uso) {
+  if (!uso) return {};
+  const imagem = (uso.candidatesTokensDetails || []).filter(d => d.modality === "IMAGE").reduce((s, d) => s + (d.tokenCount || 0), 0);
+  return { entrada: uso.promptTokenCount || 0, saida: Math.max(0, (uso.candidatesTokenCount || 0) - imagem) + (uso.thoughtsTokenCount || 0), imagem };
+}
+const motivoHTTP = st => st === 400 || st === 404 ? "modelo-indisponivel" : st === 429 ? "limite-provedor" : "erro-provedor";
+const BLOQUEIOS = /SAFETY|PROHIBITED|BLOCK|RECITATION|SPII/i;
+
+/* faz a chamada e devolve { r, dados } ou { erro } em falha de rede */
+async function postarGemini(modelo, corpo) {
+  try {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent`, {
+      method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY }, body: JSON.stringify(corpo)
+    });
+    return { r, dados: await r.json().catch(() => ({})) };
+  } catch (e) { return { erro: e.message }; }
+}
+
 const imagemDe = corpo => String((corpo && corpo.imagem) || "").replace(/^data:image\/\w+;base64,/, "");
 
-async function chamarGemini(modelo, imagem, prompt) {
-  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent`, {
-    method: "POST",
-    headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY },
-    body: JSON.stringify({
-      contents: [{ role: "user", parts: [{ inlineData: { mimeType: "image/jpeg", data: imagem } }, { text: prompt }] }],
-      generationConfig: { responseModalities: ["TEXT", "IMAGE"], imageConfig: { aspectRatio: "4:3" } }
-    })
+async function chamarGemini(modelo, imagem, prompt, reg) {
+  const inicio = Date.now();
+  const { r, dados, erro } = await postarGemini(modelo, {
+    contents: [{ role: "user", parts: [{ inlineData: { mimeType: "image/jpeg", data: imagem } }, { text: prompt }] }],
+    generationConfig: { responseModalities: ["TEXT", "IMAGE"], imageConfig: { aspectRatio: "4:3" } }
   });
-  const dados = await r.json().catch(() => ({}));
-  if (!r.ok) return { erro: dados.error?.message || `HTTP ${r.status}`, status: r.status };
+  const anota = (sucesso, motivo) => reg.chamadas.push({ modelo, ...tokensDe(dados?.usageMetadata), sucesso, motivo, ms: Date.now() - inicio });
+  if (erro) { anota(false, "rede"); return { erro }; }
+  if (!r.ok) { anota(false, motivoHTTP(r.status)); return { erro: dados.error?.message || `HTTP ${r.status}`, status: r.status }; }
   const img = (dados.candidates?.[0]?.content?.parts || []).find(p => p.inlineData);
   if (!img) {
     const motivo = dados.candidates?.[0]?.finishReason || dados.promptFeedback?.blockReason || "sem imagem";
+    anota(false, BLOQUEIOS.test(motivo) ? "bloqueio" : "sem-imagem");
     return { erro: "A IA não devolveu imagem (" + motivo + ")." };
   }
+  anota(true);
   return { imagem: img.inlineData.data, mime: img.inlineData.mimeType || "image/png" };
 }
 
 /* simular  { imagem: "<jpeg base64>", plano: {...} } → { ok, imagem, mime } */
-async function simular(corpo) {
+async function simular(corpo, reg) {
   const imagem = imagemDe(corpo);
   if (!imagem) return ok({ ok: false, erro: "Foto ausente." }, 400);
   let prompt;
   try { prompt = montarPrompt(corpo.plano || {}); } catch (e) { return ok({ ok: false, erro: e.message }, 400); }
-  if (!contarUso()) return ok({ ok: false, erro: `Limite diário de ${LIMITE_DIA()} simulações atingido.` }, 429);
-
   const inicio = Date.now();
   let ultimo;
   for (const modelo of MODELOS()) {
-    ultimo = await chamarGemini(modelo, imagem, prompt);
+    ultimo = await chamarGemini(modelo, imagem, prompt, reg);
     if (ultimo.imagem) {
       console.log(`[IA] simulação gerada com ${modelo} em ${((Date.now() - inicio) / 1000).toFixed(1)} s`);
       return ok({ ok: true, imagem: ultimo.imagem, mime: ultimo.mime });
@@ -74,23 +93,31 @@ async function simular(corpo) {
 /* ---------- análise de imagem com modelo de texto (barato e rápido) ---------- */
 
 /* envia a imagem + pergunta e devolve o JSON respondido pela IA */
-async function perguntarJSON(imagem, pedido, nome) {
+async function perguntarJSON(imagem, pedido, nome, reg) {
   for (const modelo of MODELOS_TEXTO()) {
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent`, {
-      method: "POST",
-      headers: { "content-type": "application/json", "x-goog-api-key": process.env.GEMINI_API_KEY },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ inlineData: { mimeType: "image/jpeg", data: imagem } }, { text: pedido }] }],
-        /* sem "raciocínio" interno: a resposta cai de ~15 s para ~3 s nesta tarefa simples */
-        generationConfig: { responseMimeType: "application/json", temperature: 0, thinkingConfig: { thinkingBudget: 0 } }
-      })
+    const inicio = Date.now();
+    const { r, dados, erro } = await postarGemini(modelo, {
+      contents: [{ role: "user", parts: [{ inlineData: { mimeType: "image/jpeg", data: imagem } }, { text: pedido }] }],
+      /* sem "raciocínio" interno: a resposta cai de ~15 s para ~3 s nesta tarefa simples */
+      generationConfig: { responseMimeType: "application/json", temperature: 0, thinkingConfig: { thinkingBudget: 0 } }
     });
-    const dados = await r.json().catch(() => ({}));
-    if (!r.ok) { console.error(`[IA] ${nome} (${modelo}):`, dados.error?.message || r.status); if (r.status === 404 || r.status === 400) continue; return null; }
+    const anota = (sucesso, motivo) => reg.chamadas.push({ modelo, ...tokensDe(dados?.usageMetadata), sucesso, motivo, ms: Date.now() - inicio });
+    if (erro) { anota(false, "rede"); console.error(`[IA] ${nome} (${modelo}): ${erro}`); return null; }
+    if (!r.ok) {
+      anota(false, motivoHTTP(r.status));
+      console.error(`[IA] ${nome} (${modelo}):`, dados.error?.message || r.status);
+      if (r.status === 404 || r.status === 400) continue; return null;
+    }
     try {
       const texto = (dados.candidates?.[0]?.content?.parts || []).map(p => p.text || "").join("");
-      return { modelo, json: JSON.parse(texto.replace(/```json|```/g, "")) };
-    } catch { console.error(`[IA] ${nome}: resposta inesperada`); return null; }
+      const json = JSON.parse(texto.replace(/```json|```/g, ""));
+      anota(true);
+      return { modelo, json };
+    } catch {
+      const motivo = dados.candidates?.[0]?.finishReason || dados.promptFeedback?.blockReason || "";
+      anota(false, BLOQUEIOS.test(motivo) ? "bloqueio" : "resposta-invalida");
+      console.error(`[IA] ${nome}: resposta inesperada`); return null;
+    }
   }
   return null;
 }
@@ -130,14 +157,14 @@ const PEDIDO_ANALISE = `You are organizing clinical photos for a dental case pre
 "mouth_box" = lips + all visible teeth and gums; "face_box" = the whole face from hairline to chin. Coordinates normalized 0-1000 in the ORIGINAL image as given (before rotation). Use null when not visible.`;
 
 /* localizar  { imagem } → { ok, caixa } — posição da boca, para a região do sorriso */
-async function localizar(corpo) {
+async function localizar(corpo, reg) {
   const imagem = imagemDe(corpo); if (!imagem) return ok({ ok: false }, 400);
   const resp = await perguntarJSON(imagem, "Detect the mouth of the main person in this photo: the area including both lips and all visible teeth and gums. " +
-    'Answer only JSON: {"box_2d": [ymin, xmin, ymax, xmax]} with coordinates normalized to 0-1000. If there is no visible mouth, answer {"box_2d": null}.', "localizar");
+    'Answer only JSON: {"box_2d": [ymin, xmin, ymax, xmax]} with coordinates normalized to 0-1000. If there is no visible mouth, answer {"box_2d": null}.', "localizar", reg);
   let c = resp ? caixa(resp.json.box_2d) : null;
   /* às vezes a primeira pergunta volta sem a boca: tenta de novo pela análise completa da foto */
   if (!c) {
-    const outra = await perguntarJSON(imagem, PEDIDO_ANALISE, "localizar (2ª tentativa)");
+    const outra = await perguntarJSON(imagem, PEDIDO_ANALISE, "localizar (2ª tentativa)", reg);
     c = outra ? caixa(outra.json.mouth_box) : null;
   }
   if (!c) return ok({ ok: false, erro: "Boca não encontrada na foto." });
@@ -147,9 +174,9 @@ async function localizar(corpo) {
 
 /* analisar-foto  { imagem } → { ok, rotacao, angulo, boca, rosto }
    Organiza fotos clínicas: quanto girar, qual ângulo é e onde estão boca e rosto (na imagem original). */
-async function analisarFoto(corpo) {
+async function analisarFoto(corpo, reg) {
   const imagem = imagemDe(corpo); if (!imagem) return ok({ ok: false }, 400);
-  const resp = await perguntarJSON(imagem, PEDIDO_ANALISE, "analisar-foto");
+  const resp = await perguntarJSON(imagem, PEDIDO_ANALISE, "analisar-foto", reg);
   if (!resp) return ok({ ok: false, erro: "Não foi possível analisar a foto." }, 502);
   const j = resp.json;
   const rotacao = [0, 90, 180, 270].includes(Number(j.rotation)) ? Number(j.rotation) : 0;
@@ -169,9 +196,9 @@ Lower arch, from image left to image right: 46, 45, 44, 43, 42, 41 | 31, 32, 33,
 If a tooth is missing but its space is visible, still return the box of that empty space.
 Answer only JSON: [{"fdi": 11, "box_2d": [ymin, xmin, ymax, xmax]}, ...] with coordinates normalized 0-1000. Only include teeth (or spaces) that are actually visible.`;
 
-async function detectarDentes(corpo) {
+async function detectarDentes(corpo, reg) {
   const imagem = imagemDe(corpo); if (!imagem) return ok({ ok: false }, 400);
-  const resp = await perguntarJSON(imagem, PEDIDO_DENTES, "dentes");
+  const resp = await perguntarJSON(imagem, PEDIDO_DENTES, "dentes", reg);
   if (!resp || !Array.isArray(resp.json)) return ok({ ok: false, erro: "Não foi possível identificar os dentes." }, 502);
   const vistos = new Set(), dentes = [];
   for (const d of resp.json) {
@@ -201,7 +228,8 @@ const USA_IA = new Set(["simular", "localizar", "analisar-foto", "dentes"]);
 
 /* ponto único de entrada.
    - Com contas configuradas (Supabase): exige login + assinatura ativa + aparelho dentro do limite;
-     a simulação desconta 1 do mês e é devolvida se a IA falhar.
+     a simulação desconta 1 do mês e é devolvida se a IA falhar. Toda chamada à IA passa pelos limites de
+     margem (auxiliares do dia, teto de falhas, freio global) e é registrada em chamadas_ia (server/margem.mjs).
    - Sem contas (computador local / testes): vale a senha de acesso antiga (ACESSO_SENHA), se existir.
    cab = { senha, token, aparelho, descricao } vindos dos cabeçalhos da requisição */
 export async function atender(nome, corpo, cab = {}) {
@@ -216,9 +244,16 @@ export async function atender(nome, corpo, cab = {}) {
       else if (!acessoLiberado(cab.senha)) return ok({ ok: false, erro: "Acesso não autorizado. Entre de novo com a senha.", semAcesso: true }, 401);
     }
     if (USA_IA.has(nome) && !process.env.GEMINI_API_KEY) return ok({ ok: false, erro: "A IA não está configurada no servidor." }, 500);
+    const tipo = nome === "simular" ? "simulacao" : USA_IA.has(nome) ? "auxiliar" : null;
     let usado = null;
     if (nome === "simular" && conta) usado = await consumirSimulacao(conta);
-    const r = await rota(corpo || {});
+    if (tipo && conta) {
+      try { await liberarChamadaIA(conta, tipo); }
+      catch (e) { if (usado !== null) await devolverSimulacao(conta); throw e; }
+    } else if (nome === "simular" && !contarUso()) return ok({ ok: false, erro: `Limite diário de ${LIMITE_DIA()} simulações atingido.` }, 429);
+    const reg = { chamadas: [] };
+    const r = await rota(corpo || {}, reg);
+    if (tipo && conta) await registrarChamadasIA(conta, nome, reg.chamadas);
     if (usado !== null) {
       if (r.status !== 200) await devolverSimulacao(conta);   // a IA falhou: a simulação não conta
       else r.corpo.uso = { simulacoes: usado, limite: conta.plano.simulacoes };

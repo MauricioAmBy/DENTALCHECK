@@ -30,6 +30,13 @@
 .ad-lib label{font-size:12px;font-weight:700;color:var(--muted);display:grid;gap:4px}
 .msg{padding:10px 14px;border-radius:var(--r-sm);font-size:14px;margin-bottom:14px}
 .msg.erro{background:#fdecec;color:#9b1c1c}.msg.ok{background:#e8f7ef;color:#1f7a45}
+.ad-margem{margin-top:14px}.ad-margem summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.ad-margem summary::-webkit-details-marker{display:none}
+.ad-margem h4{margin:18px 0 6px;font-size:14px;color:var(--navy)}
+.ad-margem p{font-size:13px;color:var(--muted);margin:4px 0}
+.ad-tab{width:100%;border-collapse:collapse;font-size:13px}.ad-tab th,.ad-tab td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}
+.ad-tab th{color:var(--muted);font-weight:700;font-size:12px}.ad-tab td.n,.ad-tab th.n{text-align:right;white-space:nowrap}
+.ad-rolar{overflow-x:auto}
 @media (max-width:700px){.ad-novo,.ad-lib{grid-template-columns:1fr 1fr}.ad-novo label:first-child{grid-column:1/-1}.ad-item{grid-template-columns:1fr}.ad-acoes{justify-content:flex-start}}
 </style>
 </head>
@@ -54,6 +61,10 @@
         <button class="btn pri">Liberar</button>
       </form>
     </div>
+    <details class="card ad-margem" id="margemBox">
+      <summary><b style="color:var(--navy)">Custo da IA e margem</b><span class="muted" style="font-size:13px" id="margemResumo">carregando…</span></summary>
+      <div id="margem"></div>
+    </details>
     <input class="in ad-busca" id="busca" type="search" placeholder="Buscar por e-mail">
     <div class="ad-lista" id="lista"></div>
   </div>
@@ -134,9 +145,38 @@
     e.preventDefault();
     if (liberar($("novoEmail").value.trim().toLowerCase(), $("novoPlano").value, $("novoAte").value)) { $("novoEmail").value = ""; $("novoAte").value = ""; }
   };
+  /* custo da IA e margem: separado da lista, para uma falha aqui (ex.: migração não aplicada) não esconder as contas */
+  const real = v => "R$ " + Number(v).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+  async function carregarMargem() {
+    try {
+      const m = (await chamar({ acao: "margem" })).margem;
+      const acima = m.planos.filter(p => p.percentual > m.teto);
+      $("margemResumo").innerHTML = acima.length ? `<span class="selo off">${acima.length} acima de ${m.teto}%</span>` : `<span class="selo ok">todos dentro de ${m.teto}%</span>`;
+      const origem = c => c.medido ? `medido em ${c.amostras} pedidos nos últimos ${m.dias} dias` : "estimativa (menos de 20 medições até agora)";
+      $("margem").innerHTML = `
+        <p>Custo por simulação: <b>${real(m.custoSimulacao.valor)}</b> · ${origem(m.custoSimulacao)}</p>
+        <p>Custo por análise auxiliar (localizar, analisar foto, dentes): <b>${real(m.custoAuxiliar.valor)}</b> · ${origem(m.custoAuxiliar)}</p>
+        <h4>Pior caso por plano (a conta usa tudo o que o plano permite)</h4>
+        <div class="ad-rolar"><table class="ad-tab"><tr><th>Plano</th><th class="n">Receita líquida/mês</th><th class="n">Custo máximo/mês</th><th class="n">% da receita</th><th></th></tr>
+        ${m.planos.map(p => `<tr><td>${esc(p.nome)}</td><td class="n">${real(p.receita)}</td><td class="n">${real(p.custoMax)}</td><td class="n">${p.percentual}%</td><td>${p.percentual > 100 ? `<span class="selo off">prejuízo</span>` : p.percentual > m.teto ? `<span class="selo off">acima de ${m.teto}%</span>` : `<span class="selo ok">ok</span>`}</td></tr>`).join("")}</table></div>
+        <p>Receita líquida = preço − taxa da Kiwify (${Math.round(m.kiwify.percentual * 100)}% + ${real(m.kiwify.fixo)}), dividida pelos meses do período. Custo máximo = simulações do plano + análises auxiliares do limite diário × 30 dias. Dólar: ${real(m.dolar)}.</p>
+        <p>Limites atuais: ${m.limites.tetoFalhasDia} falhas por conta por dia · análises auxiliares por dia: Essencial ${m.limites.auxiliaresDia.essencial}, Profissional ${m.limites.auxiliaresDia.profissional}, Clínica ${m.limites.auxiliaresDia.clinica} · freio do sistema: ${m.limites.simulacoesDia} simulações e ${m.limites.auxiliaresDiaGlobal} auxiliares por dia.</p>
+        <h4>Chamadas à IA nos últimos ${m.dias} dias</h4>
+        ${m.porModelo.length ? `<div class="ad-rolar"><table class="ad-tab"><tr><th>Rota</th><th>Modelo</th><th class="n">Chamadas</th><th class="n">Deram certo</th><th class="n">Custo</th></tr>
+        ${m.porModelo.map(l => `<tr><td>${esc(l.rota)}</td><td>${esc(l.modelo)}${l.semPreco ? ` <span class="selo off" title="Cadastre o preço em CUSTO_IA_JSON">sem preço</span>` : ""}</td><td class="n">${l.chamadas}</td><td class="n">${l.sucessos}</td><td class="n">${real(l.custoReais)}</td></tr>`).join("")}</table></div>` : "<p>Nenhuma chamada registrada ainda.</p>"}
+        <h4>Falhas recentes</h4>
+        ${m.falhas.length ? `<div class="ad-rolar"><table class="ad-tab"><tr><th>Quando</th><th>Conta</th><th>Rota</th><th>Motivo</th></tr>
+        ${m.falhas.map(f => `<tr><td>${new Date(f.quando).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })}</td><td>${esc(f.conta)}</td><td>${esc(f.rota)}</td><td>${esc(f.motivo)}</td></tr>`).join("")}</table></div>` : "<p>Nenhuma falha nos últimos dias.</p>"}`;
+    } catch (e) {
+      $("margemResumo").textContent = "indisponível";
+      $("margem").innerHTML = `<p>${esc(e.message)}</p><p>Se a mensagem fala de função ou tabela inexistente, rode supabase/migrations/20261109120000_margem_ia.sql no Supabase.</p>`;
+    }
+  }
+
   $("busca").oninput = desenhar;
-  $("btnAtualizar").onclick = () => carregar();
+  $("btnAtualizar").onclick = () => { carregar(); carregarMargem(); };
   carregar();
+  carregarMargem();
 })();
 </script>
 </body>

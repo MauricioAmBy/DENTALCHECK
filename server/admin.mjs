@@ -3,6 +3,7 @@
    A cortesia é uma assinatura comum marcada com kiwify_pedido = "cortesia"; se a pessoa comprar depois,
    a Kiwify sobrescreve normalmente. */
 import { PLANOS, ErroConta, rest, usuarioDoToken, mesAtual, acessoLiberado } from "./conta.mjs";
+import { relatorioMargem } from "./margem.mjs";
 
 export const CORTESIA = "cortesia";
 const enc = encodeURIComponent;
@@ -67,12 +68,13 @@ async function encerrar(email) {
   });
 }
 
-/* corpo.acao: "verificar" | "listar" | "liberar" { email, plano, ate? "AAAA-MM-DD" } | "encerrar" { email } */
+/* corpo.acao: "verificar" | "margem" (custo da IA e conta por plano) | "listar" | "liberar" { email, plano, ate? "AAAA-MM-DD" } | "encerrar" { email } */
 export async function atenderAdmin(corpo, cab) {
   const u = await usuarioDoToken(cab.token);
   if (!ehAdmin(u.email)) throw new ErroConta(403, "Área restrita ao administrador.", "nao-admin");
   const email = String(corpo.email || "").trim().toLowerCase();
   if (corpo.acao === "verificar") return { ok: true, admin: true };
+  if (corpo.acao === "margem") return { ok: true, margem: await relatorioMargem() };
   if (corpo.acao === "liberar") await liberarCortesia(email, String(corpo.plano || ""), corpo.ate || null);
   else if (corpo.acao === "encerrar") await encerrar(email);
   return { ok: true, contas: await listar() };
