@@ -1,8 +1,8 @@
 /* DENTALCHECK — service worker: deixa o app funcionando offline depois da ativação */
-const VERSAO = "dc-v10";
+const VERSAO = "dc-v11";
 const BASE = [ /* endereços limpos (sem .html), iguais aos da Vercel */
   "/", "/apresentacao", "/simulador",
-  "./assets/app.css", "./assets/db.js", "./assets/licenca.js", "./assets/dentes.js", "./assets/ia.js",
+  "./assets/app.css", "./assets/db.js", "./assets/licenca.js", "./assets/dentes.js", "./assets/ia.js", "./assets/funil.js",
   "./manifest.webmanifest", "./icons/icon.svg", "./icons/marca.svg", "./icons/marca-branca.svg", "./icons/icon-192.png", "./icons/icon-512.png"
 ];
 /* bibliotecas e fontes externas: guardadas no primeiro uso */

@@ -67,6 +67,19 @@
 .termo .st.ok{background:var(--lima-claro,#eef6db);color:var(--preto,#151719)}
 .termo .bts{display:flex;gap:8px;flex-wrap:wrap}
 .sel-resumo b{color:var(--navy)}
+/* funil do paciente (B3) */
+.funil h2{font-size:18px}
+.etapas{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 4px}
+.etapas button{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border:1.5px solid var(--line);border-radius:99px;font-size:14px;font-weight:700;color:var(--muted);background:#fff}
+.etapas button i{width:10px;height:10px;border-radius:50%;flex:none}
+.etapas button.on{color:#fff;border-color:transparent}
+.etapas .seta{color:var(--line2);align-self:center;font-size:13px}
+.funil-campos{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-top:12px}
+.funil-campos .f{margin:0;flex:0 1 220px}
+.funil-hist{font-size:12px;color:var(--muted);margin-top:10px}
+.funil-ret{margin-top:12px;background:#fff7e6;color:#8a5a00;border-radius:12px;padding:10px 14px;font-size:14px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.pcard .est{display:inline-block;margin-top:4px;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:99px;color:#fff}
+@media (max-width:600px){.etapas .seta{display:none}.etapas button{flex:1 1 30%;justify-content:center;padding:8px 6px}.funil-campos .f{flex:1 1 100%}}
 .item.fora .par{opacity:.45}
 .item .incluir{border:0;padding:0 0 10px;background:none}
 @media (max-width:600px){.caso-acoes{width:100%}.caso-acoes .btn{flex:1 1 45%}.sims{grid-template-columns:1fr}}
@@ -297,6 +310,7 @@
       <button class="btn" id="casoEditar">✏️ Editar apresentação</button>
     </div>
   </div>
+  <div class="caso-sec funil" id="funilBox"></div>
   <div class="caso-sec">
     <div class="caso-sec-topo"><h2>Simulações <small id="casoQtd"></small></h2><a class="btn sm pri" id="casoNova" href="/simulador">+ Nova simulação</a></div>
     <p class="sel-resumo hidden" id="casoSel"></p>
@@ -345,6 +359,7 @@
 <script src="assets/db.js"></script>
 <script src="assets/dentes.js"></script>
 <script src="assets/ia.js"></script>
+<script src="assets/funil.js"></script>
 <script>
 (function () {
   const $ = id => document.getElementById(id);
@@ -461,7 +476,7 @@
     $("pacientes").innerHTML = lista.length ? lista.map(p => {
       const capa = capaPaciente(p), n = (p.antesDepois || []).length;
       return `<button class="pcard" data-id="${p.id}"><div class="img" style="${capa ? `background-image:url(${capa})` : ""}">${capa ? "" : esc((p.nome || "?")[0].toUpperCase())}${n ? `<span class="tag">${n} ${n === 1 ? "simulação" : "simulações"}</span>` : ""}</div>
-        <div class="txt"><b>${esc(p.nome || "Sem nome")}</b><small>Avaliação em ${dataBR(p.data)}</small></div></button>`;
+        <div class="txt"><b>${esc(p.nome || "Sem nome")}</b><small>Avaliação em ${dataBR(p.data)}</small>${Funil.estagio(p) !== "avaliado" ? `<br><span class="est" style="background:${Funil.info(Funil.estagio(p)).cor}">${Funil.info(Funil.estagio(p)).nome}</span>` : ""}</div></button>`;
     }).join("") : `<div class="vazio" style="grid-column:1/-1"><h2>${todos.length ? "Nenhum paciente encontrado" : "Nenhum paciente ainda"}</h2><p>Comece um novo procedimento para criar o primeiro caso.</p></div>`;
   }
   $("busca").oninput = renderLista;
@@ -496,10 +511,44 @@
     $("casoSims").querySelectorAll(".cmp").forEach(ligarComparador);
     resumoSelecao(sims);
     renderTermo();
+    renderFunil();
     const fotos = ANGULOS.filter(([id]) => pac.fotos[id]);
     $("casoFotosBox").classList.toggle("hidden", !fotos.length);
     $("casoFotos").innerHTML = fotos.map(([id, nome]) => `<figure><img src="${pac.fotos[id]}" alt=""><figcaption>${nome}</figcaption></figure>`).join("");
   }
+  /* ---------- funil do paciente (B3): estágio com um toque, valor fechado, próximo contato ---------- */
+  function renderFunil() {
+    const est = Funil.estagio(pac), f = pac.funil || {}, ret = Funil.retorno(pac, cfg.diasRetorno || Funil.DIAS_PADRAO);
+    const zap = Funil.whatsapp(pac, identidade().clinica);
+    const hist = (f.historico || []).map(h => `${Funil.info(h.estagio).nome} em ${dataBR(h.data)}`).join(" · ");
+    const aberto = est !== "fechou" && est !== "perdido";
+    $("funilBox").innerHTML = `<div class="caso-sec-topo" style="margin-bottom:0"><h2>Situação do tratamento</h2>${zap ? `<a class="btn sm" href="${zap}" target="_blank" rel="noopener">WhatsApp do paciente</a>` : ""}</div>
+      <div class="etapas">${Funil.ESTAGIOS.map((e, i) => `${i && i < 4 ? `<span class="seta">›</span>` : ""}<button data-est="${e.id}" class="${e.id === est ? "on" : ""}" style="${e.id === est ? `background:${e.cor}` : ""}"><i style="background:${e.id === est ? "#fff" : e.cor}"></i>${e.nome}</button>`).join("")}</div>
+      <div class="funil-campos">
+        ${est === "fechou" ? `<div class="f"><label>Valor fechado (R$)</label><input class="in" id="fnValor" inputmode="decimal" placeholder="Ex.: 12000" value="${esc(f.valorFechado ?? "")}"></div>` : ""}
+        ${est === "perdido" ? `<div class="f" style="flex-basis:320px"><label>Motivo (opcional)</label><input class="in" id="fnMotivo" placeholder="Ex.: achou caro, vai pensar, fez em outro lugar" value="${esc(f.motivo || "")}"></div>` : ""}
+        ${aberto ? `<div class="f"><label>Próximo contato</label><input class="in" id="fnProx" type="date" value="${esc(f.proximoContato || "")}"></div>` : ""}
+      </div>
+      ${ret ? `<div class="funil-ret"><span><b>Precisa de retorno:</b> ${esc(ret.motivo)}.</span>${zap ? `<a class="btn sm pri" href="${zap}" target="_blank" rel="noopener">Chamar no WhatsApp</a>` : `<span>Cadastre o telefone em “Editar apresentação” para chamar pelo WhatsApp.</span>`}</div>` : ""}
+      <div class="funil-hist">${hist ? hist : "Ao apresentar ou baixar o PDF, o paciente passa para “Apresentado” sozinho."}</div>`;
+  }
+  $("funilBox").onclick = async e => {
+    const b = e.target.closest("[data-est]"); if (!b) return;
+    const novo = b.dataset.est, extra = {};
+    if (novo === "fechou" && Funil.estagio(pac) !== "fechou") { const v = Funil.valorSugerido(pac); if (v) extra.valorFechado = String(v); }
+    if (!Funil.mudar(pac, novo, extra)) return;
+    await DB.salvar(pac); renderFunil();
+    if (novo === "fechou") { $("fnValor")?.focus(); toast("Parabéns! Confira o valor fechado."); }
+  };
+  $("funilBox").onchange = async e => {
+    const f = pac.funil || (pac.funil = { estagio: "avaliado", historico: [] });
+    if (e.target.id === "fnValor") { const n = Funil.numero(e.target.value); f.valorFechado = n === null ? "" : String(n); if (n === null && e.target.value.trim()) toast("Digite só o número, ex.: 12000"); }
+    else if (e.target.id === "fnMotivo") f.motivo = e.target.value.trim();
+    else if (e.target.id === "fnProx") { if (e.target.value) f.proximoContato = e.target.value; else delete f.proximoContato; }
+    else return;
+    await DB.salvar(pac); renderFunil();
+  };
+
   /* ---------- termo de autorização de uso de imagem (LGPD) ---------- */
   const VERSAO_TERMO = 1;   // suba quando o texto do termo mudar (fica gravado no consentimento do paciente)
   function renderTermo() {
@@ -1170,7 +1219,9 @@ Quer conhecer o plano Profissional?`)) window.open("https://pay.kiwify.com.br/M8
     try {
       await prepararComIA();
       $("preparandoTxt").textContent = paraPDF ? "Montando o PDF…" : "Montando os slides…";
-      return await montarSlides(paraPDF);
+      const lista = await montarSlides(paraPDF);
+      if (Funil.marcarApresentado(pac)) await DB.salvar(pac);   // funil: gerar a apresentação ou o PDF = apresentado
+      return lista;
     } finally { $("preparando").classList.add("hidden"); }
   }
   $("btnApresentar").onclick = async () => {

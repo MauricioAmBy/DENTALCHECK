@@ -83,6 +83,25 @@
 .backup.alerta{border-color:var(--lima);box-shadow:0 0 0 3px rgba(195,232,107,.45)}
 .backup h3{font-size:16px}.backup p{font-size:14px;color:var(--muted);margin-top:4px;max-width:560px}
 .backup .bts{display:flex;gap:8px;flex-wrap:wrap}
+/* funil (B3): resultados do mês e pacientes que precisam de retorno */
+.funil-home{margin-top:22px;display:grid;grid-template-columns:1fr 1.3fr;gap:18px;align-items:start}
+.funil-home.so-res{grid-template-columns:1fr}
+.fh-res{background:var(--navy);color:#fff;border-radius:var(--r);padding:22px}
+.fh-res .kick{color:var(--lima,#c3e86b)}
+.fh-res .val{font-family:Montserrat,var(--sans);font-size:34px;font-weight:800;margin:6px 0 2px;color:#fff}
+.fh-res p{font-size:14px;color:rgba(255,255,255,.78);margin-top:6px}
+.fh-res .ant{border-top:1px solid rgba(255,255,255,.15);margin-top:14px;padding-top:10px;font-size:13px;color:rgba(255,255,255,.65)}
+.fh-ret{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+.fh-topo{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.fh-topo h3{font-size:16px}.fh-topo h3 span{color:var(--muted);font-weight:600}
+.fh-dias{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.fh-dias select{border:1px solid var(--line);border-radius:8px;padding:3px 6px;font:inherit;background:#fff}
+.fh-ret ul{list-style:none;display:grid;gap:8px;margin-top:12px}
+.fh-ret li{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--sky);border-radius:12px;padding:10px 12px;font-size:14px}
+.fh-ret li b{color:var(--navy)}.fh-ret li small{display:block;color:var(--muted);font-size:12px}
+.fh-ret li .bts{display:flex;gap:6px}
+.mc-resultado{font-size:14px;color:var(--navy);background:var(--mint);border-radius:12px;padding:10px 14px;margin:8px 0}
+@media (max-width:860px){.funil-home{grid-template-columns:1fr}}
 .dica{margin-top:22px;display:flex;gap:12px;align-items:center;padding:14px 18px;border-radius:var(--r);background:var(--mint);font-size:14px}
 @media (max-width:860px){#ativacao{grid-template-columns:1fr}.at-lado{padding:32px 22px}.at-lado ul{display:none}.sistemas{grid-template-columns:1fr}}
 </style>
@@ -150,6 +169,7 @@
       </div>
       <div class="mc-uso"><div class="mc-barra"><i id="mcBarra"></i></div><span id="mcUso"></span></div>
       <div class="mc-alerta hidden" id="mcAlerta"></div>
+      <p class="mc-resultado hidden" id="mcResultado"></p>
       <details class="mc-det hidden" id="mcAssinaturaBox"><summary>Pagamento e assinatura</summary><div id="mcAssinatura"></div></details>
       <details class="mc-det"><summary>Aparelhos conectados <span id="mcQtdAp"></span></summary><ul id="mcAparelhos"></ul></details>
       <details class="mc-det hidden" id="mcEquipeBox"><summary>Equipe <span id="mcQtdEq"></span></summary>
@@ -175,6 +195,14 @@
         <div class="txt"><div class="kick">Casos salvos</div><h2>Pacientes e apresentações</h2><p>Abra um paciente para revisar fotos, simulações, odontograma e propostas, apresentar na consulta e gerar o PDF.</p><div class="ir">Ver pacientes →</div></div>
       </a>
     </div>
+    <section class="funil-home hidden" id="funilHome">
+      <div class="fh-res" id="fhRes"></div>
+      <div class="fh-ret hidden" id="fhRetBox">
+        <div class="fh-topo"><h3>Precisa de retorno <span id="fhQtd"></span></h3>
+          <label class="fh-dias">Lembrar após <select id="fhDias"></select> sem resposta</label></div>
+        <ul id="fhRet"></ul>
+      </div>
+    </section>
     <section class="meus hidden" id="meusPacientes">
       <div class="meus-topo"><h2>Seus pacientes</h2><a class="btn sm" href="/apresentacao">Ver todos →</a></div>
       <div class="meus-grade" id="meusGrade"></div>
@@ -192,6 +220,7 @@
 
 <script src="assets/licenca.js"></script>
 <script src="assets/db.js"></script>
+<script src="assets/funil.js"></script>
 <script>
 (function () {
   const $ = id => document.getElementById(id);
@@ -280,7 +309,7 @@
     if (!lic) return definirModo(tokenRecuperacao ? "nova" : !pub.contas ? "senha" : modo !== "senha" ? modo : veioDaCompra ? "criar" : "entrar");
     $("ola").textContent = lic.email ? "Olá, " + lic.email.split("@")[0] + "!" : "Olá!";
     if (lic.tipo === "conta") { carregarConta(); verificarAdmin(); }
-    mostrarPacientes(); mostrarBackup();
+    mostrarPacientes(); mostrarBackup(); mostrarFunil();
     $("hubSuporte").href = linkSuporte("Preciso de ajuda.");
     if (location.hash === "#backup") setTimeout(() => $("backupBox").scrollIntoView({ behavior: "smooth", block: "center" }), 300);
     /* endereço antigo: os pacientes ficam guardados por endereço; quem usa o .vercel.app precisa levar o backup para o domínio novo */
@@ -329,7 +358,7 @@
     try {
       const r = await DB.importar(JSON.parse(await f.text()));
       toast(r.novos || r.atualizados ? `Backup restaurado: ${r.novos} novos, ${r.atualizados} atualizados.` : "Tudo já estava neste aparelho. Nada mudou.");
-      mostrarPacientes(); mostrarBackup();
+      mostrarPacientes(); mostrarBackup(); mostrarFunil();
     } catch (err) { console.error(err); toast(err instanceof SyntaxError ? "Este arquivo não é um backup do DENTALCHECK." : err.message || "Não foi possível restaurar."); }
   };
 
@@ -345,6 +374,39 @@
       return `<a class="mp" href="/apresentacao?paciente=${p.id}"><div class="img" style="${capa ? `background-image:url(${capa})` : ""}">${capa ? "" : esc((p.nome || "?")[0].toUpperCase())}${n ? `<span class="tag">${n} ${n === 1 ? "simulação" : "simulações"}</span>` : ""}</div><div class="txt"><b>${esc(p.nome || "Sem nome")}</b><small>${dataBR(p.data)}</small></div></a>`;
     }).join("");
   }
+
+  /* ---------- funil (B3): resultados do mês e "precisa de retorno", calculados neste aparelho ---------- */
+  async function mostrarFunil() {
+    const [lista, cfg] = await Promise.all([DB.listar().catch(() => []), DB.config().catch(() => ({}))]);
+    const dias = cfg.diasRetorno || Funil.DIAS_PADRAO, hoje = Funil.hojeISO(), mes = hoje.slice(0, 7);
+    const clinica = ((cfg.identidades || [])[0] || {}).clinica || cfg.clinica || "";
+    const r = Funil.resumoMes(lista, mes), ant = Funil.resumoMes(lista, Funil.mesAnterior(mes));
+    const usa = lista.some(p => !p.exemplo && Funil.estagio(p) !== "avaliado");
+    const retornos = lista.filter(p => !p.exemplo).map(p => ({ p, r: Funil.retorno(p, dias, hoje) })).filter(x => x.r).sort((a, b) => b.r.dias - a.r.dias);
+    mostra("funilHome", (usa || retornos.length > 0) && $("bloqueio").classList.contains("hidden"));
+    mostra("fhRetBox", retornos.length > 0);
+    $("funilHome").classList.toggle("so-res", !retornos.length);
+    const nm = Funil.nomeMes(mes), na = Funil.nomeMes(ant.mes);
+    const frase = r.fechados
+      ? `<div class="val">${Funil.reais(r.valor)}</div><p>fechados com o DENTALCHECK em ${nm}: ${r.fechados} ${r.fechados === 1 ? "tratamento" : "tratamentos"}.</p>`
+      : `<div class="val">${Funil.reais(0)}</div><p>Nenhum tratamento fechado em ${nm} ainda. Quando o paciente aceitar, marque “Fechou” na página dele.</p>`;
+    $("fhRes").innerHTML = `<div class="kick">Seus resultados · ${nm}</div>${frase}
+      ${r.apresentados ? `<p>${r.fechados} de ${r.apresentados} ${r.apresentados === 1 ? "paciente apresentado" : "pacientes apresentados"} no mês ${r.fechados === 1 ? "fechou" : "fecharam"} (${r.conversao}%).</p>` : ""}
+      <div class="ant">Em ${na}: ${Funil.reais(ant.valor)} · ${ant.fechados} ${ant.fechados === 1 ? "fechado" : "fechados"}${ant.conversao !== null ? ` · conversão de ${ant.conversao}%` : ""}</div>`;
+    $("fhQtd").textContent = `(${retornos.length})`;
+    $("fhDias").innerHTML = [3, 5, 7, 10, 15].map(n => `<option value="${n}" ${n === dias ? "selected" : ""}>${n} dias</option>`).join("");
+    $("fhRet").innerHTML = retornos.slice(0, 8).map(({ p, r: x }) => {
+      const zap = Funil.whatsapp(p, clinica);
+      return `<li><span><b>${esc(p.nome || "Sem nome")}</b><small>${esc(x.motivo)}</small></span><span class="bts">${zap ? `<a class="btn sm pri" href="${zap}" target="_blank" rel="noopener">WhatsApp</a>` : ""}<a class="btn sm" href="/apresentacao?paciente=${p.id}">Abrir</a></span></li>`;
+    }).join("") + (retornos.length > 8 ? `<li><span>E mais ${retornos.length - 8}. <a href="/apresentacao">Ver todos os pacientes</a></span></li>` : "");
+    /* resumo também em "Minha conta" */
+    $("mcResultado").innerHTML = usa ? `<b>${Funil.reais(r.valor)}</b> fechados com o DENTALCHECK em ${nm}${r.conversao !== null ? ` · conversão de ${r.conversao}%` : ""}.` : "";
+    mostra("mcResultado", usa);
+  }
+  $("fhDias").onchange = async e => {
+    const c = await DB.config(); c.diasRetorno = Number(e.target.value);
+    await DB.salvarConfig(c); mostrarFunil();
+  };
 
   /* ---------- suporte e assinatura (um lugar só para trocar contatos e links) ---------- */
   const SUPORTE = {
@@ -371,7 +433,7 @@
     catch (e) { return; }                                   // offline: mantém o app utilizável
     const bloqueado = !d.ok;
     mostra("bloqueio", bloqueado); mostra("minhaConta", !bloqueado); mostra("sistemas", !bloqueado);
-    if (bloqueado) mostra("meusPacientes", false);
+    if (bloqueado) { mostra("meusPacientes", false); mostra("funilHome", false); }
     if (bloqueado) return ($("bloqueioMsg").textContent = d.erro || "Não foi possível confirmar sua assinatura.");
     const c = d.conta;
     if (!c) return mostra("minhaConta", false);
