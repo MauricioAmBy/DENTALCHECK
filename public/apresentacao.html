@@ -142,7 +142,7 @@
   #palco .area .nav{top:auto;bottom:14px;transform:none;width:44px;height:44px}
   #palco .area .nav.ant{left:calc(50% - 54px)}#palco .area .nav.prox{right:calc(50% - 54px)}
 }
-@media (max-width:760px) and (orientation:portrait){#palco .dica-girar{display:block}}
+@media (max-width:760px) and (orientation:portrait){#palco .dica-girar{display:block}#palco.sem-dica .dica-girar{display:none}}
 #palco .nav{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:22px}
 #palco .nav.ant{left:12px}#palco .nav.prox{right:12px}
 .slide{width:1280px;height:720px;background:var(--s-fundo,#fff);position:relative;overflow:hidden;font-family:var(--fs,var(--sans));color:var(--s-texto,#10233a);flex:none;transform-origin:center}
@@ -213,6 +213,26 @@
 .slide .dente .num{color:var(--s-suave,#5d6f84)}
 .slide .contato{margin-top:28px;font-size:20px;color:var(--capa-texto,#fff);opacity:.88;display:grid;gap:6px}
 .slide .exame-nota{font-size:18px;color:var(--s-suave,#4a5b6e);margin-top:10px}
+/* duas opções lado a lado: "hoje" (300) + opção 1 (412) + opção 2 (412) = 1152 px; no celular em pé vira "retrato" (720×1280), empilhado */
+.slide .duo{display:grid;grid-template-columns:300px 1fr 1fr;gap:14px;flex:1;min-height:0}
+.slide .duo .op{display:flex;flex-direction:column;min-width:0;position:relative}
+.slide .duo figure{position:relative;height:300px;border-radius:18px;overflow:hidden;background:#000;flex:none}
+.slide .duo img{display:block;width:100%;height:100%;object-fit:cover}
+.slide .duo figcaption{position:absolute;top:14px;left:14px;background:rgba(21,23,25,.82);color:#fff;font-size:15px;font-weight:700;padding:5px 14px;border-radius:99px;letter-spacing:.04em;text-transform:uppercase}
+.slide .duo .op.opc figcaption{background:var(--brand)}
+.slide .duo .op.dest figure{box-shadow:0 0 0 4px var(--brand)}
+.slide .duo .selo{position:absolute;top:14px;right:14px;z-index:1;background:#fff;color:var(--brand);font-size:13px;font-weight:800;padding:5px 12px;border-radius:99px;text-transform:uppercase;letter-spacing:.06em}
+.slide .duo h3{font-size:24px;line-height:1.2;color:var(--s-texto,#0c2440);margin-top:16px}
+.slide .duo .v{font-size:30px;font-weight:800;color:var(--brand);margin-top:8px}
+.slide .duo .s{font-size:16px;color:var(--s-suave,#5d6f84);margin-top:2px}
+.slide .duo .hoje h3{color:var(--s-suave,#5d6f84);font-size:20px}
+.slide.retrato{width:720px;height:1280px}
+.slide.retrato .t{font-size:40px}
+.slide.retrato .duo{grid-template-columns:1fr;grid-template-rows:1fr 1fr;gap:24px}
+.slide.retrato .duo .hoje{display:none}
+.slide.retrato .duo figure{height:330px}
+.slide .duo-nota{display:none}
+.slide.retrato .duo-nota{display:block;margin-top:16px;font-size:15px;color:var(--s-suave2,#8a99aa)}
 
 /* ---------- painel de aparência (identidade visual) ---------- */
 #painelMarca{position:fixed;inset:0;z-index:300;display:flex;justify-content:flex-end;background:rgba(21,23,25,.35)}
@@ -340,7 +360,7 @@
   const FONTES = ["Plus Jakarta Sans", "Montserrat", "Poppins", "Playfair Display", "Lora", "Nunito"];
   const SECOES = [
     ["paciente", "Paciente"], ["fotos", "Fotos intraorais"], ["antesDepois", "Antes e depois"],
-    ["exames", "Radiografias e exames"], ["odonto", "Odontograma"], ["propostas", "Propostas"]
+    ["exames", "Radiografias e exames"], ["odonto", "Odontograma"], ["propostas", "Propostas"], ["comparar", "Comparar duas opções"]
   ];
 
   /* ---------- utilidades ---------- */
@@ -590,7 +610,7 @@
     return {
       paciente: "", fotos: Object.keys(pac.fotos).length || "", antesDepois: pac.antesDepois.length || "",
       exames: pac.exames.length || "", odonto: Object.values(pac.dentes).filter(d => d.status && d.status !== "higido").length || "",
-      propostas: pac.propostas.length || ""
+      propostas: pac.propostas.length || "", comparar: comparacao() ? "✓" : ""
     };
   }
   function renderMenu() {
@@ -603,7 +623,7 @@
   function renderEditor() {
     renderMenu();
     $("secoes").innerHTML = SECOES.map(([id]) => `<section class="secao card" id="s-${id}"></section>`).join("");
-    renderPaciente(); renderFotos(); renderAntesDepois(); renderExames(); renderOdonto(); renderPropostas();
+    renderPaciente(); renderFotos(); renderAntesDepois(); renderExames(); renderOdonto(); renderPropostas(); renderComparar();
     $("salvo").textContent = "";
   }
 
@@ -740,6 +760,7 @@
       </div>`).join("")}
       <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn sm" id="addBA">+ Adicionar comparação</button><a class="btn sm" href="/simulador?paciente=${pac.id}">Criar no simulador de sorriso</a></div>`;
     s.querySelectorAll(".item").forEach(el => ligar(el, pac.antesDepois[el.dataset.i]));
+    renderComparar();                                  // a lista de simulações da comparação acompanha esta seção
     $("addBA").onclick = () => { pac.antesDepois.push({ id: DB.uid(), titulo: "", antes: "", depois: "" }); salvar(); renderAntesDepois(); };
     s.onclick = async e => {
       const it = e.target.closest(".item"); if (!it) return;
@@ -817,8 +838,46 @@
         <label style="display:flex;gap:8px;align-items:center;flex:0 0 auto;font-size:14px"><input type="checkbox" data-campo="destaque" ${x.destaque ? "checked" : ""}> Recomendada</label></div></div>`).join("")}
       <button class="btn sm" id="addProp" ${pac.propostas.length >= 3 ? "disabled" : ""}>+ Adicionar proposta</button>`;
     s.querySelectorAll(".item").forEach(el => ligar(el, pac.propostas[el.dataset.i]));
-    $("addProp").onclick = () => { pac.propostas.push({ id: DB.uid(), titulo: "", descricao: "", valor: "", sessoes: "", destaque: false }); salvar(); renderPropostas(); };
-    s.onclick = e => { const it = e.target.closest(".item"); if (it && e.target.closest("[data-del]")) { pac.propostas.splice(it.dataset.i, 1); salvar(); renderPropostas(); } };
+    $("addProp").onclick = () => { pac.propostas.push({ id: DB.uid(), titulo: "", descricao: "", valor: "", sessoes: "", destaque: false }); salvar(); renderPropostas(); renderComparar(); };
+    s.onclick = e => { const it = e.target.closest(".item"); if (it && e.target.closest("[data-del]")) { pac.propostas.splice(it.dataset.i, 1); salvar(); renderPropostas(); renderComparar(); } };
+    s.onchange = e => { if (e.target.dataset.campo === "titulo") renderComparar(); };   // o nome da proposta aparece na escolha da comparação
+  }
+
+  /* ---------- comparar duas opções (C1) ----------
+     pac.comparar = { a, b: id da simulação; pa, pb: id da proposta com valor e sessões (opcional) }.
+     Usa só simulações que já existem: não gera nada novo e não custa nada. */
+  const simsProntas = () => (pac.antesDepois || []).filter(b => b.antes && b.depois);
+  function comparacao() {
+    const c = pac.comparar; if (!c || !c.a || !c.b || c.a === c.b) return null;
+    const sims = simsProntas(), sa = sims.find(b => b.id === c.a), sb = sims.find(b => b.id === c.b);
+    if (!sa || !sb) return null;
+    const prop = id => (id && pac.propostas.find(x => x.id === id)) || null;
+    return [{ sim: sa, prop: prop(c.pa) }, { sim: sb, prop: prop(c.pb) }];
+  }
+  function renderComparar() {
+    const s = $("s-comparar"); if (!s) return;
+    const sims = simsProntas(), c = pac.comparar || {};
+    const nomeSim = (b, i) => b.titulo || `Simulação ${i + 1}`;
+    if (sims.length < 2) {
+      s.innerHTML = `<h2>Comparar duas opções</h2><p class="muted">Mostra duas simulações do paciente no mesmo slide, com título, valor e sessões de cada uma (ex.: lentes × clareamento). Faça pelo menos duas simulações para usar.</p>
+        <a class="btn sm" href="/simulador?paciente=${pac.id}">Fazer outra simulação</a>`;
+      return;
+    }
+    const lado = (k, pk, n) => `<div><label style="font-weight:700;font-size:14px">Opção ${n}</label>
+      <div class="f"><select class="in" data-c="${k}"><option value="">Escolha a simulação…</option>${sims.map((b, i) => `<option value="${b.id}" ${c[k] === b.id ? "selected" : ""}>${esc(nomeSim(b, i))}</option>`).join("")}</select></div>
+      <div class="f"><label>Valor e sessões de qual proposta?</label><select class="in" data-c="${pk}"><option value="">Nenhuma (só o título)</option>${pac.propostas.map((x, i) => `<option value="${x.id}" ${c[pk] === x.id ? "selected" : ""}>${esc(x.titulo || `Proposta ${i + 1}`)}${x.valor ? " · " + esc(moeda(x.valor)) : ""}</option>`).join("")}</select></div></div>`;
+    const igual = c.a && c.a === c.b;
+    s.innerHTML = `<h2>Comparar duas opções</h2><p class="muted">Duas simulações no mesmo slide, com título, valor e sessões de cada uma. O valor e as sessões vêm das propostas acima${pac.propostas.length ? "" : " (cadastre as propostas para mostrar valor e sessões)"}. Não gera simulação nova.</p>
+      <div class="par">${lado("a", "pa", 1)}${lado("b", "pb", 2)}</div>
+      ${igual ? `<p style="color:var(--bad);font-size:13px;margin-top:8px">Escolha duas simulações diferentes.</p>` : ""}
+      <p class="muted" style="font-size:13px;margin-top:8px">${comparacao() ? "✓ O slide de comparação entra antes das propostas, na apresentação e no PDF." : "Escolha as duas simulações para o slide aparecer."}</p>
+      ${c.a || c.b ? `<button class="btn sm danger" id="compLimpar" style="margin-top:6px">Tirar a comparação</button>` : ""}`;
+    s.onchange = e => {
+      const k = e.target.dataset.c; if (!k) return;
+      pac.comparar = Object.assign({}, pac.comparar, { [k]: e.target.value });
+      salvar(); renderComparar();
+    };
+    if ($("compLimpar")) $("compLimpar").onclick = () => { delete pac.comparar; salvar(); renderComparar(); };
   }
 
   /* ---------- painel de aparência ----------
@@ -1044,6 +1103,24 @@ Quer conhecer o plano Profissional?`)) window.open("https://pay.kiwify.com.br/M8
       <div class="odo-s">${arcadaHTML(DENTES.ORDEM_SUP, "sup")}<div class="linha-media"></div>${arcadaHTML(DENTES.ORDEM_INF, "inf")}</div>
       <div class="achados">${achados.slice(0, 12).map(([n, d]) => { const st = DENTES.status(d.status); return `<div><i style="background:${st.cor}"></i><span><b>${n}</b> · ${st.nome}${d.nota ? " — " + esc(d.nota) : ""}</span></div>`; }).join("")}</div>`));
 
+    /* duas opções lado a lado (C1): usa o close do sorriso quando a simulação tem */
+    const duas = comparacao();
+    if (duas) {
+      const perto = b => b.close && b.close.antes ? { ...b.close, foco: null } : { antes: b.antes, depois: b.depois, foco: b.tipo === "rosto" ? b.foco : null };
+      const pa = perto(duas[0].sim);
+      const hoje = await IA.enquadrar(pa.antes, 1, pa.foco, { margem: 1.3 });
+      const ops = await Promise.all(duas.map(async ({ sim, prop }, i) => {
+        const p = perto(sim), img = await IA.enquadrar(p.depois, 412 / 300, p.foco, { margem: 1.3 });
+        const titulo = (prop && prop.titulo) || sim.titulo || `Opção ${i + 1}`;
+        return `<div class="op opc ${prop && prop.destaque ? "dest" : ""}"><figure>${prop && prop.destaque ? `<span class="selo">Recomendada</span>` : ""}<img src="${img}" alt=""><figcaption>Opção ${i + 1}</figcaption></figure>
+          <h3>${esc(titulo)}</h3>${prop && prop.valor ? `<div class="v">${esc(moeda(prop.valor))}</div>` : ""}${prop && prop.sessoes ? `<div class="s">${esc(prop.sessoes)}</div>` : ""}</div>`;
+      }));
+      out.push(`<div class="slide duo-s">${cab()}<div class="corpo"><div class="k">Compare as opções</div><div class="t">Dois caminhos para <em>o seu sorriso</em></div>
+        <div class="duo"><div class="op hoje"><figure><img src="${hoje}" alt=""><figcaption>Hoje</figcaption></figure><h3>Seu sorriso hoje</h3>
+          <div class="s" style="margin-top:10px;font-size:13px">Simulações ilustrativas. O resultado final depende da avaliação clínica.</div></div>${ops.join("")}</div>
+        <div class="duo-nota">Simulações ilustrativas. O resultado final depende da avaliação clínica.</div></div>${rod()}</div>`);
+    }
+
     if (pac.propostas.length) out.push(sl("", `<div class="k">Propostas de tratamento</div><div class="t">Opções para <em>o seu sorriso</em></div>
       <div class="props" style="grid-template-columns:repeat(${pac.propostas.length},1fr)">${pac.propostas.map(x => `<div class="prop ${x.destaque ? "dest" : ""}">${x.destaque ? `<span class="selo">Recomendada</span>` : ""}
         <h3>${esc(x.titulo || "Proposta")}</h3><p>${esc(x.descricao)}</p>${x.valor ? `<div class="v">${esc(moeda(x.valor))}</div>` : ""}${x.sessoes ? `<div class="s">${esc(x.sessoes)}</div>` : ""}</div>`).join("")}</div>`));
@@ -1059,7 +1136,11 @@ Quer conhecer o plano Profissional?`)) window.open("https://pay.kiwify.com.br/M8
   function ajustarEscala() {
     const area = $("palcoArea"), s = area.querySelector(".slide");
     if (!s) return;
-    const k = Math.min(area.clientWidth / 1280, area.clientHeight / 720) * 0.96;
+    /* o slide de comparação fica empilhado (720×1280) com o celular em pé; os outros seguem 1280×720 */
+    if (s.classList.contains("duo-s")) s.classList.toggle("retrato", area.clientHeight > area.clientWidth * 1.2);
+    $("palco").classList.toggle("sem-dica", s.classList.contains("retrato"));   // não pede para girar o celular
+    const W = s.offsetWidth || 1280, H = s.offsetHeight || 720;
+    const k = Math.min(area.clientWidth / W, area.clientHeight / H) * 0.96;
     s.style.transform = `translate(-50%, -50%) scale(${k})`;
   }
   function mostrarSlide(i) {

@@ -17,6 +17,7 @@ App web para dentistas que simula o novo sorriso do paciente com IA e gera a apr
 4. **Apresentação** (`public/apresentacao.html`):
    - **Conteúdo:** as fotos e a simulação já entram no paciente, junto com exames, odontograma e propostas.
    - **Saída:** modo apresentação, PDF e identidade da clínica.
+   - **Comparar duas opções:** no editor, a seção "Comparar duas opções" escolhe duas simulações já feitas e, para cada uma, a proposta que dá o valor e as sessões. Vira um slide antes das propostas: "hoje" + opção 1 + opção 2 lado a lado no computador e no PDF, empilhado com o celular em pé. Não gera simulação nova, então não custa nada. Fica salvo no paciente em `comparar: { a, b, pa, pb }`.
 
 Os dados dos pacientes ficam guardados no navegador do aparelho (IndexedDB), separados por endereço. Na tela inicial, **Baixar backup** gera um arquivo `.json` com todos os pacientes (fotos incluídas) e as identidades visuais, e **Restaurar backup** traz esse arquivo para outro aparelho ou endereço sem apagar nada. O app lembra o dentista quando o último backup tem mais de 7 dias.
 
